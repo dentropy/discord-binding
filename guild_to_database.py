@@ -8,12 +8,12 @@ import json
 import numpy
 import sqlalchemy
 
-base_directory = "/home/paul/Projects/exports"
+base_directory = "/home/paul/Downloads/TheRoundTable/TheRoundTable"
 
 # Recursively find all JSON files in the directory and its subdirectories
 json_files = glob.glob(os.path.join(base_directory, '**/*.json'), recursive=True)
 
-engine = create_engine('sqlite:///your_database.db')
+engine = create_engine('sqlite:///TheRoundTable.db')
 # engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
 
 for json_file_path in json_files:
@@ -29,16 +29,21 @@ for json_file_path in json_files:
     reactions = []
     mentions = []
     with open(json_file_path, 'r') as json_file:
-        data = json.load(json_file)
+        try:
+            print(f"Processing {json_file}")
+            data = json.load(json_file)
+        except Exception as e:
+            continue
     guilds.append(data["guild"])
     data["channel"]["guild_id"] = data["guild"]["id"]
     channels.append(data["channel"])
     for message in data["messages"]:
-        if message["author"]["roles"] != []:
-            for role in message["author"]["roles"]:
-                role["user_id"] = message["author"]
-                roles.append(role)
-        del message["author"]["roles"]   
+        if "roles" in message["author"].keys():
+            if message["author"]["roles"] != []:
+                for role in message["author"]["roles"]:
+                    role["user_id"] = message["author"]
+                    roles.append(role)
+            del message["author"]["roles"]   
         authors[message["author"]["id"]] = message["author"]
         message["author"] = message["author"]["id"]
         if message["attachments"] != []:
@@ -59,13 +64,14 @@ for json_file_path in json_files:
             message["embeds"] = True
         else:
             message["embeds"] = False
-        if message["stickers"] != []:
-            for sticker in message["stickers"]:
-                sticker["message_id"] = message["id"]
-                stickers.append(sticker)
-            message["stickers"] = True
-        else:
-            message["stickers"] = False
+        if "stickers" in message.keys():
+            if message["stickers"] != []:
+                for sticker in message["stickers"]:
+                    sticker["message_id"] = message["id"]
+                    stickers.append(sticker)
+                message["stickers"] = True
+            else:
+                message["stickers"] = False
         if message["reactions"] != []:
             for reaction in message["reactions"]:
                 reaction["message_id"] = message["id"]

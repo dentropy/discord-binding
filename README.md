@@ -59,3 +59,11 @@ GROUP BY message_id
 order by message_id desc;
 
 ```
+
+## Total Number of Messages
+
+``` sql
+
+SELECT COUNT(*) FROM messages;
+
+```
