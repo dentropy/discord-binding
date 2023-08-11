@@ -1,3 +1,10 @@
+
+## Access Postgres
+
+``` bash
+docker exec -it postgres2 psql -U postgres
+```
+
 ## DROP TABLES
 
 ``` sql
@@ -51,12 +58,12 @@ ORDER BY LENGTH(content) DESC;
 
 ``` sql
 
-SELECT *
+SELECT count, content, name
 FROM reactions
 INNER JOIN messages ON messages.id = reactions.message_id
 INNER JOIN authors ON messages.author = authors.id
 GROUP BY message_id
-order by message_id desc;
+order by count desc;
 
 ```
 

@@ -2,3 +2,7 @@ postgres_db_1
 env/
 out.json
 *db
+__pycache__
+.ipynb_checkpoints
+*sqlite
+*.sqlite-journal

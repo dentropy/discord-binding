@@ -8,13 +8,13 @@ import json
 import numpy
 import sqlalchemy
 
-base_directory = "/home/paul/Downloads/TheRoundTable/TheRoundTable"
+base_directory = "/home/paul/Projects/DiscordScraping/Colony"
 
 # Recursively find all JSON files in the directory and its subdirectories
-json_files = glob.glob(os.path.join(base_directory, '**/*.json'), recursive=True)
+json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
 
-engine = create_engine('sqlite:///TheRoundTable.db')
-# engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
+engine = create_engine('sqlite:///Colony.db')
+engine = create_engine('postgresql://postgres:postgres@localhost:5432/postgres')
 
 for json_file_path in json_files:
     guilds = []
