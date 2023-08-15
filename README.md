@@ -74,3 +74,9 @@ order by count desc;
 SELECT COUNT(*) FROM messages;
 
 ```
+
+## Embeddings Stuff
+
+``` sql
+DROP TABLE cohere_embeddings_t;
+```
