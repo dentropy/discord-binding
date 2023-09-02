@@ -1,5 +1,6 @@
 postgres_db_1
 env/
+.env
 out.json
 *db
 __pycache__
@@ -7,4 +8,8 @@ __pycache__
 *sqlite
 *.sqlite-journal
 out*
+<<<<<<< HEAD
 .env
+=======
+OldData/
+>>>>>>> main
