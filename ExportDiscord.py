@@ -68,6 +68,7 @@ class ExportDiscord():
         data["channel"]["guild_id"] = data["guild"]["id"]
         root_dict["channels"].append(data["channel"])
         for message in data["messages"]:
+            message["channel_id"] = data["channel"]["id"]
             if "roles" in message["author"].keys():
                 if message["author"]["roles"] != []:
                     for role in message["author"]["roles"]:
