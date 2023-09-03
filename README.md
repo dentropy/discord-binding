@@ -74,15 +74,3 @@ order by count desc;
 SELECT COUNT(*) FROM messages;
 
 ```
-
-## Embeddings Stuff
-
-``` sql
-DROP TABLE cohere_embeddings_t;
-```
-
-## Vector Databases to Try
-
-* [qdrant/qdrant-client: Python client for Qdrant vector search engine](https://github.com/qdrant/qdrant-client)
-* [milvus-io/milvus: A cloud-native vector database, storage for next generation AI applications](https://github.com/milvus-io/milvus)
-* [marqo-ai/marqo: Vector search for humans.](https://github.com/marqo-ai/marqo)

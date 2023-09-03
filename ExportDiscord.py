@@ -106,6 +106,7 @@ class ExportDiscord():
             if message["reactions"] != []:
                 for reaction in message["reactions"]:
                     reaction["message_id"] = message["id"]
+                    reaction["channel_id"] = data["channel"]["id"]
                     root_dict["reactions"].append(reaction)
                 message["reactions"] = True
             else:
@@ -163,6 +164,7 @@ class ExportDiscord():
             self.create_raw_json_table("raw_" + tmp_table_name)
 
     def json_data_to_sql(self, guild_data):
+        print(f"Inserting\n {guild_data['channels']}\n\n")
         for tbd_table_name in guild_data.keys():
             for tbd_row in guild_data[tbd_table_name]:
                 retries = 0
@@ -171,8 +173,9 @@ class ExportDiscord():
                 while retries < max_retries:
                     try:
                         self.cur.execute( f'INSERT INTO raw_{tbd_table_name}_t (raw_json) VALUES (?)', (json.dumps(tbd_row),)).fetchall()
-                        self.con.commit()
-                        print(tbd_row)
+                        # Uncomment this if getting errors, will reduce memory required
+                        # self.con.commit()
+                        # print(tbd_row)
                         break
                     except sqlite3.OperationalError as e:
                         if "database is locked" in str(e):
@@ -182,6 +185,7 @@ class ExportDiscord():
                             raise
                 else:
                     raise Exception("Max retries exceeded")
+                self.con.commit()
 
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
