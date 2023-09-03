@@ -74,3 +74,7 @@ order by count desc;
 SELECT COUNT(*) FROM messages;
 
 ```
+
+## Helpers
+
+You can check if the SQLite database is being written to with `ls -lrt` a couple times in the directory of the database to see if it is increasing.
