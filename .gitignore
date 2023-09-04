@@ -9,3 +9,4 @@ __pycache__
 *.sqlite-journal
 out*
 OldData/
+*out
