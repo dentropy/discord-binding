@@ -106,6 +106,7 @@ class ExportDiscord():
             if message["reactions"] != []:
                 for reaction in message["reactions"]:
                     reaction["message_id"] = message["id"]
+                    reaction["author_id"] = message["author"]
                     reaction["channel_id"] = data["channel"]["id"]
                     root_dict["reactions"].append(reaction)
                 message["reactions"] = True
