@@ -125,7 +125,6 @@ class ExportDiscord():
             else:
                 message["reference"] = ""
             root_dict["messages"].append(message)
-            pprint(authors_dict)
             for author in authors_dict: 
                 root_dict["authors"].append(authors_dict[author])
         return root_dict
