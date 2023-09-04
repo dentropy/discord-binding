@@ -76,7 +76,7 @@ class ExportDiscord():
                         root_dict["roles"].append(role)
                 del message["author"]["roles"]   
             root_dict["authors"][message["author"]["id"]] = message["author"]
-            message["author"] = message["author"]["id"]
+            message["author"] = message["author"]
             if message["attachments"] != []:
                 for attachment in message["attachments"]:
                     attachment["message_id"] = message["id"]

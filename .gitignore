@@ -8,8 +8,5 @@ __pycache__
 *sqlite
 *.sqlite-journal
 out*
-<<<<<<< HEAD
-.env
-=======
 OldData/
->>>>>>> main
+*out
