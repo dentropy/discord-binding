@@ -12,6 +12,7 @@ import sqlite3
 # from sqlalchemy import distinct, desc
 import time
 import glob
+import copy
 
 class ExportDiscord():
     def __init__(self, sqlite_url="./discord_guild_export.sqlite"):
@@ -51,7 +52,8 @@ class ExportDiscord():
         root_dict["channels"] = []
         root_dict["messages"] = []
         # Parts of a message
-        root_dict["authors"] = {}
+        authors_dict = {}
+        root_dict["authors"] = []
         root_dict["roles"] = []
         root_dict["attachments"] = []
         root_dict["embeds"] = []
@@ -68,6 +70,7 @@ class ExportDiscord():
         data["channel"]["guild_id"] = data["guild"]["id"]
         root_dict["channels"].append(data["channel"])
         for message in data["messages"]:
+            authors_dict[message["author"]["id"]] = message["author"]
             message["channel_id"] = data["channel"]["id"]
             if "roles" in message["author"].keys():
                 if message["author"]["roles"] != []:
@@ -75,8 +78,6 @@ class ExportDiscord():
                         role["user_id"] = message["author"]
                         root_dict["roles"].append(role)
                 del message["author"]["roles"]   
-            root_dict["authors"][message["author"]["id"]] = message["author"]
-            message["author"] = message["author"]
             if message["attachments"] != []:
                 for attachment in message["attachments"]:
                     attachment["message_id"] = message["id"]
@@ -106,7 +107,7 @@ class ExportDiscord():
             if message["reactions"] != []:
                 for reaction in message["reactions"]:
                     reaction["message_id"] = message["id"]
-                    reaction["author_id"] = message["author"]
+                    reaction["author_id"] = message["author"]["id"]
                     reaction["channel_id"] = data["channel"]["id"]
                     root_dict["reactions"].append(reaction)
                 message["reactions"] = True
@@ -124,6 +125,9 @@ class ExportDiscord():
             else:
                 message["reference"] = ""
             root_dict["messages"].append(message)
+            pprint(authors_dict)
+            for author in authors_dict: 
+                root_dict["authors"].append(authors_dict[author])
         return root_dict
 
     def create_raw_json_table(self, table_name):

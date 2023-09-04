@@ -9,7 +9,7 @@ if not os.path.exists(directory_name):
 else:
     print(f"Directory '{directory_name}' already exists in the current working directory.")
 
-path = "/home/paul/Projects/DiscordScraping/Processed"
+path = os.environ.get("guild_directory_path")
 directories = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 for directory in directories:
   # print(os.getcwd() + f"/out/{directory}_discord_guild.sqlite")

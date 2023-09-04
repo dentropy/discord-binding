@@ -1,5 +1,9 @@
 from ExportDiscord import ExportDiscord
 import os
-ex_dis = ExportDiscord(os.getcwd() + "/Arbitrum2.sqlite")
+from dotenv import load_dotenv
+load_dotenv()
+guild_path = os.environ.get("guild_path")
+db_name = guild_path.split("/")[-1]
+ex_dis = ExportDiscord(os.getcwd() + f"/{db_name}.sqlite")
 ex_dis.create_raw_json_tables()
-ex_dis.process_json_files("/home/paul/Projects/DiscordScraping/Processed/Arbitrum")
+ex_dis.process_json_files(guild_path)
