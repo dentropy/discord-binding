@@ -15,6 +15,9 @@ path = str(  os.environ.get("guild_directory_path")  )
 directories = [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 for directory in directories:
   print(os.getcwd() + f"/out/{directory}_discord_guild.sqlite")
-  ex_dis = ExportDiscord(os.getcwd() + f"/out/{directory}_discord_guild.sqlite")
+  ex_dis = ExportDiscord(
+    "sqlite",
+    os.getcwd() + f"/out/{directory}_discord_guild.sqlite"
+  )
   ex_dis.create_raw_json_tables()
   ex_dis.process_json_files(path + "/" + directory)

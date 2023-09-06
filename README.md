@@ -81,6 +81,14 @@ You can check if the SQLite database is being written to with `ls -lrt` a couple
 
 ## Postgres Test
 
+``` bash
+wget https://gist.githubusercontent.com/dentropy/e408f86de7261a516af9bb43234ae343/raw/b7c1373bff0152fc59c246e8af0a7f7d48bc340b/postgres2.yml
+docker-compose -f postgres2.yml up -d
+docker-compose -f postgres2.yml logs -f
+
+psql postgresql://postgres:postgres@127.0.0.1:5432/postgres
+```
+
 * To make work with postgres
   * Check ExportDiscord to make sure the postgres_query's are being run rather than sqlite_query
   * 
