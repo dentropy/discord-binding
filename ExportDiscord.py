@@ -134,6 +134,7 @@ class ExportDiscord():
                 message["reference"] = json.dumps(message["reference"])
             else:
                 message["reference"] = ""
+            message["author"] = message["author"]["id"]
             root_dict["messages"].append(message)
         for author in authors_dict.values(): 
             root_dict["authors"].append(author)
