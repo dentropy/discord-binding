@@ -10,3 +10,5 @@ __pycache__
 out*
 OldData/
 *out
+postgres_db_1
+postgres2.yml

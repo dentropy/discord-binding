@@ -1,4 +1,5 @@
 from string import Template
+import psycopg2
 import subprocess
 import json
 from glob import glob
@@ -15,7 +16,11 @@ import glob
 import copy
 
 class ExportDiscord():
-    def __init__(self, sqlite_url="./discord_guild_export.sqlite"):
+    def __init__(
+        self, 
+        db_select="sqlite",
+        db_url="./discord_guild_export.sqlite"
+    ):
         """Initialize the ExportKeybase object."""
         # self.extractor = URLExtract()
         # Make folders if they do not exist
@@ -26,9 +31,13 @@ class ExportDiscord():
         # files_in_dir = []
         # for path in paths_in_dir:
         #    files_in_dir.append( path.split("/")[-1] )
-        self.sqlite_url = sqlite_url
-        print(self.sqlite_url)
-        self.con = sqlite3.connect(self.sqlite_url)
+        self.db_url = db_url
+        print(self.db_url)
+        self.db_select = db_select
+        if(db_select == "sqlite"):
+            self.con = sqlite3.connect(self.db_url)
+        elif(db_select == "postgres"):
+            self.con = psycopg2.connect(dsn=db_url)
         self.cur = self.con.cursor()
 
     def execute_with_retry(self, query, params=None, max_retries=3, retry_delay=0.1):
@@ -47,6 +56,7 @@ class ExportDiscord():
             raise Exception("Max retries exceeded")
 
     def process_discord_json(self, json_file_path):
+        print(f"Running process_discord_json")
         root_dict = {}
         root_dict["guilds"] = []
         root_dict["channels"] = []
@@ -125,23 +135,35 @@ class ExportDiscord():
             else:
                 message["reference"] = ""
             root_dict["messages"].append(message)
-            for author in authors_dict: 
-                root_dict["authors"].append(authors_dict[author])
+        for author in authors_dict.values(): 
+            root_dict["authors"].append(author)
+        print(f"Done Running process_discord_json")
         return root_dict
 
     def create_raw_json_table(self, table_name):
-        query = f'''
+        sqlite_query = f'''
             CREATE TABLE IF NOT EXISTS {table_name}_t (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 raw_json JSON
             )
         '''
+        postgres_query = f'''
+            CREATE TABLE IF NOT EXISTS {table_name}_t (
+                id serial PRIMARY KEY,
+                raw_json JSON
+            )
+        '''
+        if (self.db_select == "sqlite"):
+            query = sqlite_query
+        elif (self.db_select == "postgres"):
+            query = postgres_query
         print(query)
         retries = 0
         retry_delay=0.3
         while retries < 3:
             try:
-                self.cur.execute(query).fetchall()
+                self.cur.execute(query)# .fetchall()
+                # self.cur.fetchall()
             except sqlite3.OperationalError as e:
                 if "database is locked" in str(e):
                     retries += 1
@@ -168,15 +190,27 @@ class ExportDiscord():
             self.create_raw_json_table("raw_" + tmp_table_name)
 
     def json_data_to_sql(self, guild_data):
-        print(f"Inserting\n {guild_data['channels']}\n\n")
+        print(f"json_data_to_sql Inserting\n {guild_data['channels']}\n\n")
         for tbd_table_name in guild_data.keys():
+            print(f"tbd_table_name = {tbd_table_name}")
+            print( len( guild_data[tbd_table_name] )  )
             for tbd_row in guild_data[tbd_table_name]:
                 retries = 0
                 max_retries = 3
                 retry_delay = 0.3
                 while retries < max_retries:
                     try:
-                        self.cur.execute( f'INSERT INTO raw_{tbd_table_name}_t (raw_json) VALUES (?)', (json.dumps(tbd_row),)).fetchall()
+                        postgres_insert_query = f"""
+                            INSERT INTO raw_{tbd_table_name}_t (raw_json) VALUES (%s)
+                        """
+                        sqlite_insert_query = f"""
+                            INSERT OR IGNORE INTO raw_{tbd_table_name}_t (raw_json) VALUES (?)
+                        """
+                        if (self.db_select == "sqlite"):
+                            query = sqlite_insert_query
+                        elif (self.db_select == "postgres"):
+                            query = postgres_insert_query
+                        self.cur.execute(query , (json.dumps(tbd_row), ))# .fetchall()
                         # Uncomment this if getting errors, will reduce memory required
                         # self.con.commit()
                         # print(tbd_row)

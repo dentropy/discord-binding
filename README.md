@@ -78,3 +78,9 @@ SELECT COUNT(*) FROM messages;
 ## Helpers
 
 You can check if the SQLite database is being written to with `ls -lrt` a couple times in the directory of the database to see if it is increasing.
+
+## Postgres Test
+
+* To make work with postgres
+  * Check ExportDiscord to make sure the postgres_query's are being run rather than sqlite_query
+  * 
