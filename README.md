@@ -88,7 +88,3 @@ docker-compose -f postgres2.yml logs -f
 
 psql postgresql://postgres:postgres@127.0.0.1:5432/postgres
 ```
-
-* To make work with postgres
-  * Check ExportDiscord to make sure the postgres_query's are being run rather than sqlite_query
-  * 
