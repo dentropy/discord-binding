@@ -14,7 +14,7 @@ describe('Connection test', async function () {
       body: JSON.stringify(requestData)
     }
     let response : any= await fetch("http://localhost:3000/QUERY", requestOptions)
-    response = await response.text()
-    console.log(response)
+    response = await response.json()
+    console.log(  JSON.stringify(response, null, 2)  )
   })
 })
