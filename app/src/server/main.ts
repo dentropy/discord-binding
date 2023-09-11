@@ -19,13 +19,11 @@ app.get("/hello", (_, res) => {
 
 app.post("/QUERY", async (req, res) => {
   // console.log(req.body)
-  let resJSON = await perform_query({ guild_path : process.env.guild_directory_path})
+  let resJSON = await perform_query(guild_id_to_path, req.body)
   // let resJSON : any = req.body
   // resJSON.resolved = true
 
-  res.json({
-    resJSON
-  });
+  res.json(resJSON);
 });
 
 app.post("/QUERY2", async (req, res) => {
