@@ -12,3 +12,5 @@ OldData/
 *out
 postgres_db_1
 postgres2.yml
+DiscordScraping*
+logs*
