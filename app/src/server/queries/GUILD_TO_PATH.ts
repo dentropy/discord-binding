@@ -1,4 +1,4 @@
-import { glob, GlobOptions } from 'glob';
+import { glob } from 'glob';
 import sqlite from 'better-sqlite3';
 
 function addSlashIfNotPresent(inputString : string) {
@@ -9,8 +9,8 @@ function addSlashIfNotPresent(inputString : string) {
   }
 }
 
-export async function LIST_GUILD(guild_path : string){
-    console.log("RUNNING LIST_GUILD")
+export async function GUILD_TO_PATH(guild_path : string){
+    console.log("LIST_GUILD")
     guild_path = addSlashIfNotPresent(guild_path)
     guild_path += "*"
     let file_list : any = await glob(guild_path + "*", {nodir : true})
@@ -22,7 +22,8 @@ export async function LIST_GUILD(guild_path : string){
             raw_guilds_t
         LIMIT 1
     `
-    let guilds_listed : any= []
+    let guild_to_path : any = {}
+    guild_to_path.LIST_GUILDS = []
     // for(var i = 0; i < file_list.length; i++){
     //   // console.log("sqlite_path")
     //   // console.log(file_list[i])
@@ -39,7 +40,8 @@ export async function LIST_GUILD(guild_path : string){
         let result : any  = await db.prepare(query).all();
         await db.close()
         // console.log(result)
-        guilds_listed.push(result[0])
+        guild_to_path[result[0].guild_id] = sqlite_path
+        guild_to_path.LIST_GUILDS.push(result[0])
     });
-    return guilds_listed
+    return guild_to_path
 }
