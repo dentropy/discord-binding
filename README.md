@@ -75,6 +75,91 @@ SELECT COUNT(*) FROM messages;
 
 ```
 
+## Get all the json key's from a raw_json column
+
+``` sql
+
+SELECT DISTINCT json_tree.key as keyname
+FROM raw_messages_t
+JOIN json_tree(raw_messages_t.raw_json) ON 1
+ORDER BY keyname ASC;
+
+SELECT
+    json_extract(raw_json, '$.interaction') as interaction
+FROM raw_messages_t
+WHERE interaction IS NOT NULL;
+
+
+CREATE TABLE messages_t (
+  id INT PRIMARY KEY,
+  attachments BOOLEAN,
+  author INT,
+  channel_id INT,
+  content TEXT,
+  interaction JSON,
+  isBot BOOLEAN,
+  isPinned BOOLEAN,
+  mentions BOOLEAN,
+  msg_type VARCHAR
+)
+
+SELECT
+  json_extract(raw_json, '$.id') as id,
+  json_extract(raw_json, '$.attachments') as attachments,
+  json_extract(raw_json, '$.author') as author,
+  json_extract(raw_json, '$.channel_id') as channel_id,
+  json_extract(raw_json, '$.content') as content,
+  json_extract(raw_json, '$.interaction') as interaction,
+  json_extract(raw_json, '$.isBot') as isBot,
+  json_extract(raw_json, '$.isPinned') as isPinned,
+  json_extract(raw_json, '$.mentions') as mentions,
+  json_extract(raw_json, '$.type') as msg_type
+FROM
+  raw_messages_t
+LIMIT 5;
+
+CREATE TABLE messages_t AS
+SELECT
+  json_extract(raw_json, '$.id') as id,
+  json_extract(raw_json, '$.attachments') as attachments,
+  json_extract(raw_json, '$.author') as author,
+  json_extract(raw_json, '$.channel_id') as channel_id,
+  json_extract(raw_json, '$.content') as content,
+  json_extract(raw_json, '$.interaction') as interaction,
+  json_extract(raw_json, '$.isBot') as isBot,
+  json_extract(raw_json, '$.isPinned') as isPinned,
+  json_extract(raw_json, '$.mentions') as mentions,
+  json_extract(raw_json, '$.type') as msg_type
+FROM
+  raw_messages_t;
+
+CREATE TABLE channels_t AS
+SELECT
+  json_extract(raw_json, '$.id') as id,
+  json_extract(raw_json, '$.name') as channel_name,
+  json_extract(raw_json, '$.type') as channel_type,
+  json_extract(raw_json, '$.categoryId') as categoryId,
+  json_extract(raw_json, '$.category') as category,
+  json_extract(raw_json, '$.guild_id') as guild_id,
+  json_extract(raw_json, '$.topic') as topic
+FROM
+  raw_channels_t;
+
+#TODO
+
+Guilds
+Roles
+Attachments
+
+
+
+
+```
+
+## New Table
+
+
+
 ## Helpers
 
 You can check if the SQLite database is being written to with `ls -lrt` a couple times in the directory of the database to see if it is increasing.
