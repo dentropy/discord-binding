@@ -88,7 +88,9 @@ SELECT
     json_extract(raw_json, '$.interaction') as interaction
 FROM raw_messages_t
 WHERE interaction IS NOT NULL;
+```
 
+``` sql
 
 CREATE TABLE messages_t (
   id INT PRIMARY KEY,
@@ -118,7 +120,11 @@ FROM
   raw_messages_t
 LIMIT 5;
 
-CREATE TABLE messages_t AS
+```
+
+``` sql
+
+CREATE TABLE IF NOT EXISTS messages_t AS
 SELECT
   json_extract(raw_json, '$.id') as id,
   json_extract(raw_json, '$.attachments') as attachments,
@@ -133,7 +139,7 @@ SELECT
 FROM
   raw_messages_t;
 
-CREATE TABLE channels_t AS
+CREATE TABLE IF NOT EXISTS channels_t AS
 SELECT
   json_extract(raw_json, '$.id') as id,
   json_extract(raw_json, '$.name') as channel_name,
@@ -145,14 +151,29 @@ SELECT
 FROM
   raw_channels_t;
 
-#TODO
+CREATE TABLE IF NOT EXISTS guilds_t AS
+SELECT
+  json_extract(raw_json, '$.id') as guild_id,
+  json_extract(raw_json, '$.name') as guild_name,
+  json_extract(raw_json, '$.iconUrl') as iconUrl
+FROM raw_guilds_t;
 
-Guilds
-Roles
-Attachments
+CREATE TABLE IF NOT EXISTS roles_t AS
+SELECT
+  DISTINCT(json_extract(raw_json, '$.id')) as role_id,
+  json_extract(raw_json, '$.role_name') as role_name,
+  json_extract(raw_json, '$.color') as color,
+  json_extract(raw_json, '$.position') as position
+FROM raw_roles_t;
 
-
-
+CREATE TABLE IF NOT EXISTS attachments_t AS
+SELECT
+  DISTINCT(json_extract(raw_json, '$.id')) as attachment_id,
+  json_extract(raw_json, '$.attachment_url') as attachment_url,
+  json_extract(raw_json, '$.fileName') as attachment_filename,
+  json_extract(raw_json, '$.fileSizeBytes') as fileSizeBytes,
+  json_extract(raw_json, '$.message_id') as message_id
+FROM raw_attachments_t;
 
 ```
 
