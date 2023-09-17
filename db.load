@@ -1,5 +1,5 @@
 load database
-     from sqlite:///home/discord-binding/dev.db
+     from sqlite:///home/paul/Projects/discord-binding/out/FusionTrading_discord_guild.sqlite
      into postgresql://postgres:postgres@127.0.0.1:5432/test04
 
  with include drop, create tables, create indexes, reset sequences, prefetch rows = 10000, batch rows = 10000

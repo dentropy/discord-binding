@@ -206,3 +206,49 @@ cd GraphQL
 npx prisma db pull
 npx prisma generate
 ```
+
+## Postgres Fix Schema
+
+``` SQL
+ALTER TABLE channels_t
+  ADD CONSTRAINT channels_t_guild_id_to_guilds_t
+  FOREIGN KEY (guild_id)
+  REFERENCES guilds_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON channels_t (guild_id);
+
+
+ALTER TABLE messages_t
+  ADD CONSTRAINT message_id_to_channel_id
+  FOREIGN KEY (channel_id)
+  REFERENCES channels_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON messages_t (channel_id);
+
+
+ALTER TABLE attachments_t
+  ADD CONSTRAINT attachment_id_to_message_id
+  FOREIGN KEY (message_id)
+  REFERENCES messages_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON attachments_t (message_id);
+
+```
+
+## TODO
+
+Seems like we may need to fix the Export Procedure.
+
+Indexes in author_t should reference guild
+Primary Key for author_t should reference guild as well as author_id
+We should have a simple_authors_t that has the unique authors and another for the authors with metadata
+We need a script to import multiple sqlite files and put the real database data into temporary tables
+
+``` sql
+ALTER TABLE messages_t
+  ADD CONSTRAINT message_id_to_author_id
+  FOREIGN KEY (author)
+  REFERENCES authors_t(author_id)
+  ON DELETE CASCADE;
+CREATE INDEX ON messages_t(author);
+```
