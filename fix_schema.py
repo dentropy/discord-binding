@@ -79,8 +79,8 @@ CREATE TABLE IF NOT EXISTS messages_t (
   isPinned     BOOLEAN,
   mentions     BOOLEAN,
   msg_type     TEXT,
-  timestamp    DATETIME,
-  timestampEdited DATETIME,
+  timestamp    INT,
+  timestampEdited INT,
   content_length INT
 )
 """,

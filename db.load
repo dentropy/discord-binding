@@ -1,0 +1,7 @@
+load database
+     from sqlite:///home/discord-binding/dev.db
+     into postgresql://postgres:postgres@127.0.0.1:5432/test04
+
+ with include drop, create tables, create indexes, reset sequences, prefetch rows = 10000, batch rows = 10000
+
+  set work_mem to '2046MB', maintenance_work_mem to '512 MB';
