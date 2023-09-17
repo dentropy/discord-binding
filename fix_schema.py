@@ -1,4 +1,8 @@
 import sqlite3
+import sys
+if len(sys.argv) != 2:
+    print("Usage: python script.py <argument>")
+    sys.exit(1)
 
 queries = ["""
 CREATE TABLE IF NOT EXISTS messages_t AS
@@ -64,6 +68,7 @@ FROM raw_attachments_t;
 table_type_queries = [
 """
 CREATE TABLE IF NOT EXISTS messages_t (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   message_id   TEXT,
   attachments  TEXT,
   author       TEXT,
@@ -100,6 +105,7 @@ FROM
 
 """
 CREATE TABLE IF NOT EXISTS channels_t (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   channel_id    TEXT,
   channel_name  TEXT,
   channel_type  TEXT,
@@ -127,6 +133,7 @@ FROM
 
 """
 CREATE TABLE IF NOT EXISTS guilds_t (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   guild_id    TEXT,
   guild_name  TEXT,
   iconUrl     TEXT
@@ -144,6 +151,7 @@ FROM raw_guilds_t;
 
 """
 CREATE TABLE IF NOT EXISTS attachments_t (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   attachment_id TEXT,
   attachment_url TEXT,
   attachment_filename TEXT,
@@ -165,6 +173,7 @@ FROM raw_attachments_t;
 
 """
 CREATE TABLE IF NOT EXISTS roles_t (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
   role_id TEXT,
   role_name TEXT,
   color TEXT,
@@ -184,8 +193,8 @@ FROM raw_roles_t;
 
 ]
 
-print("Don't forget to update path to database in this file, I will add CLI arguments for this later")
-sqlite3_connection = sqlite3.connect("./test.db")
+
+sqlite3_connection = sqlite3.connect(sys.argv[1])
 sqlite3_cursor = sqlite3_connection.cursor()
 for query in table_type_queries:
   print(query)
