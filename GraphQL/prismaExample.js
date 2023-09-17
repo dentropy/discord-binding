@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-  const channels = await prisma.attachments_t.findMany()
+  const channels = await prisma.channels_t.findMany()
   console.log(channels)
 
 }
