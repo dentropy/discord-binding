@@ -200,8 +200,8 @@ psql postgresql://postgres:postgres@127.0.0.1:5432/postgres
 ``` bash
 cp ./out/GUILD.sqlite dev.db
 python3 fix_schema dev.db
-cp dev.db GraphQl/prisma
-cd GraphQl
+cp dev.db GraphQL/prisma
+cd GraphQL
 npx prisma db pull
 npx prisma generate
 ```

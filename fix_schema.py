@@ -189,6 +189,30 @@ SELECT
   json_extract(raw_json, '$.color') as color,
   json_extract(raw_json, '$.position') as position
 FROM raw_roles_t;
+""",
+
+"""
+CREATE TABLE IF NOT EXISTS authors_t (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  author_id    TEXT,
+  name         TEXT,
+  nickname     INTEGER,
+  color        TEXT,
+  isBot        BOOLEAN,
+  avatarUrl    TEXT
+)
+""",
+
+"""
+INSERT INTO authors_t (author_id, name, nickname, color, isBot, avatarUrl)
+SELECT
+  DISTINCT(json_extract(raw_json, '$.id')) as author_id,
+  json_extract(raw_json, '$.name') as name,
+  json_extract(raw_json, '$.nickname') as nickname,
+  json_extract(raw_json, '$.color') as color,
+  json_extract(raw_json, '$.isBot') as isBot,
+  json_extract(raw_json, '$.avatarUrl') as avatarUrl
+FROM raw_roles_t;
 """
 
 ]

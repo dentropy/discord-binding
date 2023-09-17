@@ -78,6 +78,22 @@ const resolvers = {
       const query_result = await prisma_table.findMany()
       return query_result
     },
+    async author(_, { orderBy }) {
+      let prisma_table = prisma.authors_t
+      if(orderBy){
+        let query_input = {
+          orderBy: [
+            {
+              [orderBy.field] : orderBy.direction
+            }
+          ]
+        }
+        const query_result = await prisma_table.findMany(query_input)
+        return query_result
+      }
+      const query_result = await prisma_table.findMany()
+      return query_result
+    },
   }
   // Channel : {
   //   async channels() {

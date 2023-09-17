@@ -13,6 +13,10 @@ enum OrderByChannelField {
   	attachment_filename
   	fileSizeBytes
   }
+  enum OrderByAuthorField {
+  	name
+  	nickname
+  }
   enum OrderByDirection {
     asc
     desc
@@ -33,12 +37,17 @@ enum OrderByChannelField {
     field: OrderByAttachmentField!
     direction: OrderByDirection!
   }
+  input OrderByAuthorInput {
+    field: OrderByAuthorField!
+    direction: OrderByDirection!
+  }
 
   type Query {
     channel(orderBy: OrderByChannelInput): [Channel]
     guild(orderBy: OrderByGuildInput): [Guild]
     message(orderBy: OrderByMessageInput): [Message],
     attachment(orderBy: OrderByAttachmentInput): [Attachment]
+    author(orderBy: OrderByAuthorInput): [Author]
   }
   
 
@@ -90,5 +99,15 @@ enum OrderByChannelField {
     attachment_filename: String,
     fileSizeBytes:       Int,
     message_id:          String
+  }
+
+  type Author {
+    id:        Int!,
+    author_id: String,
+    name:      String,
+    nickname:  String,
+    color:     String,
+    isBot:     Boolean,
+    avatarUrl: String
   }
 `
