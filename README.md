@@ -194,3 +194,14 @@ docker-compose -f postgres2.yml logs -f
 
 psql postgresql://postgres:postgres@127.0.0.1:5432/postgres
 ```
+
+## Prisma Setup
+
+``` bash
+cp ./out/GUILD.sqlite dev.db
+python3 fix_schema dev.db
+cp dev.db GraphQl/prisma
+cd GraphQl
+npx prisma db pull
+npx prisma generate
+```
