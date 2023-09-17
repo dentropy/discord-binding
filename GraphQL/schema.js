@@ -1,4 +1,47 @@
 export const typeDefs = `#graphql
+
+enum OrderByChannelField {
+    channel_name
+  }
+  enum OrderByGuildField {
+    guild_name
+  }
+  enum OrderByMessageField {
+    timestamp
+  }
+  enum OrderByAttachmentField {
+  	attachment_filename
+  	fileSizeBytes
+  }
+  enum OrderByDirection {
+    asc
+    desc
+  }
+  input OrderByChannelInput {
+    field: OrderByChannelField!
+    direction: OrderByDirection!
+  }
+  input OrderByGuildInput {
+    field: OrderByGuildField!
+    direction: OrderByDirection!
+  }
+  input OrderByMessageInput {
+    field: OrderByMessageField!
+    direction: OrderByDirection!
+  }
+  input OrderByAttachmentInput {
+    field: OrderByAttachmentField!
+    direction: OrderByDirection!
+  }
+
+  type Query {
+    channel(orderBy: OrderByChannelInput): [Channel]
+    guild(orderBy: OrderByGuildInput): [Guild]
+    message(orderBy: OrderByMessageInput): [Message],
+    attachment(orderBy: OrderByAttachmentInput): [Attachment]
+  }
+  
+
   type Query {
     channel: [Channel]
     guild: [Guild]

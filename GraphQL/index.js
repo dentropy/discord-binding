@@ -9,20 +9,73 @@ import { typeDefs } from './schema.js'
 // resolvers
 const resolvers = {
   Query: {
-    async channel() {
-      const query_result = await prisma.channels_t.findMany()
+    async channel(_, { orderBy }) {
+      let prisma_table = prisma.channels_t
+      if(orderBy){
+        let query_input = {
+          orderBy: [
+            {
+              [orderBy.field] : orderBy.direction
+            }
+          ]
+        }
+        const query_result = await prisma_table.findMany(query_input)
+        return query_result
+      }
+      const query_result = await prisma_table.findMany()
       return query_result
     },
-    async guild() {
-      const query_result = await prisma.guilds_t.findMany()
+    async guild(_, { orderBy }) {
+      let prisma_table = prisma.guilds_t
+      if(orderBy){
+        let query_input = {
+          orderBy: [
+            {
+              [orderBy.field] : orderBy.direction
+            }
+          ],
+          where: {},
+          distinct: ['guild_id'],
+        }
+        const query_result = await prisma_table.findMany(query_input)
+        return query_result
+      }
+      const query_result = await prisma_table.findMany({
+        where: {},
+        distinct: ['guild_id'],
+      })
       return query_result
     },
-    async message() {
-      const query_result = await prisma.messages_t.findMany()
+    async message(_, { orderBy }) {
+      let prisma_table = prisma.messages_t
+      if(orderBy){
+        let query_input = {
+          orderBy: [
+            {
+              [orderBy.field] : orderBy.direction
+            }
+          ]
+        }
+        const query_result = await prisma_table.findMany(query_input)
+        return query_result
+      }
+      const query_result = await prisma_table.findMany()
       return query_result
     },
-    async attachment() {
-      const query_result = await prisma.attachments_t.findMany()
+    async attachment(_, { orderBy }) {
+      let prisma_table = prisma.attachments_t
+      if(orderBy){
+        let query_input = {
+          orderBy: [
+            {
+              [orderBy.field] : orderBy.direction
+            }
+          ]
+        }
+        const query_result = await prisma_table.findMany(query_input)
+        return query_result
+      }
+      const query_result = await prisma_table.findMany()
       return query_result
     },
   }
