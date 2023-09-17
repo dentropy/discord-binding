@@ -80,12 +80,13 @@ CREATE TABLE IF NOT EXISTS messages_t (
   mentions     BOOLEAN,
   msg_type     TEXT,
   timestamp    DATETIME,
-  timestampEdited DATETIME
+  timestampEdited DATETIME,
+  content_length INT
 )
 """,
 
 """
-INSERT INTO messages_t (message_id, attachments, author, channel_id, content, interaction, isBot, isPinned, mentions, msg_type, timestamp, timestampEdited)
+INSERT INTO messages_t (message_id, attachments, author, channel_id, content, interaction, isBot, isPinned, mentions, msg_type, timestamp, timestampEdited, content_length)
 SELECT
   json_extract(raw_json, '$.id') as message_id,
   json_extract(raw_json, '$.attachments') as attachments,
@@ -98,7 +99,8 @@ SELECT
   json_extract(raw_json, '$.mentions') as mentions,
   json_extract(raw_json, '$.type') as msg_type,
   strftime('%s', json_extract(raw_json, '$.timestamp')) as timestamp,
-  strftime('%s', json_extract(raw_json, '$.timestampEdited')) as timestampEdited
+  strftime('%s', json_extract(raw_json, '$.timestampEdited')) as timestampEdited,
+  LENGTH(json_extract(raw_json, '$.content')) as content_length
 FROM
   raw_messages_t;
 """,
@@ -112,13 +114,14 @@ CREATE TABLE IF NOT EXISTS channels_t (
   categoryId    TEXT,
   category      TEXT,
   guild_id      TEXT,
-  topic         TEXT
+  topic         TEXT,
+  channel_name_length INT
 )
 """,
 
 
 """
-INSERT INTO channels_t (channel_id, channel_name, channel_type, categoryId, category, guild_id, topic)
+INSERT INTO channels_t (channel_id, channel_name, channel_type, categoryId, category, guild_id, topic, channel_name_length)
 SELECT
   json_extract(raw_json, '$.id') as channel_id,
   json_extract(raw_json, '$.name') as channel_name,
@@ -126,7 +129,8 @@ SELECT
   json_extract(raw_json, '$.categoryId') as categoryId,
   json_extract(raw_json, '$.category') as category,
   json_extract(raw_json, '$.guild_id') as guild_id,
-  json_extract(raw_json, '$.topic') as topic
+  json_extract(raw_json, '$.topic') as topic,
+  LENGTH(json_extract(raw_json, '$.name')) as channel_name_length
 FROM
   raw_channels_t;
 """,
@@ -196,7 +200,7 @@ CREATE TABLE IF NOT EXISTS authors_t (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   author_id    TEXT,
   name         TEXT,
-  nickname     INTEGER,
+  nickname     TEXT,
   color        TEXT,
   isBot        BOOLEAN,
   avatarUrl    TEXT
@@ -212,7 +216,7 @@ SELECT
   json_extract(raw_json, '$.color') as color,
   json_extract(raw_json, '$.isBot') as isBot,
   json_extract(raw_json, '$.avatarUrl') as avatarUrl
-FROM raw_roles_t;
+FROM raw_authors_t;
 """
 
 ]
