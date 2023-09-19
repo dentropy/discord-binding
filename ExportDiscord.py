@@ -80,6 +80,7 @@ class ExportDiscord():
         data["channel"]["guild_id"] = data["guild"]["id"]
         root_dict["channels"].append(data["channel"])
         for message in data["messages"]:
+            message["author_id"] = message["author"]["id"] + "-" + data["guild"]["id"] 
             authors_dict[message["author"]["id"]] = message["author"]
             message["channel_id"] = data["channel"]["id"]
             if "roles" in message["author"].keys():
@@ -117,7 +118,7 @@ class ExportDiscord():
             if message["reactions"] != []:
                 for reaction in message["reactions"]:
                     reaction["message_id"] = message["id"]
-                    reaction["author_id"] = message["author"]["id"]
+                    reaction["author_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
                     reaction["channel_id"] = data["channel"]["id"]
                     root_dict["reactions"].append(reaction)
                 message["reactions"] = True
@@ -137,6 +138,10 @@ class ExportDiscord():
             message["author"] = message["author"]["id"]
             root_dict["messages"].append(message)
         for author in authors_dict.values(): 
+            tmp_author = author
+            tmp_author["guild_id"] = data["guild"]["id"] 
+            tmp_author["author_id"] = tmp_author["id"]
+            tmp_author["id"] = tmp_author["id"] + "-" + data["guild"]["id"] 
             root_dict["authors"].append(author)
         print(f"Done Running process_discord_json")
         return root_dict
@@ -158,7 +163,7 @@ class ExportDiscord():
             query = sqlite_query
         elif (self.db_select == "postgres"):
             query = postgres_query
-        print(query)
+        # print(query)
         retries = 0
         retry_delay=0.3
         while retries < 3:
