@@ -1,0 +1,25 @@
+{
+  "name": "graphql",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "@apollo/client": "^3.8.3",
+    "@apollo/server": "^4.9.3",
+    "@prisma/client": "^5.3.1",
+    "graphql": "^16.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.1",
+    "prisma": "^5.3.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}
