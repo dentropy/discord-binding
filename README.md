@@ -5,6 +5,8 @@
 docker exec -it postgres2 psql -U postgres
 ```
 
+
+
 ## DROP TABLES
 
 ``` sql
