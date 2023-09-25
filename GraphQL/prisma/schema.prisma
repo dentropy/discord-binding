@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model attachments_t {
+  id                  Int     @id @default(autoincrement())
+  attachment_id       String?
+  attachment_url      String?
+  attachment_filename String?
+  fileSizeBytes       Int?
+  message_id          String?
+}
+
+model channels_t {
+  id           Int     @id @default(autoincrement())
+  channel_id   String?
+  channel_name String?
+  channel_type String?
+  categoryId   String?
+  category     String?
+  guild_id     String?
+  topic        String?
+}
+
+model guilds_t {
+  id         Int     @id @default(autoincrement())
+  guild_id   String?
+  guild_name String?
+  iconUrl    String?
+}
+
+model messages_t {
+  id              Int       @id @default(autoincrement())
+  message_id      String?
+  attachments     String?
+  author          String?
+  channel_id      String?
+  content         String?
+  interaction     String?
+  isBot           Boolean?
+  isPinned        Boolean?
+  mentions        Boolean?
+  msg_type        String?
+  timestamp       DateTime?
+  timestampEdited DateTime?
+}
+
+model raw_attachments_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_authors_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_channels_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_embeds_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_guilds_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_mentions_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_messages_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_reactions_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_roles_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model raw_stickers_t {
+  id       Int                  @id @default(autoincrement())
+  raw_json Unsupported("json")?
+}
+
+model roles_t {
+  id        Int     @id @default(autoincrement())
+  role_id   String?
+  role_name String?
+  color     String?
+  position  Int?
+}
+
+model authors_t {
+  id        Int      @id @default(autoincrement())
+  author_id String?
+  name      String?
+  nickname  Int?
+  color     String?
+  isBot     Boolean?
+  avatarUrl String?
+}
