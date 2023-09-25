@@ -1,6 +1,6 @@
 load database
-     from sqlite:///home/paul/Projects/discord-binding/out/AVAE_discord_guild.sqlite
-     into postgresql://postgres:postgres@127.0.0.1:5432/test02
+     from sqlite://$sqlite_path
+     into postgresql://postgres:postgres@127.0.0.1:5432/$postgres_db_name
 
  with include drop, create tables, create indexes, reset sequences, prefetch rows = 10000, batch rows = 10000
 

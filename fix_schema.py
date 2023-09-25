@@ -1,7 +1,7 @@
 import sqlite3
 import sys
 if len(sys.argv) != 2:
-    print("Usage: python script.py <argument>")
+    print("Usage: python fix_schema.py <argument>")
     sys.exit(1)
 
 queries = ["""
@@ -82,7 +82,8 @@ SELECT
   DISTINCT(json_extract(raw_json, '$.id')) as id,
   json_extract(raw_json, '$.name') as guild_name,
   json_extract(raw_json, '$.iconUrl') as iconUrl
-FROM raw_guilds_t;
+FROM raw_guilds_t
+LIMIT 1;
 """,
 
 """
