@@ -3,12 +3,14 @@
 ## DROP TABLES
 
 ``` sql
-DROP TABLE messages;
-DROP TABLE guilds;
-DROP TABLE channels;
-DROP TABLE embeds;
-DROP TABLE embeds;
-DROP TABLE embeds;
+
+DROP TABLE messages_t;
+DROP TABLE guilds_t;
+DROP TABLE channels_t;
+DROP TABLE embeds_t;
+DROP TABLE embeds_t;
+DROP TABLE embeds_t;
+
 ```
 
 

@@ -9,7 +9,7 @@ create_table_queries = [
 
 """
 CREATE TABLE IF NOT EXISTS guilds_t (
-  id          INTEGER PRIMARY KEY,
+  id          VARCHAR PRIMARY KEY,
   guild_id    TEXT,
   guild_name  TEXT,
   iconUrl     TEXT
@@ -18,12 +18,12 @@ CREATE TABLE IF NOT EXISTS guilds_t (
 
 """
 CREATE TABLE IF NOT EXISTS channels_t (
-  id            INTEGER PRIMARY KEY,
+  id            VARCHAR PRIMARY KEY,
   channel_name  TEXT,
   channel_type  TEXT,
   categoryId    TEXT,
   category      TEXT,
-  guild_id      INTEGER,
+  guild_id      VARCHAR,
   topic         TEXT,
   channel_name_length INT,
   FOREIGN KEY (guild_id) REFERENCES guilds_t(id)
@@ -32,10 +32,10 @@ CREATE TABLE IF NOT EXISTS channels_t (
 
 """
 CREATE TABLE IF NOT EXISTS messages_t (
-  id           INTEGER PRIMARY KEY,
+  id           VARCHAR PRIMARY KEY,
   attachments  TEXT,
   author       TEXT,
-  channel_id   INTEGER,
+  channel_id   VARCHAR,
   content      TEXT,
   interaction  TEXT,
   isBot        BOOLEAN,
@@ -52,8 +52,8 @@ CREATE TABLE IF NOT EXISTS messages_t (
 
 """
 CREATE TABLE IF NOT EXISTS authors_t (
-  id            INTEGER PRIMARY KEY,
-  author_id     INTEGER,
+  id            VARCHAR PRIMARY KEY,
+  author_id     VARCHAR,
   name          TEXT,
   nickname      TEXT,
   color         TEXT,
@@ -65,20 +65,20 @@ CREATE TABLE IF NOT EXISTS authors_t (
 
 """
 CREATE TABLE IF NOT EXISTS attachments_t (
-  id                    INTEGER PRIMARY KEY,
+  id                    VARCHAR PRIMARY KEY,
   attachment_url        TEXT,
   attachment_filename   TEXT,
-  fileSizeBytes         INTEGER,
-  message_id            INTEGER
+  fileSizeBytes         BIGINT,
+  message_id            BIGINT
 )
 """,
 
 """
 CREATE TABLE IF NOT EXISTS roles_t (
-  id          INTEGER PRIMARY KEY,
+  id          VARCHAR PRIMARY KEY,
   role_name   TEXT,
   color       TEXT,
-  position    INTEGER
+  position    BIGINT
 )
 """,
 
@@ -96,6 +96,7 @@ try:
     )
     cursor = conn.cursor()
     for query in create_table_queries:
+      print(query)
       cursor.execute(query)
       conn.commit()
       print("Another table created")

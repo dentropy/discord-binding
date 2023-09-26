@@ -99,14 +99,25 @@ docker exec -it postgres2 psql -U postgres
 
 ``` bash
 CREATE DATABASE DiscordData;
+
+\c discorddata
+```
+
+``` bash
+psql postgresql://postgres:postgres@127.0.0.1:5432/discorddata
 ```
 
 * Create Tables
 
+Set postgres_url in .env
 
+``` bash
 
+python3 postgres_schema.py
 
-* Write script to Export CSV and Import to Postgres
+bash postgres_load.sh
+
+```
 
 
 ## Helpers

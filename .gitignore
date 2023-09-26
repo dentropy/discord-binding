@@ -1,5 +1,6 @@
 postgres_db_1
 env/
+*csv
 .env
 out.json
 *db
