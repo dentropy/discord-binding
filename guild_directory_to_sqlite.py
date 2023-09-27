@@ -21,3 +21,4 @@ for directory in directories:
   )
   ex_dis.create_raw_json_tables()
   ex_dis.process_json_files(path + "/" + directory)
+  ex_dis.save_sqlite_to_disk(os.getcwd() + f"/out/{directory}_discord_guild.sqlite")

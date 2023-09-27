@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS channels_t (
 """,
 
 """
-CREATE TABLE IF NOT EXISTS messages_t (
+CREATE TABLE IF NOT EXISTS messages_dump_t (
   id           VARCHAR PRIMARY KEY,
   attachments  TEXT,
   author       TEXT,
@@ -44,6 +44,24 @@ CREATE TABLE IF NOT EXISTS messages_t (
   msg_type     TEXT,
   timestamp    INT,
   timestampEdited INT,
+  content_length INT
+)
+""",
+
+"""
+CREATE TABLE IF NOT EXISTS messages_t (
+  id           VARCHAR PRIMARY KEY,
+  attachments  TEXT,
+  author       TEXT,
+  channel_id   VARCHAR,
+  content      TEXT,
+  interaction  TEXT,
+  isBot        BOOLEAN,
+  isPinned     BOOLEAN,
+  mentions     BOOLEAN,
+  msg_type     TEXT,
+  timestamp    TIMESTAMP,
+  timestampEdited TIMESTAMP,
   content_length INT,
   FOREIGN KEY (channel_id) REFERENCES channels_t(id)
 )
@@ -62,6 +80,18 @@ CREATE TABLE IF NOT EXISTS authors_t (
 )
 """,
 
+"""
+CREATE TABLE IF NOT EXISTS authors_dump_t (
+  id            VARCHAR,
+  author_id     VARCHAR,
+  name          TEXT,
+  nickname      TEXT,
+  color         TEXT,
+  isBot         BOOLEAN,
+  avatarUrl     TEXT
+)
+""",
+
 
 """
 CREATE TABLE IF NOT EXISTS attachments_t (
@@ -69,7 +99,7 @@ CREATE TABLE IF NOT EXISTS attachments_t (
   attachment_url        TEXT,
   attachment_filename   TEXT,
   fileSizeBytes         BIGINT,
-  message_id            BIGINT
+  message_id            TEXT
 )
 """,
 
@@ -82,6 +112,32 @@ CREATE TABLE IF NOT EXISTS roles_t (
 )
 """,
 
+"""
+ALTER TABLE channels_t
+  ADD CONSTRAINT channels_t_guild_id_to_guilds_t
+  FOREIGN KEY (guild_id)
+  REFERENCES guilds_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON channels_t (guild_id);
+""",
+
+"""
+ALTER TABLE messages_t
+  ADD CONSTRAINT message_id_to_channel_id
+  FOREIGN KEY (channel_id)
+  REFERENCES channels_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON messages_t (channel_id);
+""",
+
+"""
+ALTER TABLE attachments_t
+  ADD CONSTRAINT attachment_id_to_message_id
+  FOREIGN KEY (message_id)
+  REFERENCES messages_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON attachments_t (message_id);
+"""
 ]
 
 try:

@@ -88,11 +88,13 @@ docker-compose -f postgres2.yml logs -f
 * Access Postgres
 
 ``` bash
+
 psql postgresql://postgres:postgres@127.0.0.1:5432/postgres
 
 # or
 
 docker exec -it postgres2 psql -U postgres
+
 ```
 
 * Create Database
@@ -104,7 +106,9 @@ CREATE DATABASE DiscordData;
 ```
 
 ``` bash
+
 psql postgresql://postgres:postgres@127.0.0.1:5432/discorddata
+
 ```
 
 * Create Tables
@@ -115,52 +119,177 @@ Set postgres_url in .env
 
 python3 postgres_schema.py
 
+```
+
+* Load sqlite databases
+
+``` bash
+
+
 bash postgres_load.sh
 
 ```
 
+* Setup [PostGraphile](https://www.graphile.org/postgraphile/usage-cli/)
+
+
+``` bash
+# Install
+npm install -g postgraphile @graphile/pg-aggregates
+
+# Run
+postgraphile --append-plugins @graphile/pg-aggregates --enhance-graphiql -c postgresql://postgres:postgres@127.0.0.1:5432/discorddata
+
+```
 
 ## Helpers
 
 You can check if the SQLite database is being written to with `ls -lrt` a couple times in the directory of the database to see if it is increasing.
 
 
-## Prisma Setup
+## Example postgraphile queries
 
-``` bash
-cp ./out/GUILD.sqlite dev.db
-python3 fix_schema.py dev.db
-sqlitebrowser dev.db # optional
-cp dev.db GraphQL/prisma
-cd GraphQL
-npx prisma db pull
-npx prisma generate
+``` graphql
+
+{
+  allChannelsTs{
+    nodes {
+      id,
+      channelName,
+      guildId,
+      guildsTByGuildId{
+        id,
+        guildName
+      }
+    }
+  }
+}
+
 ```
 
-## Postgres Fix Schema
+
+``` graphql
+
+query MyQuery {
+  allGuildsTs {
+    aggregates {
+      distinctCount {
+        id
+      }
+    }
+  }
+  allMessagesTs {
+    aggregates {
+      distinctCount {
+        id
+      }
+    }
+  }
+  allChannelsTs {
+    aggregates {
+      distinctCount {
+        id
+      }
+    }
+  }
+}
+
+```
+## Fix the timestamps!
+
+
+``` sql
+ALTER TABLE messages_t ALTER timestamp TYPE DATETIME;
+```
+
+``` sql
+INSERT INTO messages_t
+            (
+                        id,
+                        channnel_id,
+                        attachments,
+                        author,
+                        content,
+                        interaction,
+                        ispinned,
+                        mentions,
+                        msg_type,
+                        timestamp,
+                        timestampedited,
+                        content_length
+            )
+            (
+                   SELECT id,
+                          channel_id,
+                          attachments,
+                          author,
+                          content,
+                          interaction,
+                          ispinned,
+                          mentions,
+                          msg_type,
+                          To_timestamp(timestamp),
+                          To_timestamp(timestampedited),
+                          content_length
+                   FROM   messages_dump_t )
+on conflict
+            (
+                        id
+            )
+            do nothing;
+```
+
 
 ``` SQL
-ALTER TABLE channels_t
-  ADD CONSTRAINT channels_t_guild_id_to_guilds_t
-  FOREIGN KEY (guild_id)
-  REFERENCES guilds_t(id)
-  ON DELETE CASCADE;
-CREATE INDEX ON channels_t (guild_id);
+ALTER TABLE messages_dump_t
+ADD COLUMN real_timestamp timestamp WITHOUT TIME ZONE;
 
+ALTER TABLE messages_dump_t
+ADD COLUMN real_timestamp_edited timestamp WITHOUT TIME ZONE;
+```
 
-ALTER TABLE messages_t
-  ADD CONSTRAINT message_id_to_channel_id
-  FOREIGN KEY (channel_id)
-  REFERENCES channels_t(id)
-  ON DELETE CASCADE;
-CREATE INDEX ON messages_t (channel_id);
+``` SQL
+ALTER TABLE messages_dump_t
+DROP COLUMN real_timestamp;
+```
 
+``` sql
+UPDATE messages_dump_t
+SET real_timestamp = to_timestamp(timestamp);
+```
 
-ALTER TABLE attachments_t
-  ADD CONSTRAINT attachment_id_to_message_id
-  FOREIGN KEY (message_id)
-  REFERENCES messages_t(id)
-  ON DELETE CASCADE;
-CREATE INDEX ON attachments_t (message_id);
-
+``` sql
+INSERT INTO messages_t (
+    id,
+    channel_id,
+    attachments,
+    author,
+    content,
+    interaction,
+    ispinned,
+    mentions,
+    msg_type,
+    timestamp,
+    timestampedited,
+    content_length
+) 
+SELECT 
+    id,
+    channel_id,
+    attachments,
+    author,
+    content,
+    interaction,
+    ispinned,
+    mentions,
+    msg_type,
+    TO_TIMESTAMP(timestamp),
+    TO_TIMESTAMP(timestampedited),
+    content_length
+FROM messages_dump_t
+WHERE channel_id  IN (
+    SELECT id
+    FROM channels_t 
+)
+ON CONFLICT (id) DO NOTHING;
 ```

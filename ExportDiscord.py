@@ -35,7 +35,8 @@ class ExportDiscord():
         print(self.db_url)
         self.db_select = db_select
         if(db_select == "sqlite"):
-            self.con = sqlite3.connect(self.db_url)
+            # self.con = sqlite3.connect(self.db_url)
+            self.con = sqlite3.connect(':memory:')
         elif(db_select == "postgres"):
             self.con = psycopg2.connect(dsn=db_url)
         self.cur = self.con.cursor()
@@ -237,3 +238,7 @@ class ExportDiscord():
             guild_data = self.process_discord_json(json_file)
             if guild_data != False:
                 self.json_data_to_sql(guild_data)
+
+    def save_sqlite_to_disk(self, path):
+        disk_conn = sqlite3.connect(path)
+        self.con.backup(disk_conn)
