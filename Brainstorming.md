@@ -213,3 +213,77 @@ ALTER TABLE attachments_t
 CREATE INDEX ON attachments_t (message_id);
 
 ```
+
+## Migrate tables, we don't do this anymore
+
+``` sql
+INSERT INTO messages_t
+            (
+                        id,
+                        channnel_id,
+                        attachments,
+                        author,
+                        content,
+                        interaction,
+                        ispinned,
+                        mentions,
+                        msg_type,
+                        timestamp,
+                        timestampedited,
+                        content_length
+            )
+            (
+                   SELECT id,
+                          channel_id,
+                          attachments,
+                          author,
+                          content,
+                          interaction,
+                          ispinned,
+                          mentions,
+                          msg_type,
+                          To_timestamp(timestamp),
+                          To_timestamp(timestampedited),
+                          content_length
+                   FROM   messages_dump_t )
+on conflict
+            (
+                        id
+            )
+            do nothing;
+```
+``` sql
+INSERT INTO messages_t (
+    id,
+    channel_id,
+    attachments,
+    author,
+    content,
+    interaction,
+    ispinned,
+    mentions,
+    msg_type,
+    timestamp,
+    timestampedited,
+    content_length
+) 
+SELECT 
+    id,
+    channel_id,
+    attachments,
+    author,
+    content,
+    interaction,
+    ispinned,
+    mentions,
+    msg_type,
+    TO_TIMESTAMP(timestamp),
+    TO_TIMESTAMP(timestampedited),
+    content_length
+FROM messages_dump_t
+WHERE channel_id  IN (
+    SELECT id
+    FROM channels_t 
+)
+ON CONFLICT (id) DO NOTHING;
+```

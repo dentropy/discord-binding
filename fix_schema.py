@@ -68,6 +68,30 @@ FROM raw_attachments_t;
 table_type_queries = [
 
 """
+DROP TABLE IF EXISTS guilds_t;
+""",
+
+"""
+DROP TABLE IF EXISTS channels_t;
+""",
+
+"""
+DROP TABLE IF EXISTS messages_t;
+""",
+
+"""
+DROP TABLE IF EXISTS authors_t;
+""",
+
+"""
+DROP TABLE IF EXISTS attachments_t;
+""",
+
+"""
+DROP TABLE IF EXISTS roles_t;
+""",
+
+"""
 CREATE TABLE IF NOT EXISTS guilds_t (
   id          INTEGER PRIMARY KEY,
   guild_id    TEXT,
@@ -119,6 +143,7 @@ FROM
 """
 CREATE TABLE IF NOT EXISTS messages_t (
   id           INTEGER PRIMARY KEY,
+  guild_id     TEXT,
   attachments  TEXT,
   author       TEXT,
   channel_id   INTEGER,
@@ -163,9 +188,10 @@ FROM raw_authors_t;
 
 
 """
-INSERT INTO messages_t (id, attachments, author, channel_id, content, interaction, isBot, isPinned, mentions, msg_type, timestamp, timestampEdited, content_length)
+INSERT INTO messages_t (id, guild_id, attachments, author, channel_id, content, interaction, isBot, isPinned, mentions, msg_type, timestamp, timestampEdited, content_length)
 SELECT
   json_extract(raw_json, '$.id') as id,
+  json_extract(raw_json, '$.guild_id') as guild_id,
   json_extract(raw_json, '$.attachments') as attachments,
   json_extract(raw_json, '$.author') as author,
   json_extract(raw_json, '$.channel_id') as channel_id,

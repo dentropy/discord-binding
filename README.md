@@ -45,7 +45,7 @@ Set `guild_directory_path`
 
 ``` bash
 
-python3 guild_directory_to_sqlite.py
+python3 guild_directory_to_sqlite.py > logs-$(date +"%Y-%m-%d_%H-%M-%S").out
 
 ```
 
@@ -100,15 +100,18 @@ docker exec -it postgres2 psql -U postgres
 * Create Database
 
 ``` bash
-CREATE DATABASE DiscordData;
+CREATE DATABASE discorddata;
 
 \c discorddata
+
+exit;
 ```
 
 ``` bash
 
 psql postgresql://postgres:postgres@127.0.0.1:5432/discorddata
 
+exit;
 ```
 
 * Create Tables
@@ -125,10 +128,10 @@ python3 postgres_schema.py
 
 ``` bash
 
-
 bash postgres_load.sh
 
 ```
+
 
 * Setup [PostGraphile](https://www.graphile.org/postgraphile/usage-cli/)
 
@@ -198,98 +201,32 @@ query MyQuery {
 ## Fix the timestamps!
 
 
-``` sql
-ALTER TABLE messages_t ALTER timestamp TYPE DATETIME;
-```
-
-``` sql
-INSERT INTO messages_t
-            (
-                        id,
-                        channnel_id,
-                        attachments,
-                        author,
-                        content,
-                        interaction,
-                        ispinned,
-                        mentions,
-                        msg_type,
-                        timestamp,
-                        timestampedited,
-                        content_length
-            )
-            (
-                   SELECT id,
-                          channel_id,
-                          attachments,
-                          author,
-                          content,
-                          interaction,
-                          ispinned,
-                          mentions,
-                          msg_type,
-                          To_timestamp(timestamp),
-                          To_timestamp(timestampedited),
-                          content_length
-                   FROM   messages_dump_t )
-on conflict
-            (
-                        id
-            )
-            do nothing;
-```
-
 
 ``` SQL
-ALTER TABLE messages_dump_t
+ALTER TABLE messages_t
 ADD COLUMN real_timestamp timestamp WITHOUT TIME ZONE;
 
-ALTER TABLE messages_dump_t
+ALTER TABLE messages_t
 ADD COLUMN real_timestamp_edited timestamp WITHOUT TIME ZONE;
+
+UPDATE messages_t
+SET real_timestamp = to_timestamp(unix_timestamp);
+
+UPDATE messages_t
+SET real_timestamp_edited = to_timestamp(unix_timestampEdited)
+WHERE unix_timestampEdited IS NOT NULL;
+
+ALTER TABLE messages_t
+  ADD CONSTRAINT messages_t_to_guild_id
+  FOREIGN KEY (guild_id)
+  REFERENCES guilds_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON messages_t (guild_id);
 ```
+
+## DON'T RUN THIS
 
 ``` SQL
 ALTER TABLE messages_dump_t
-DROP COLUMN real_timestamp;
-```
-
-``` sql
-UPDATE messages_dump_t
-SET real_timestamp = to_timestamp(timestamp);
-```
-
-``` sql
-INSERT INTO messages_t (
-    id,
-    channel_id,
-    attachments,
-    author,
-    content,
-    interaction,
-    ispinned,
-    mentions,
-    msg_type,
-    timestamp,
-    timestampedited,
-    content_length
-) 
-SELECT 
-    id,
-    channel_id,
-    attachments,
-    author,
-    content,
-    interaction,
-    ispinned,
-    mentions,
-    msg_type,
-    TO_TIMESTAMP(timestamp),
-    TO_TIMESTAMP(timestampedited),
-    content_length
-FROM messages_dump_t
-WHERE channel_id  IN (
-    SELECT id
-    FROM channels_t 
-)
-ON CONFLICT (id) DO NOTHING;
+DROP COLUMN #real_timestamp;
 ```

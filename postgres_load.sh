@@ -1,5 +1,7 @@
 #!/bin/bash
 
+start_time=$(date +%s.%N)
+
 # Load .env variables
 if [[ -f .env ]]; then
   source .env
@@ -30,7 +32,7 @@ for sqlite_path in $sqlite_databases; do
   psql $postgres_url -c "\copy channels_t FROM '$(pwd)/channels_t.csv'  WITH (FORMAT CSV, HEADER false);"
   echo "Completed channels_t for $sqlite_path"
   sqlite3 $sqlite_path -csv "SELECT * FROM messages_t;" > messages_t.csv
-  psql $postgres_url -c "\copy messages_dump_t FROM '$(pwd)/messages_t.csv'  WITH (FORMAT CSV, HEADER false);"
+  psql $postgres_url -c "\copy messages_t FROM '$(pwd)/messages_t.csv'  WITH (FORMAT CSV, HEADER false);"
   echo "Completed messages_t for $sqlite_path"
   sqlite3 $sqlite_path -csv "SELECT * FROM authors_t;" > authors_t.csv
   psql $postgres_url -c "\copy authors_dump_t FROM '$(pwd)/authors_t.csv'  WITH (FORMAT CSV, HEADER false);"
@@ -41,3 +43,6 @@ echo "putting data inside authors_t"
 psql $postgres_url -c "insert into authors_t (id, author_id, name, nickname, color, isBot, avatarurl) ( select id, author_id, name, nickname, color, isBot, avatarurl from authors_dump_t ) on conflict (id) do nothing;"
 # psql $postgres_url -c "INSERT INTO messages_t ( id, channel_id, attachments, author, content, interaction, ispinned, mentions, msg_type, timestamp, timestampedited, content_length ) ( select id, channel_id, attachments, author, content, interaction, ispinned, mentions, msg_type, To_timestamp(timestamp), To_timestamp(timestampedited), content_length FROM messages_dump_t ) on conflict ( id ) do nothing;"
 echo "Done"
+
+execution_time=$(echo "$end_time - $start_time" | bc)
+echo "Execution time: $execution_time seconds"

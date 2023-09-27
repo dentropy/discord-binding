@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS channels_t (
 """
 CREATE TABLE IF NOT EXISTS messages_dump_t (
   id           VARCHAR PRIMARY KEY,
+  guild_id     VARCHAR,
   attachments  TEXT,
   author       TEXT,
   channel_id   VARCHAR,
@@ -51,6 +52,7 @@ CREATE TABLE IF NOT EXISTS messages_dump_t (
 """
 CREATE TABLE IF NOT EXISTS messages_t (
   id           VARCHAR PRIMARY KEY,
+  guild_id     VARCHAR,
   attachments  TEXT,
   author       TEXT,
   channel_id   VARCHAR,
@@ -60,8 +62,8 @@ CREATE TABLE IF NOT EXISTS messages_t (
   isPinned     BOOLEAN,
   mentions     BOOLEAN,
   msg_type     TEXT,
-  timestamp    TIMESTAMP,
-  timestampEdited TIMESTAMP,
+  unix_timestamp    INTEGER,
+  unix_timestampEdited INTEGER,
   content_length INT,
   FOREIGN KEY (channel_id) REFERENCES channels_t(id)
 )
