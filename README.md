@@ -212,10 +212,6 @@ ADD COLUMN real_timestamp_edited timestamp WITHOUT TIME ZONE;
 UPDATE messages_t
 SET real_timestamp = to_timestamp(unix_timestamp);
 
-UPDATE messages_t
-SET real_timestamp_edited = to_timestamp(unix_timestampEdited)
-WHERE unix_timestampEdited IS NOT NULL;
-
 ALTER TABLE messages_t
   ADD CONSTRAINT messages_t_to_guild_id
   FOREIGN KEY (guild_id)
