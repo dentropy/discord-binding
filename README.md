@@ -143,6 +143,8 @@ npm install -g postgraphile @graphile/pg-aggregates
 # Run
 postgraphile --append-plugins @graphile/pg-aggregates --enhance-graphiql -c postgresql://postgres:postgres@127.0.0.1:5432/discorddata
 
+
+postgraphile --append-plugins @graphile/pg-aggregates,$(pwd)/graphile_time_queries.js --enhance-graphiql -c postgresql://postgres:postgres@127.0.0.1:5432/discorddata
 ```
 
 ## Helpers
