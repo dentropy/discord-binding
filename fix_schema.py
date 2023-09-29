@@ -246,7 +246,34 @@ SELECT
   json_extract(raw_json, '$.color') as color,
   json_extract(raw_json, '$.position') as position
 FROM raw_roles_t;
+""",
+
 """
+CREATE TABLE IF NOT EXISTS roles_metadata_t (
+  author_guild_id   TEXT PRIMARY KEY,
+  guild_id          TEXT,
+  author_id         TEXT,
+  role_id           TEXT
+)
+""",
+
+
+
+"""
+CREATE TABLE IF NOT EXISTS attachments_metadata_t (
+  attachment_id         TEXT PRIMARY KEY,
+  message_id            TEXT,
+  message_id            TEXT,
+  author_id             TEXT,
+  author_guild_id       TEXT,
+  guild_id              TEXT,
+  attachment_url        TEXT,
+  attachment_filename   TEXT,
+  attachment_file_type  TEXT,
+  file_size_bytes       BIGINT,
+
+)
+""",
 
 ]
 

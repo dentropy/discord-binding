@@ -35,8 +35,8 @@ class ExportDiscord():
         print(self.db_url)
         self.db_select = db_select
         if(db_select == "sqlite"):
-            # self.con = sqlite3.connect(self.db_url)
-            self.con = sqlite3.connect(':memory:')
+            self.con = sqlite3.connect(self.db_url)
+            # self.con = sqlite3.connect(':memory:')
         elif(db_select == "postgres"):
             self.con = psycopg2.connect(dsn=db_url)
         self.cur = self.con.cursor()
@@ -71,6 +71,7 @@ class ExportDiscord():
         root_dict["stickers"] = []
         root_dict["reactions"] = []
         root_dict["mentions"] = []
+        root_dict["roles_metadata"] = []
         with open(json_file_path, 'r') as json_file:
             try:
                 # print(f"Processing {json_file}")
@@ -81,18 +82,27 @@ class ExportDiscord():
         data["channel"]["guild_id"] = data["guild"]["id"]
         root_dict["channels"].append(data["channel"])
         for message in data["messages"]:
-            message["author_id"] = message["author"]["id"] + "-" + data["guild"]["id"] 
+            message["author_id"] = message["author"]["id"]
             authors_dict[message["author"]["id"]] = message["author"]
             message["channel_id"] = data["channel"]["id"]
             if "roles" in message["author"].keys():
+                # TODO this does not work
                 if message["author"]["roles"] != []:
                     for role in message["author"]["roles"]:
                         role["user_id"] = message["author"]
+                        role["author_id"] = message["author"]["id"]
+                        role["author_guild_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
+                        role["guild_id"] = data["guild"]["id"]
                         root_dict["roles"].append(role)
                 del message["author"]["roles"]   
             if message["attachments"] != []:
                 for attachment in message["attachments"]:
                     attachment["message_id"] = message["id"]
+                    attachment["message_id"] = message["id"]
+                    attachment["guild_id"] = data["guild"]["id"]
+                    attachment["author_id"] = message["author"]["id"] 
+                    attachment["author_guild_id"] = data["guild"]["id"] + "-" + message["author"]["id"]
+                    attachment["guild_id"] = data["guild"]["id"]
                     root_dict["attachments"].append(attachment)
                 message["attachments"] = True
             else:
@@ -119,7 +129,9 @@ class ExportDiscord():
             if message["reactions"] != []:
                 for reaction in message["reactions"]:
                     reaction["message_id"] = message["id"]
-                    reaction["author_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
+                    reaction["author_id"] = message["author"]["id"]
+                    reaction["author_guild_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
+                    reaction["guild_id"] = data["guild"]["id"]
                     reaction["channel_id"] = data["channel"]["id"]
                     root_dict["reactions"].append(reaction)
                 message["reactions"] = True
@@ -128,6 +140,10 @@ class ExportDiscord():
             if message["mentions"] != []:
                 for mention in message["mentions"]:
                     mention["message_id"] = message["id"]
+                    mention["author_id"] = message["author"]["id"]
+                    mention["author_guild_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
+                    mention["guild_id"] = data["guild"]["id"]
+                    mention["channel_id"] = data["channel"]["id"]
                     root_dict["mentions"].append(mention)
                 message["mentions"] = True
             else:
@@ -136,6 +152,7 @@ class ExportDiscord():
                 message["reference"] = json.dumps(message["reference"])
             else:
                 message["reference"] = ""
+            message["author_guild_id"] = data["guild"]["id"] + "-" + message["author"]["id"]
             message["author"] = message["author"]["id"]
             message["guild_id"] = data["guild"]["id"]
             root_dict["messages"].append(message)
@@ -143,7 +160,7 @@ class ExportDiscord():
             tmp_author = author
             tmp_author["guild_id"] = data["guild"]["id"] 
             tmp_author["author_id"] = tmp_author["id"]
-            tmp_author["id"] = tmp_author["id"] + "-" + data["guild"]["id"] 
+            tmp_author["author_guild_id"] = tmp_author["id"] + "-" + data["guild"]["id"] 
             root_dict["authors"].append(author)
         print(f"Done Running process_discord_json")
         return root_dict
@@ -183,7 +200,7 @@ class ExportDiscord():
 
     def create_raw_json_tables(self):
         raw_table_names = [
-             "guilds",
+            "guilds",
             "channels",
             "messages",
             "authors",
@@ -192,7 +209,8 @@ class ExportDiscord():
             "embeds",
             "stickers",
             "reactions",
-            "mentions"
+            "mentions",
+            "roles_metadata"
         ] 
         for tmp_table_name in raw_table_names:
             self.create_raw_json_table("raw_" + tmp_table_name)

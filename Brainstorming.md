@@ -287,3 +287,13 @@ WHERE channel_id  IN (
 )
 ON CONFLICT (id) DO NOTHING;
 ```
+
+
+``` sql
+ALTER TABLE messages_t
+  ADD CONSTRAINT message_id_to_author_id
+  FOREIGN KEY (author)
+  REFERENCES authors_t(author_id)
+  ON DELETE CASCADE;
+CREATE INDEX ON messages_t(author);
+```
