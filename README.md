@@ -147,6 +147,16 @@ postgraphile --append-plugins @graphile/pg-aggregates --enhance-graphiql -c post
 postgraphile --append-plugins @graphile/pg-aggregates,$(pwd)/graphile_time_queries.js --enhance-graphiql -c postgresql://postgres:postgres@127.0.0.1:5432/discorddata
 ```
 
+``` bash
+
+curl 'http://localhost:5000/graphql' \
+  -X POST \
+  -H 'content-type: application/json' \
+  --data '{
+    "query": "query MyQuery { allGuildsTs { nodes { id guildName } } }"
+  }'
+
+```
 ## Helpers
 
 You can check if the SQLite database is being written to with `ls -lrt` a couple times in the directory of the database to see if it is increasing.
