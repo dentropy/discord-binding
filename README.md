@@ -152,9 +152,7 @@ postgraphile --append-plugins @graphile/pg-aggregates,$(pwd)/graphile_time_queri
 curl 'http://localhost:5000/graphql' \
   -X POST \
   -H 'content-type: application/json' \
-  --data '{
-    "query": "query MyQuery { allGuildsTs { nodes { id guildName } } }"
-  }'
+  --data '{"query": "query MyQuery { allGuildsTs { nodes { id guildName } } }"}'
 
 ```
 ## Helpers
