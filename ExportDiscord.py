@@ -78,6 +78,8 @@ class ExportDiscord():
                 data = json.load(json_file)
             except Exception as e:
                 return False
+        if("guild" not in data):
+            return False
         root_dict["guilds"].append(data["guild"])
         data["channel"]["guild_id"] = data["guild"]["id"]
         root_dict["channels"].append(data["channel"])

@@ -44,8 +44,14 @@ Set `guild_directory_path`
 `guild_directory_path` is the directory of guilds exported from DiscordChatExporter 
 
 ``` bash
+python3 -m pip install --upgrade pip
+python3 -m pip install psycopg2
+python3 -m pip install python-dotenv
+```
 
-python3 guild_directory_to_sqlite.py > logs-$(date +"%Y-%m-%d_%H-%M-%S").out
+``` bash
+
+python3 guild_directory_to_sqlite.py > logs-$(date +"%Y-%m-%d_%H-%M-%S").out &
 
 ```
 
