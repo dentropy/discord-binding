@@ -128,12 +128,6 @@ Set postgres_url in .env
 
 python3 postgres_schema.py
 
-```
-
-* Load sqlite databases
-
-``` bash
-
 bash postgres_load.sh
 
 ```

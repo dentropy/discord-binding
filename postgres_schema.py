@@ -114,32 +114,32 @@ CREATE TABLE IF NOT EXISTS roles_t (
 )
 """,
 
-"""
-ALTER TABLE channels_t
-  ADD CONSTRAINT channels_t_guild_id_to_guilds_t
-  FOREIGN KEY (guild_id)
-  REFERENCES guilds_t(id)
-  ON DELETE CASCADE;
-CREATE INDEX ON channels_t (guild_id);
-""",
+# """
+# ALTER TABLE channels_t
+#   ADD CONSTRAINT channels_t_guild_id_to_guilds_t
+#   FOREIGN KEY (guild_id)
+#   REFERENCES guilds_t(id)
+#   ON DELETE CASCADE;
+# CREATE INDEX ON channels_t (guild_id);
+# """,
 
-"""
-ALTER TABLE messages_t
-  ADD CONSTRAINT message_id_to_channel_id
-  FOREIGN KEY (channel_id)
-  REFERENCES channels_t(id)
-  ON DELETE CASCADE;
-CREATE INDEX ON messages_t (channel_id);
-""",
+# """
+# ALTER TABLE messages_t
+#   ADD CONSTRAINT message_id_to_channel_id
+#   FOREIGN KEY (channel_id)
+#   REFERENCES channels_t(id)
+#   ON DELETE CASCADE;
+# CREATE INDEX ON messages_t (channel_id);
+# """,
 
-"""
-ALTER TABLE attachments_t
-  ADD CONSTRAINT attachment_id_to_message_id
-  FOREIGN KEY (message_id)
-  REFERENCES messages_t(id)
-  ON DELETE CASCADE;
-CREATE INDEX ON attachments_t (message_id);
-"""
+# """
+# ALTER TABLE attachments_t
+#   ADD CONSTRAINT attachment_id_to_message_id
+#   FOREIGN KEY (message_id)
+#   REFERENCES messages_t(id)
+#   ON DELETE CASCADE;
+# CREATE INDEX ON attachments_t (message_id);
+# """
 ]
 
 try:

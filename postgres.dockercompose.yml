@@ -15,9 +15,9 @@ services:
     volumes: 
       - ./postgres_db_1:/var/lib/postgresql/data
 
-  adminer:
-    image: adminer
-    container_name: adminer2
-    restart: always
-    ports:
-      - 127.0.0.1:8180:8080
+  # adminer:
+  #   image: adminer
+  #   container_name: adminer2
+  #   restart: always
+  #   ports:
+  #     - 127.0.0.1:8180:8080
