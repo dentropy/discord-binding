@@ -11,7 +11,7 @@ if(os.environ.get("allow_sqlite_in_memory") == "True"):
     os.environ.get(":memory:")  
   )
 else:
-    ex_dis = ExportDiscord(  
+  ex_dis = ExportDiscord(  
     os.environ.get("db_select"),
     os.environ.get("db_url")  
   )

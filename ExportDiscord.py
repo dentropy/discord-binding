@@ -41,6 +41,18 @@ class ExportDiscord():
             self.con = psycopg2.connect(dsn=db_url)
         self.cur = self.con.cursor()
 
+
+    def test_connection(self):
+        try:
+            # Execute a simple SQL query (e.g., select the current date)
+            self.cursor.execute("SELECT current_date")
+            # Fetch the result (in this case, a single date)
+            print(result)
+            result = cursor.fetchone()
+            
+            return True
+        except:
+            return False
     def execute_with_retry(self, query, params=None, max_retries=3, retry_delay=0.1):
         retries = 0
         while retries < max_retries:
