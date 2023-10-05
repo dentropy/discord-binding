@@ -44,9 +44,18 @@ Set `guild_directory_path`
 `guild_directory_path` is the directory of guilds exported from DiscordChatExporter 
 
 ``` bash
+
+curl https://bootstrap.pypa.io/get-pip.py | python3 $1
+
+```
+
+``` bash
+
 python3 -m pip install --upgrade pip
-python3 -m pip install psycopg2
+python3 -m pip install psycopg2-binary
+python3 -m pip install boto3
 python3 -m pip install python-dotenv
+
 ```
 
 ``` bash
