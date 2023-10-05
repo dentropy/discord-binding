@@ -22,6 +22,7 @@ logging.basicConfig(
 )
 logging.info("Starting Discord-to-SQL-Migration")
 
+# TODO Check all Environment Variables are valid, especially object_path_list
 
 def test_s3_connection():
   logging.info("Testing S3 Connection")
