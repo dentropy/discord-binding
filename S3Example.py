@@ -42,3 +42,11 @@ for page in page_iterator:
           print(obj["Key"])
           json_object_paths.append(obj["Key"])
 print(len(json_object_paths))
+
+
+
+BUCKET = 'InitalData'
+FILE_TO_READ = "SET THIS.json"
+content_object = s3_client.get_object(Bucket=BUCKET, Key=FILE_TO_READ)
+mah_json = json.loads(  content_object["Body"].read().decode('utf-8')   )
+pprint(mah_json)

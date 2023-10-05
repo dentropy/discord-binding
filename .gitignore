@@ -18,3 +18,5 @@ postgres2.yml
 DiscordScraping*
 logs*
 2023-*
+S3*
+tmp*

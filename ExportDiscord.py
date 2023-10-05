@@ -45,11 +45,9 @@ class ExportDiscord():
     def test_connection(self):
         try:
             # Execute a simple SQL query (e.g., select the current date)
-            self.cursor.execute("SELECT current_date")
+            self.cur.execute("SELECT current_date")
             # Fetch the result (in this case, a single date)
-            print(result)
-            result = cursor.fetchone()
-            
+            result = self.cur.fetchone()
             return True
         except:
             return False
@@ -68,7 +66,7 @@ class ExportDiscord():
         else:
             raise Exception("Max retries exceeded")
 
-    def process_discord_json(self, json_file_path):
+    def process_discord_json(self, data):
         print(f"Running process_discord_json")
         root_dict = {}
         root_dict["guilds"] = []
@@ -84,12 +82,6 @@ class ExportDiscord():
         root_dict["reactions"] = []
         root_dict["mentions"] = []
         root_dict["roles_metadata"] = []
-        with open(json_file_path, 'r') as json_file:
-            try:
-                # print(f"Processing {json_file}")
-                data = json.load(json_file)
-            except Exception as e:
-                return False
         if("guild" not in data):
             return False
         root_dict["guilds"].append(data["guild"])
@@ -196,19 +188,21 @@ class ExportDiscord():
             query = sqlite_query
         elif (self.db_select == "postgres"):
             query = postgres_query
-        # print(query)
         retries = 0
         retry_delay=0.3
         while retries < 3:
             try:
                 self.cur.execute(query)# .fetchall()
                 # self.cur.fetchall()
+                if(self.db_select == "postgres"):
+                    self.con.commit()
             except sqlite3.OperationalError as e:
                 if "database is locked" in str(e):
                     retries += 1
                     time.sleep(retry_delay)
                 else:
                     raise
+            
             return True
 
 
@@ -225,9 +219,10 @@ class ExportDiscord():
             "reactions",
             "mentions",
             "roles_metadata"
-        ] 
+        ]
         for tmp_table_name in raw_table_names:
             self.create_raw_json_table("raw_" + tmp_table_name)
+        return True
 
     def json_data_to_sql(self, guild_data):
         print(f"json_data_to_sql Inserting\n {guild_data['channels']}\n\n")
@@ -268,7 +263,13 @@ class ExportDiscord():
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
         for json_file in json_files:
-            guild_data = self.process_discord_json(json_file)
+            with open(json_file, 'r') as json_file:
+                try:
+                    # print(f"Processing {json_file}")
+                    data = json.load(json_file)
+                except Exception as e:
+                    return False
+            guild_data = self.process_discord_json(data)
             if guild_data != False:
                 self.json_data_to_sql(guild_data)
 

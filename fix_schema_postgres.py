@@ -1,8 +1,5 @@
 import sqlite3
 import sys
-if len(sys.argv) != 2:
-    print("Usage: python fix_schema.py <argument>")
-    sys.exit(1)
 
 queries = ["""
 CREATE TABLE IF NOT EXISTS messages_t AS
@@ -187,7 +184,7 @@ SELECT
   json_extract_path_text(raw_json::json, 'avatarUrl') as avatarUrl
 FROM raw_authors_t;
 
-# """,
+""",
 
 
 """
@@ -213,22 +210,22 @@ FROM
 
 """
 CREATE TABLE IF NOT EXISTS attachments_t (
-  id                    INTEGER PRIMARY KEY,
+  id                    VARCHAR PRIMARY KEY,
   attachment_url        TEXT,
   attachment_filename   TEXT,
   fileSizeBytes         BIGINT,
-  message_id            INTEGER
+  message_id            VARCHAR
 )
 """,
 
 """
 INSERT INTO attachments_t (id, attachment_url, attachment_filename, fileSizeBytes, message_id)
 SELECT
-  DISTINCT(json_extract_path_text(raw_json::json, 'id')) as id,
+  DISTINCT(CAST(json_extract_path_text(raw_json::json, 'id') as VARCHAR)) as id,
   json_extract_path_text(raw_json::json, 'attachment_url') as attachment_url,
   json_extract_path_text(raw_json::json, 'fileName') as attachment_filename,
-  CAST( json_extract_path_text(raw_json::json, 'fileSizeBytes')  as BIGINT)as fileSizeBytes,
-  json_extract_path_text(raw_json::json, 'message_id') as message_id
+  CAST(  json_extract_path_text(raw_json::json, 'fileSizeBytes')  as BIGINT)as fileSizeBytes,
+  CAST(  json_extract_path_text(raw_json::json, 'message_id') as VARCHAR) as message_id
 FROM raw_attachments_t
 ON CONFLICT (id) DO NOTHING;
 """,
@@ -268,7 +265,6 @@ CREATE TABLE IF NOT EXISTS roles_metadata_t (
 CREATE TABLE IF NOT EXISTS attachments_metadata_t (
   attachment_id         TEXT PRIMARY KEY,
   message_id            TEXT,
-  message_id            TEXT,
   author_id             TEXT,
   author_guild_id       TEXT,
   guild_id              TEXT,
@@ -277,24 +273,29 @@ CREATE TABLE IF NOT EXISTS attachments_metadata_t (
   attachment_file_type  TEXT,
   file_size_bytes       BIGINT
 )
-""",
+"""
 
 ]
 
-from urllib.parse import urlparse
-import psycopg2
-url = urlparse(sys.argv[1])
-print(url)
-connection = psycopg2.connect(
-    host=url.hostname,
-    port=url.port,
-    database=url.path[1:],
-    user=url.username,
-    password=url.password
-)
-cursor = connection.cursor()
-for query in table_type_queries:
-  print(query)
-  print("\n\n")
-  cursor.execute(query)
-  connection.commit()
+def fix_schema_postgres(postgres_url):
+  from urllib.parse import urlparse
+  import psycopg2
+  url = urlparse(postgres_url)
+  print(url)
+  connection = psycopg2.connect(
+      host=url.hostname,
+      port=url.port,
+      database=url.path[1:],
+      user=url.username,
+      password=url.password
+  )
+  cursor = connection.cursor()
+  for query in table_type_queries:
+    print(query)
+    print("\n\n")
+    cursor.execute(query)
+    connection.commit()
+
+if ( len(sys.argv) == 2):
+  sys.exit(1)
+  fix_schema_postgres(sys.argv[1])
