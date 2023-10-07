@@ -227,38 +227,30 @@ class ExportDiscord():
     def json_data_to_sql(self, guild_data):
         print(f"json_data_to_sql Inserting\n {guild_data['channels']}\n\n")
         for tbd_table_name in guild_data.keys():
+            postgres_insert_query = f"""
+                INSERT INTO raw_{tbd_table_name}_t (raw_json) VALUES (%s)
+            """
+            sqlite_insert_query = f"""
+                INSERT OR IGNORE INTO raw_{tbd_table_name}_t (raw_json) VALUES (?)
+            """
             print(f"tbd_table_name = {tbd_table_name}")
             print( len( guild_data[tbd_table_name] )  )
+            insert_args = []
+            from psycopg2.extras import execute_batch
             for tbd_row in guild_data[tbd_table_name]:
-                retries = 0
-                max_retries = 3
-                retry_delay = 0.3
-                while retries < max_retries:
-                    try:
-                        postgres_insert_query = f"""
-                            INSERT INTO raw_{tbd_table_name}_t (raw_json) VALUES (%s)
-                        """
-                        sqlite_insert_query = f"""
-                            INSERT OR IGNORE INTO raw_{tbd_table_name}_t (raw_json) VALUES (?)
-                        """
-                        if (self.db_select == "sqlite"):
-                            query = sqlite_insert_query
-                        elif (self.db_select == "postgres"):
-                            query = postgres_insert_query
-                        self.cur.execute(query , (json.dumps(tbd_row), ))# .fetchall()
-                        # Uncomment this if getting errors, will reduce memory required
-                        # self.con.commit()
-                        # print(tbd_row)
-                        break
-                    except sqlite3.OperationalError as e:
-                        if "database is locked" in str(e):
-                            retries += 1
-                            time.sleep(retry_delay)
-                        else:
-                            raise
-                else:
-                    raise Exception("Max retries exceeded")
-                self.con.commit()
+                if (self.db_select == "sqlite"):
+                    query = sqlite_insert_query
+                elif (self.db_select == "postgres"):
+                    query = postgres_insert_query
+                insert_args.append(  [ json.dumps(tbd_row) ]  )
+                # (query , (json.dumps(tbd_row), ))# .fetchall()
+                # I should use self.cur.executemany
+                # Uncomment this if getting errors, will reduce memory required
+                # self.con.commit()
+                # print(tbd_row)
+                # pprint(insert_args)
+            execute_batch(self.cur, query, insert_args)
+        self.con.commit()
 
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
