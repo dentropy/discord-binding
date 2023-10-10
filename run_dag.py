@@ -161,4 +161,4 @@ test_s3_connection()
 # transform_tables_in_database()
 import json
 json_object_paths = json.load(open('S3_JSON_OBJECTS.json'))
-transform_s3_json_to_database_sql(    [json_object_paths[32]]    )
+transform_s3_json_to_database_sql(    json_object_paths    )
