@@ -91,12 +91,35 @@ def get_list_s3_json_objects():
   logging.info("Successfully got list of S3 JSON objects")
   return json_object_paths
 
-def transform_s3_json_to_database(json_object_paths):
-  logging.info("Transforming S3 JSON files to Postgres")
+def transform_s3_json_to_database_json(json_object_paths):
+  logging.info("Transforming S3 JSON files to Postgres JSON")
   create_tables_status = ex_dis.create_raw_json_tables()
   for discord_object_json_path in json_object_paths:
     print("discord_object_json_path")
-    print(discord_object_json_path)
+    pprint(discord_object_json_path)
+    try:
+      print("Getting Buckets")
+      content_object = s3_client.get_object(
+        Bucket=os.environ.get("bucket_name"),
+        Key=discord_object_json_path
+      )
+      print("Got Bucket")
+      mah_json = json.loads(  content_object["Body"].read().decode('utf-8')   )
+      print("mah_json")
+      processed_json = ex_dis.process_discord_json(mah_json)
+      ex_dis.json_data_to_json_sql(processed_json)
+      logging.info(f"Successfully Indexed: {discord_object_json_path}")
+    except Exception as e:
+      logging.debug(f"Error Reading S3 JSON Filename: {discord_object_json_path}")
+      logging.debug(f"S3 JSON Error Description : {e}")
+  logging.info("Successfully Transformed S3 JSON files to Postgres")
+
+def transform_s3_json_to_database_sql(json_object_paths):
+  logging.info("Transforming S3 JSON files to Postgres SQL")
+  create_tables_status = ex_dis.create_sql_tables()
+  for discord_object_json_path in json_object_paths:
+    print("discord_object_json_path")
+    pprint(discord_object_json_path)
     try:
       print("Getting Buckets")
       content_object = s3_client.get_object(
@@ -104,16 +127,17 @@ def transform_s3_json_to_database(json_object_paths):
         Key=discord_object_json_path
       )
       mah_json = json.loads(  content_object["Body"].read().decode('utf-8')   )
-      print("mah_json")
+      print("Got Bucket")
       processed_json = ex_dis.process_discord_json(mah_json)
+      # pprint(processed_json)
       ex_dis.json_data_to_sql(processed_json)
       logging.info(f"Successfully Indexed: {discord_object_json_path}")
     except Exception as e:
+      print("Error with S3 Object")
+      pprint(e)
       logging.debug(f"Error Reading S3 JSON Filename: {discord_object_json_path}")
       logging.debug(f"S3 JSON Error Description : {e}")
   logging.info("Successfully Transformed S3 JSON files to Postgres")
-
-
 
 def transform_tables_in_database():
   fix_schema_postgres(os.environ.get("db_url"))
@@ -129,9 +153,12 @@ ex_dis = ExportDiscord(
   os.environ.get("db_url")  
 )
 test_s3_connection()
-test_database_connection()
-json_object_paths = get_list_s3_json_objects()
-for json_object_path in json_object_paths:
-  print(json_object_path)
-transform_s3_json_to_database( json_object_paths )
-transform_tables_in_database()
+# test_database_connection()
+# json_object_paths = get_list_s3_json_objects()
+# for json_object_path in json_object_paths:
+#   print(json_object_path)
+# transform_s3_json_to_database_json( json_object_paths )
+# transform_tables_in_database()
+import json
+json_object_paths = json.load(open('S3_JSON_OBJECTS.json'))
+transform_s3_json_to_database_sql(    [json_object_paths[32]]    )

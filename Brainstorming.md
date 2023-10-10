@@ -1,15 +1,37 @@
 
 
+
+## Testing Queries
+
+``` sql
+select * from guilds_t;
+select * from channels_t;
+select * from messages_t;
+select count(*) from messages_t;
+select * from authors_t;
+select * from reactions_t;
+select * from attachments_t;
+select * from roles_t;
+select count(*) from roles_t;
+select count(*) from messages_t;
+select * from mentions_t;
+select count(*) from mentions_t;
+```
+
 ## DROP TABLES
 
 ``` sql
 
-DROP TABLE messages_t;
-DROP TABLE guilds_t;
-DROP TABLE channels_t;
-DROP TABLE embeds_t;
-DROP TABLE embeds_t;
-DROP TABLE embeds_t;
+drop table if exists "attachments_t" cascade;
+drop table if exists "guilds_t" cascade;
+drop table if exists "channels_t" cascade;
+drop table if exists "messages_dump_t" cascade;
+drop table if exists "messages_t" cascade;
+drop table if exists "authors_t" cascade;
+drop table if exists "authors_dump_t" cascade;
+drop table if exists "roles_t" cascade;
+drop table if exists "reactions_t" cascade;
+if exists "mentions_t" cascade;
 
 ```
 
