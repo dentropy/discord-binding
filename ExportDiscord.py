@@ -92,6 +92,7 @@ class ExportDiscord():
         root_dict["channels"].append(data["channel"])
         for message in data["messages"]:
             message["author_id"] = message["author"]["id"]
+            message["isBot"] = message["author"]["isBot"]
             authors_dict[message["author"]["id"]] = message["author"]
             message["channel_id"] = data["channel"]["id"]
             if "roles" in message["author"].keys():
@@ -322,7 +323,7 @@ class ExportDiscord():
             channel_id   ,
             content      ,
             -- interaction  ,
-            -- isBot        ,
+            isBot        ,
             isPinned     , -- 8
             mentions     ,
             msg_type     ,
@@ -335,7 +336,7 @@ class ExportDiscord():
             %s, %s, %s, %s,
             %s, %s, %s, %s,
             %s, %s, %s, %s,
-            %s, %s
+            %s, %s, %s
         )
         on conflict on constraint messages_t_pkey do nothing
         ;
@@ -352,7 +353,7 @@ class ExportDiscord():
                     message["channel_id"], # 6
                     message["content"], # 7
                     # message["interaction"],
-                    # message["isBot"],
+                    message["isBot"],
                     message["isPinned"], # 8
                     message["mentions"],
                     message["type"],
@@ -375,11 +376,13 @@ class ExportDiscord():
                 color,
                 isBot,
                 avatarUrl,
-                un_indexed_json -- 8
+                guild_id,
+                un_indexed_json -- 9
             )
             VALUES (
                 %s, %s, %s, %s,
-                %s, %s, %s, %s
+                %s, %s, %s, %s,
+                %s
             ) 
             on conflict (id) do nothing;
             """
@@ -393,7 +396,8 @@ class ExportDiscord():
                     author["color"],
                     author["isBot"],
                     author["avatarUrl"],
-                    json.dumps(author) # 8
+                    author["guild_id"],
+                    json.dumps(author) # 9
                 ])
             execute_batch(self.cur, query, authors_list)
             self.con.commit()
