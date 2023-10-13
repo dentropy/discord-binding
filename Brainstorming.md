@@ -1,5 +1,25 @@
 
+## Test Script
 
+``` python
+import os
+from dotenv import load_dotenv
+load_dotenv()
+from DiscordAnalytics import DiscordAnalytics
+discord_analytics = DiscordAnalytics(os.environ.get("db_url"))
+
+guilds_list = discord_analytics.fetch_all_guilds()
+discord_analytics.set_guild_white_list(list(guilds_list["guild_id"]))
+discord_analytics.calculate_base_guild_stats()
+discord_analytics.df
+
+discord_analytics.calculate_num_authors_more_x_messages(20)
+discord_analytics.calculate_num_authors_less_x_messages(20)
+discord_analytics.calculate_num_authors_between_msg_count(2,100)
+discord_analytics.calculate_average_half_life_top_x_percent_users(20, 2)
+discord_analytics.calculate_average_half_life_top_x_percent_users(30, 2)
+discord_analytics.df
+```
 
 ## Testing Queries
 
