@@ -20,4 +20,4 @@ json_object_paths = etl_functions.get_list_s3_json_objects()
 # json_object_paths = json.load(open('tmp_list.json', 'r'))
 # json_object_paths = json.load(open('S3_JSON_OBJECTS.json', 'r'))
 
-etl_functions.transform_s3_json_to_database_json( json_object_paths )
+etl_functions.transform_s3_json_to_database_sql( json_object_paths )
