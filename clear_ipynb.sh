@@ -2,7 +2,7 @@
 
 # Use the ls command to list files in the current directory
 # You can replace "." with a specific directory path if needed
-file_list=$(ls *ipynb)
+file_list=$(ls JupyterNotebooks/*ipynb)
 
 # Loop through each file in the list
 for file in $file_list; do
