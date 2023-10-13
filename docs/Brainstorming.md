@@ -16,6 +16,34 @@ discord_analytics.caultate_monthly_guild_stats()
 contact_df = discord_analytics.concat_month_df_with_base_df()
 ```
 
+## Add Constraints Queries
+
+``` SQL
+ALTER TABLE messages_t
+ADD COLUMN real_timestamp timestamp WITHOUT TIME ZONE;
+
+ALTER TABLE messages_t
+ADD COLUMN real_timestamp_edited timestamp WITHOUT TIME ZONE;
+
+UPDATE messages_t
+SET real_timestamp = to_timestamp(unix_timestamp);
+
+ALTER TABLE messages_t
+  ADD CONSTRAINT messages_t_to_guild_id
+  FOREIGN KEY (guild_id)
+  REFERENCES guilds_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON messages_t (guild_id);
+```
+
+## DON'T RUN THIS
+
+``` SQL
+ALTER TABLE messages_dump_t
+DROP COLUMN #real_timestamp;
+```
+
+
 ## Testing Queries
 
 ``` sql
@@ -75,6 +103,10 @@ ORDER BY LENGTH(content) DESC;
 
 ```
 
+## Helpers
+
+You can check if the SQLite database is being written to with `ls -lrt` a couple times in the directory of the database to see if it is increasing.
+
 ## Get my messages ordered by length
 
 ``` sql
@@ -108,6 +140,8 @@ order by count desc;
 SELECT COUNT(*) FROM messages;
 
 ```
+
+
 
 ## Get all the json key's from a raw_json column
 
