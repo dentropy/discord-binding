@@ -3,7 +3,7 @@ from pprint import pprint
 from decouple import AutoConfig
 current_directory = os.getcwd()
 parent_directory = os.path.dirname(current_directory)
-config = AutoConfig(search_path=parent_directory)
+config = AutoConfig(search_path=current_directory)
 
 import sys
 sys.path.append(os.getcwd() + '/..')
@@ -23,6 +23,7 @@ discord_analytics.table_size_df.to_csv(f"{run_name}table_size_df.csv")
 
 print("calculate_base_guild_stats")
 discord_analytics.calculate_base_guild_stats()
+discord_analytics.calulate_demo_guild_stats()
 discord_analytics.df.to_csv(f"{run_name}df.csv")
 
 print("calculate_base_guild_stats")
