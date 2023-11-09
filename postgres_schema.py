@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS authors_t (
   id               VARCHAR PRIMARY KEY,
   author_id        VARCHAR,
   guild_id         VARCHAR,
-  name             TEXT,
+  author_name      TEXT,
   nickname         TEXT,
   color            TEXT,
   isBot            BOOLEAN,

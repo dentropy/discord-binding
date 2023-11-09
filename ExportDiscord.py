@@ -380,7 +380,7 @@ class ExportDiscord():
                 id, 
                 author_id,
                 guild_id,
-                name,
+                author_name,
                 nickname,       -- 5 
                 color,
                 isBot,
