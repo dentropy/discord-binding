@@ -110,7 +110,7 @@ class ExportDiscord():
                     attachment["message_id"] = message["id"]
                     attachment["guild_id"] = data["guild"]["id"]
                     attachment["author_id"] = message["author"]["id"] 
-                    attachment["author_guild_id"] = data["guild"]["id"] + "-" + message["author"]["id"]
+                    attachment["author_guild_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
                     attachment["guild_id"] = data["guild"]["id"]
                     root_dict["attachments"].append(attachment)
                 message["attachments"] = True
@@ -161,7 +161,7 @@ class ExportDiscord():
                 message["reference"] = json.dumps(message["reference"])
             else:
                 message["reference"] = ""
-            message["author_guild_id"] = data["guild"]["id"] + "-" + message["author"]["id"]
+            message["author_guild_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
             message["author"] = message["author"]["id"]
             message["guild_id"] = data["guild"]["id"]
             root_dict["messages"].append(message)
