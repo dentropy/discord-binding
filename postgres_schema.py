@@ -33,26 +33,6 @@ CREATE TABLE IF NOT EXISTS channels_t (
 """,
 
 """
-CREATE TABLE IF NOT EXISTS messages_dump_t (
-  id           VARCHAR PRIMARY KEY,
-  guild_id     VARCHAR,
-  attachments  TEXT,
-  author       TEXT,
-  channel_id   VARCHAR,
-  content      TEXT,
-  interaction  TEXT,
-  isBot        BOOLEAN,
-  isPinned     BOOLEAN,
-  mentions     BOOLEAN,
-  msg_type     TEXT,
-  timestamp    INT,
-  timestampEdited INT,
-  content_length INT,
-  un_indexed_json TEXT
-)
-""",
-
-"""
 CREATE TABLE IF NOT EXISTS messages_t (
   id           VARCHAR PRIMARY KEY,
   guild_id     VARCHAR,
@@ -77,7 +57,7 @@ CREATE TABLE IF NOT EXISTS messages_t (
 
 """
 CREATE TABLE IF NOT EXISTS authors_t (
-  author_guild_id  VARCHAR PRIMARY KEY,
+  id               VARCHAR PRIMARY KEY,
   author_id        VARCHAR,
   guild_id         VARCHAR,
   name             TEXT,
@@ -102,19 +82,6 @@ CREATE TABLE IF NOT EXISTS reactions_t (
   emoji_name         VARCHAR,
   emoji_json         TEXT,
   un_indexed_json    TEXT
-)
-""",
-
-"""
-CREATE TABLE IF NOT EXISTS authors_dump_t (
-  id            VARCHAR,
-  author_id     VARCHAR,
-  name          TEXT,
-  nickname      TEXT,
-  color         TEXT,
-  isBot         BOOLEAN,
-  avatarUrl     TEXT,
-  un_indexed_json TEXT
 )
 """,
 

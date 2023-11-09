@@ -17,6 +17,7 @@ import copy
 from psycopg2.extras import execute_batch
 import datetime 
 import uuid
+import copy
 
 class ExportDiscord():
     def __init__(
@@ -92,7 +93,7 @@ class ExportDiscord():
         data["channel"]["guild_id"] = data["guild"]["id"]
         root_dict["channels"].append(data["channel"])
         for message in data["messages"]:
-            message["author_id"] = message["author"]["id"]
+            message["author_id"] = copy.deepcopy(message["author"]["id"])
             message["isBot"] = message["author"]["isBot"]
             authors_dict[message["author"]["id"]] = message["author"]
             message["channel_id"] = data["channel"]["id"]
@@ -164,12 +165,15 @@ class ExportDiscord():
             message["author"] = message["author"]["id"]
             message["guild_id"] = data["guild"]["id"]
             root_dict["messages"].append(message)
-        for author in authors_dict.values(): 
-            tmp_author = author
+        # print("\nauthors_dict.values()")
+        # pprint(len ( authors_dict.keys())  )
+        for author in authors_dict.keys(): 
+            tmp_author = authors_dict[author]
             tmp_author["guild_id"] = data["guild"]["id"] 
             tmp_author["author_id"] = tmp_author["id"]
             tmp_author["author_guild_id"] = tmp_author["id"] + "-" + data["guild"]["id"] 
-            root_dict["authors"].append(author)
+            # pprint(tmp_author["author_guild_id"])
+            root_dict["authors"].append(tmp_author)
         print(f"Done Running process_discord_json")
         return root_dict
 
@@ -298,7 +302,8 @@ class ExportDiscord():
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
         on conflict (id) do nothing;
         """
-        pprint(discord_data["channels"])
+        # pprint("Test Channels")
+        # pprint(discord_data["channels"])
         insert_args = [[
             discord_data["channels"][0]["id"],
             discord_data["channels"][0]["name"],
@@ -313,7 +318,8 @@ class ExportDiscord():
         execute_batch(self.cur, query, insert_args)
         self.con.commit()
         # Messages
-        pprint(discord_data["messages"][0])
+        # pprint("Test Messages")
+        # pprint(discord_data["messages"][0])
         query = """
         INSERT INTO messages_t (
             id           ,
@@ -367,14 +373,15 @@ class ExportDiscord():
             execute_batch(self.cur, query, messages_list)
             self.con.commit()
             # Authors
-            pprint(discord_data["authors"][0])
+            # pprint("Authors Test")
+            # pprint(discord_data["authors"][0])
             query = """
             INSERT INTO authors_t (
-                author_guild_id, 
+                id, 
                 author_id,
                 guild_id,
                 name,
-                nickname,       -- 4 
+                nickname,       -- 5 
                 color,
                 isBot,
                 avatarUrl,
@@ -385,14 +392,15 @@ class ExportDiscord():
                 %s, %s, %s, %s,
                 %s
             ) 
-            on conflict (author_guild_id) do nothing;
+            on conflict (id) do nothing;
             """
             authors_list = []
             for author in discord_data["authors"]:
+                # pprint(author["author_guild_id"])
                 authors_list.append([
-                    message["author_guild_id"], # 1
-                    message["author_id"],              # 2
-                    message["guild_id"],        # 3
+                    author["author_guild_id"], # 1
+                    author["author_id"],       # 2
+                    author["guild_id"],        # 3
                     author["name"],             # 4
                     author["nickname"],         # 5
                     author["color"],            # 6
@@ -400,9 +408,9 @@ class ExportDiscord():
                     author["avatarUrl"],        # 8 
                     json.dumps(author)          # 9
                 ])
+            # pprint("authors_list")
+            # pprint(authors_list)
             execute_batch(self.cur, query, authors_list)
-            pprint("authors_list")
-            pprint(authors_list)
             self.con.commit()
         # Reactions
         if len(discord_data["reactions"]) != 0:
@@ -478,8 +486,9 @@ class ExportDiscord():
             execute_batch(self.cur, query, attachments_list)
             self.con.commit()
         # Roles
+        # pprint("Test Roles")
+        # pprint(discord_data["roles"][0])
         if(len(discord_data["roles"]) != 0) :
-            pprint(discord_data["roles"][0])
             query = """
             INSERT INTO roles_t (
                 id              , -- 1
@@ -510,8 +519,9 @@ class ExportDiscord():
             execute_batch(self.cur, query, roles_list)
             self.con.commit()
         # mentions
+        # pprint("Test Mentions")
+        # pprint(discord_data["mentions"][0])
         if(len(discord_data["mentions"]) != 0) :
-            pprint(discord_data["mentions"][0])
             query = """
             INSERT INTO mentions_t (
                 id,
