@@ -77,14 +77,14 @@ CREATE TABLE IF NOT EXISTS messages_t (
 
 """
 CREATE TABLE IF NOT EXISTS authors_t (
-  id               VARCHAR PRIMARY KEY,
-  author_guild_id  VARCHAR,
+  author_guild_id  VARCHAR PRIMARY KEY,
+  author_id        VARCHAR,
+  guild_id         VARCHAR,
   name             TEXT,
   nickname         TEXT,
   color            TEXT,
   isBot            BOOLEAN,
   avatarUrl        TEXT,
-  guild_id         VARCHAR,
   un_indexed_json  TEXT
 )
 """,

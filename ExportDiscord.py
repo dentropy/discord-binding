@@ -16,6 +16,7 @@ import glob
 import copy
 from psycopg2.extras import execute_batch
 import datetime 
+import uuid
 
 class ExportDiscord():
     def __init__(
@@ -369,14 +370,14 @@ class ExportDiscord():
             pprint(discord_data["authors"][0])
             query = """
             INSERT INTO authors_t (
-                id, 
                 author_guild_id, 
-                name, 
-                nickname, -- 4 
+                author_id,
+                guild_id,
+                name,
+                nickname,       -- 4 
                 color,
                 isBot,
                 avatarUrl,
-                guild_id,
                 un_indexed_json -- 9
             )
             VALUES (
@@ -384,22 +385,24 @@ class ExportDiscord():
                 %s, %s, %s, %s,
                 %s
             ) 
-            on conflict (id) do nothing;
+            on conflict (author_guild_id) do nothing;
             """
             authors_list = []
             for author in discord_data["authors"]:
                 authors_list.append([
-                    author["author_id"],
-                    author["author_guild_id"],
-                    author["name"],
-                    author["nickname"], # 4
-                    author["color"],
-                    author["isBot"],
-                    author["avatarUrl"],
-                    author["guild_id"],
-                    json.dumps(author) # 9
+                    message["author_guild_id"], # 1
+                    message["author_id"],              # 2
+                    message["guild_id"],        # 3
+                    author["name"],             # 4
+                    author["nickname"],         # 5
+                    author["color"],            # 6
+                    author["isBot"],            # 7
+                    author["avatarUrl"],        # 8 
+                    json.dumps(author)          # 9
                 ])
             execute_batch(self.cur, query, authors_list)
+            pprint("authors_list")
+            pprint(authors_list)
             self.con.commit()
         # Reactions
         if len(discord_data["reactions"]) != 0:

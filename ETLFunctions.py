@@ -39,11 +39,12 @@ class ETLFunctions():
     self.aws_secret_access_key = aws_secret_access_key
     self.endpoint_url = endpoint_url
     self.ex_dis = ExportDiscord(db_select, db_url)
-    self.s3_client = boto3.client('s3', 
-                    aws_access_key_id=aws_access_key_id, 
-                    aws_secret_access_key=aws_secret_access_key,
-                    endpoint_url=endpoint_url
-                    )
+    if(self.aws_access_key_id != "PLACEHOLDER"):
+      self.s3_client = boto3.client('s3', 
+                      aws_access_key_id=aws_access_key_id, 
+                      aws_secret_access_key=aws_secret_access_key,
+                      endpoint_url=endpoint_url
+                      )
   def test_s3_connection(self):
     logging.info("Testing S3 Connection")
     try:
@@ -159,5 +160,22 @@ class ETLFunctions():
         logging.debug(f"S3 JSON Error Description : {e}")
     logging.info("Successfully Transformed S3 JSON files to Postgres")
 
+  def transform_json_to_database_sql(self, json_object_paths):
+    logging.info("Transforming JSON files to Postgres SQL")
+    create_tables_status = self.ex_dis.create_sql_tables()
+    for discord_object_json_path in json_object_paths:
+      logging.info(f"discord_object_json_path {discord_object_json_path}")
+      with open(discord_object_json_path, 'r') as json_file:
+        try:
+          mah_json = json.load(json_file)
+          processed_json = self.ex_dis.process_discord_json(mah_json)
+          self.ex_dis.json_data_to_sql(processed_json)
+          logging.info(f"Successfully Indexed: {discord_object_json_path}")
+        except Exception as e:
+          print("Error with processing JSON file")
+          pprint(e)
+          logging.debug(f"Error Reading JSON Filename: {discord_object_json_path}")
+          logging.debug(f"READ JSON Error Description : {e}")
+    logging.info("Successfully Transformed JSON files to Postgres")
   # def transform_tables_in_database(self):
   #   fix_schema_postgres(os.environ.get("db_url"))

@@ -26,6 +26,7 @@ Steps:
 # install pip
 curl https://bootstrap.pypa.io/get-pip.py | python3 $1
 python3 -m pip install virtualenv
+sudo apt install python3.10-venv # Debian Distros
 python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt

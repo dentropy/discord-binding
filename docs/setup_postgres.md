@@ -39,7 +39,7 @@ exit;
 
 * Create Tables
 
-Set postgres_url in .env
+Set postgres_url `postgresql://postgres:postgres@127.0.0.1:5432/discorddata` in .env
 
 
 ## Check currently running queries
@@ -50,4 +50,14 @@ FROM pg_stat_activity
 WHERE state <> 'idle' 
     AND query NOT LIKE '% FROM pg_stat_activity %' 
 ORDER BY age;
+```
+
+## Reset Postgres
+
+``` sql
+\c postgres
+DROP DATABASE discorddata;
+CREATE DATABASE discorddata;
+\c discorddata
+dt
 ```
