@@ -13,11 +13,9 @@ import sqlite3
 # from sqlalchemy import distinct, desc
 import time
 import glob
-import copy
 from psycopg2.extras import execute_batch
 import datetime 
 import uuid
-import copy
 
 class ExportDiscord():
     def __init__(
@@ -93,7 +91,7 @@ class ExportDiscord():
         data["channel"]["guild_id"] = data["guild"]["id"]
         root_dict["channels"].append(data["channel"])
         for message in data["messages"]:
-            message["author_id"] = copy.deepcopy(message["author"]["id"])
+            message["author_id"] = message["author"]["id"] # copy.deepcopy(message["author"]["id"])
             message["isBot"] = message["author"]["isBot"]
             authors_dict[message["author"]["id"]] = message["author"]
             message["channel_id"] = data["channel"]["id"]
