@@ -38,7 +38,7 @@ class ETLFunctions():
     self.aws_access_key_id = aws_access_key_id
     self.aws_secret_access_key = aws_secret_access_key
     self.endpoint_url = endpoint_url
-    self.ex_dis = ExportDiscord(db_select, db_url)
+    ex_dis = ExportDiscord(db_select, db_url)
     if(self.aws_access_key_id != "PLACEHOLDER"):
       self.s3_client = boto3.client('s3', 
                       aws_access_key_id=aws_access_key_id, 
@@ -58,7 +58,8 @@ class ETLFunctions():
 
   def test_database_connection(self):
     logging.info("Testing Postgres Connection Connection")
-    if self.ex_dis.test_connection() == True:
+    ex_dis = ExportDiscord(self.db_select, self.db_url)
+    if ex_dis.test_connection() == True:
       logging.info("Postgres Connection is Valid")
     else:
       logging.critical("Postgres connection is invalid Exiting")
@@ -114,7 +115,8 @@ class ETLFunctions():
 
   def transform_s3_json_to_database_json(self, json_object_paths):
     logging.info("Transforming S3 JSON files to Postgres JSON")
-    create_tables_status = self.ex_dis.create_raw_json_tables()
+    ex_dis = ExportDiscord(self.db_select, self.db_url)
+    create_tables_status = ex_dis.create_raw_json_tables()
     for discord_object_json_path in json_object_paths:
       print("discord_object_json_path")
       pprint(discord_object_json_path)
@@ -127,8 +129,8 @@ class ETLFunctions():
         print("Got Bucket")
         mah_json = json.loads(  content_object["Body"].read().decode('utf-8')   )
         print("mah_json")
-        processed_json = self.ex_dis.process_discord_json(mah_json)
-        self.ex_dis.json_data_to_json_sql(processed_json)
+        processed_json = ex_dis.process_discord_json(mah_json)
+        ex_dis.json_data_to_json_sql(processed_json)
         logging.info(f"Successfully Indexed: {discord_object_json_path}")
       except Exception as e:
         logging.debug(f"Error Reading S3 JSON Filename: {discord_object_json_path}")
@@ -137,7 +139,8 @@ class ETLFunctions():
 
   def transform_s3_json_to_database_sql(self, json_object_paths):
     logging.info("Transforming S3 JSON files to Postgres SQL")
-    create_tables_status = self.ex_dis.create_sql_tables()
+    ex_dis = ExportDiscord(self.db_select, self.db_url)
+    create_tables_status = ex_dis.create_sql_tables()
     for discord_object_json_path in json_object_paths:
       print("discord_object_json_path")
       pprint(discord_object_json_path)
@@ -149,9 +152,9 @@ class ETLFunctions():
         )
         mah_json = json.loads(  content_object["Body"].read().decode('utf-8')   )
         print("Got Bucket")
-        processed_json = self.ex_dis.process_discord_json(mah_json)
+        processed_json = ex_dis.process_discord_json(mah_json)
         # pprint(processed_json)
-        self.ex_dis.json_data_to_sql(processed_json)
+        ex_dis.json_data_to_sql(processed_json)
         logging.info(f"Successfully Indexed: {discord_object_json_path}")
       except Exception as e:
         print("Error with S3 Object")
@@ -162,14 +165,15 @@ class ETLFunctions():
 
   def transform_json_to_database_sql(self, json_object_paths):
     logging.info("Transforming JSON files to Postgres SQL")
-    create_tables_status = self.ex_dis.create_sql_tables()
+    ex_dis = ExportDiscord(self.db_select, self.db_url)
+    create_tables_status = ex_dis.create_sql_tables()
     for discord_object_json_path in json_object_paths:
       logging.info(f"discord_object_json_path {discord_object_json_path}")
       with open(discord_object_json_path, 'r') as json_file:
         try:
           mah_json = json.load(json_file)
-          processed_json = self.ex_dis.process_discord_json(mah_json)
-          self.ex_dis.json_data_to_sql(processed_json)
+          processed_json = ex_dis.process_discord_json(mah_json)
+          ex_dis.json_data_to_sql(processed_json)
           logging.info(f"Successfully Indexed: {discord_object_json_path}")
         except Exception as e:
           print("Error with processing JSON file")
