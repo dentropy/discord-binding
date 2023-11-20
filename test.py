@@ -52,7 +52,6 @@ def test_schema_creation_and_reset():
 def test_indexing_json_file(discord_object_json_path):
   import json
   from ExportDiscord import ExportDiscord
-  reset_postgres_database(os.environ.get("db_url"))
   ex_dis = ExportDiscord(
     os.environ.get("db_select"),
     os.environ.get("db_url")
@@ -99,8 +98,7 @@ def test_sqlalchemy_schema_creation():
 # test_db_connection()
 # test_schema_creation()
 # test_schema_creation_and_reset()
-
+# reset_postgres_database(os.environ.get("db_url"))
 directory_path = os.environ.get("discord_export_path")
 json_file_paths = find_json_files(directory_path)
-
 test_indexing_json_file(json_file_paths[0])

@@ -1,14 +1,15 @@
-version: '3.8'
+version: '3.1'
 
 services:
   neo4j:
     image: neo4j:latest
     container_name: my_neo4j_container
     environment:
-      NEO4J_AUTH: neo4j/password # Replace 'password' with your desired password
+      # NEO4J_AUTH: neo4j/discorddata # username/password
+      NEO4J_AUTH: none
     ports:
       - "7474:7474" # Bolt protocol
       - "7687:7687" # HTTP protocol
     volumes:
-      - ./neo4j_db_1
+      - ./neo4j_db_1:/data
 

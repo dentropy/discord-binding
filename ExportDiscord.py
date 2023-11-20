@@ -48,6 +48,11 @@ class ExportDiscord():
             self.engine = create_engine(engine_path, echo=True)
             Session = sessionmaker(bind=self.engine, autoflush=False)
             self.session = Session()
+        elif(db_select == "neo4j"):
+            from neomodel import db
+            self.db = db.set_connection(url=self.db_url)
+
+
 
 
     def test_connection(self):
@@ -61,7 +66,7 @@ class ExportDiscord():
                 return True
             except:
                 return False
-        if(self.db_select == "sqlalchemy"):
+        elif(self.db_select == "sqlalchemy"):
             from sqlalchemy import create_engine
             # [SQLAlchemy Connection Test](https://chat.openai.com/share/f6e511fe-2db5-4de8-aa05-9df38efea672)
             try:
@@ -76,6 +81,16 @@ class ExportDiscord():
             except Exception as e:
                 # print(f"Connection failed! Error: {e}")
                 return False
+        elif (self.db_select == "neo4j"):
+            try:
+                from neomodel import db
+                db.set_connection(url=self.db_url)
+                results, meta = db.cypher_query("RETURN 'Hello World' as message")
+                return True
+            except Exception as e:
+                # print(f"Connection failed! Error: {e}")
+                return False
+        return False
 
     def execute_with_retry(self, query, params=None, max_retries=3, retry_delay=0.1):
         retries = 0
@@ -696,7 +711,47 @@ class ExportDiscord():
                 self.session.commit()
             # TODO embeds
             # TODO stickers
-                
+        if self.db_select == "neo4j":
+            from schema_neo4j import Guilds, Channels, Authors
+            from neomodel import db
+            db.set_connection(url=self.db_url)
+            with db.transaction:
+                guild = Guilds(
+                    identifier = discord_data["guilds"][0]["id"],
+                    guild_name = discord_data["guilds"][0]["name"],
+                    iconUrl = discord_data["guilds"][0]["iconUrl"]
+                ).save()
+                # inserted_guild = Guilds.nodes.get(identifier=discord_data["guilds"][0]["id"])
+                channel = Channels(
+                    identifier = discord_data["channels"][0]["id"],
+                    channel_name = discord_data["channels"][0]["name"],
+                    channel_type = discord_data["channels"][0]["type"],
+                    category_id = discord_data["channels"][0]["categoryId"],
+                    category = discord_data["channels"][0]["category"],
+                    guild_id = discord_data["channels"][0]["guild_id"],
+                    # discord_topic = discord_data["channels"][0]["topic"],
+                    channel_name_length = len(discord_data["channels"][0]["name"])
+                ).save()
+                # inserted_channel = Channels.nodes.get(identifier = discord_data["channels"][0]["id"])
+                # inserted_channel.guild_id.connect(inserted_guild)
+                # pprint(discord_data["authors"])
+                for author in discord_data["authors"]:
+                    author = Authors(
+                        identifier = author["author_guild_id"], # 1
+                        author_id = author["author_id"],       # 2
+                        guild_id = author["guild_id"],        # 3
+                        author_name = author["name"],             # 4
+                        nickname = author["nickname"],         # 5
+                        # color = author["color"],            # 6
+                        isBot = author["isBot"],            # 7
+                        avatarUrl = author["avatarUrl"],        # 8 
+                        un_indexed_json = json.dumps(author)          # 9
+                    ).save()
+                    # inserted_author = Authors.nodes.get(identifier = author["author_guild_id"])
+                    # pprint(inserted_author)
+                    # inserted_author.guild_id.connect(inserted_guild)
+                    break
+
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
         for json_file in json_files:
