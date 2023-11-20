@@ -61,3 +61,16 @@ CREATE DATABASE discorddata;
 \c discorddata
 dt
 ```
+
+
+## Test Queries
+
+``` sql
+
+select * from guilds_t;
+
+select * from channels_t;
+
+select * from messages_t limit 100;
+
+```

@@ -180,6 +180,11 @@ class ETLFunctions():
           pprint(e)
           logging.debug(f"Error Reading JSON Filename: {discord_object_json_path}")
           logging.debug(f"READ JSON Error Description : {e}")
+        # For Testing
+        # mah_json = json.load(json_file)
+        # processed_json = ex_dis.process_discord_json(mah_json)
+        # ex_dis.json_data_to_sql(processed_json)
+        # logging.info(f"Successfully Indexed: {discord_object_json_path}")
     logging.info("Successfully Transformed JSON files to Postgres")
   # def transform_tables_in_database(self):
   #   fix_schema_postgres(os.environ.get("db_url"))

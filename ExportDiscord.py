@@ -7,15 +7,14 @@ import os
 from pprint import pprint
 # from database import DB, Messages, Users
 # from urlextract import URLExtract
-import datetime
+# from sqlalchemy import distinct, desc
 from pathlib import Path
 import sqlite3
-# from sqlalchemy import distinct, desc
 import time
 import glob
 from psycopg2.extras import execute_batch
-import datetime 
 import uuid
+from sqlalchemy.dialects.postgresql import insert
 
 class ExportDiscord():
     def __init__(
@@ -34,26 +33,50 @@ class ExportDiscord():
         # for path in paths_in_dir:
         #    files_in_dir.append( path.split("/")[-1] )
         self.db_url = db_url
-        print(self.db_url)
         self.db_select = db_select
         if(db_select == "sqlite"):
             self.con = sqlite3.connect(self.db_url)
             # self.con = sqlite3.connect(':memory:')
+            self.cur = self.con.cursor()
         elif(db_select == "postgres"):
             self.con = psycopg2.connect(dsn=db_url)
-        self.cur = self.con.cursor()
+            self.cur = self.con.cursor()
+        elif(db_select == "sqlalchemy"):
+            from sqlalchemy import create_engine
+            from sqlalchemy.orm import Session, sessionmaker
+            engine_path = db_url
+            self.engine = create_engine(engine_path, echo=True)
+            Session = sessionmaker(bind=self.engine, autoflush=False)
+            self.session = Session()
 
 
     def test_connection(self):
-        try:
-            # Execute a simple SQL query (e.g., select the current date)
-            self.cur.execute("SELECT current_date")
-            # Fetch the result (in this case, a single date)
-            result = self.cur.fetchone()
-            pprint(result)
-            return True
-        except:
-            return False
+        if(self.db_select == "posgres"):
+            try:
+                # Execute a simple SQL query (e.g., select the current date)
+                self.cur.execute("SELECT version();")
+                # Fetch the result (in this case, a single date)
+                result = self.cur.fetchone()
+                pprint(result)
+                return True
+            except:
+                return False
+        if(self.db_select == "sqlalchemy"):
+            from sqlalchemy import create_engine
+            # [SQLAlchemy Connection Test](https://chat.openai.com/share/f6e511fe-2db5-4de8-aa05-9df38efea672)
+            try:
+                # Create an engine
+                engine = create_engine(self.db_url)
+
+                # Try to connect
+                with engine.connect() as connection:
+                    # print("Connection successful!")
+                    return True
+                    
+            except Exception as e:
+                # print(f"Connection failed! Error: {e}")
+                return False
+
     def execute_with_retry(self, query, params=None, max_retries=3, retry_delay=0.1):
         retries = 0
         while retries < max_retries:
@@ -229,12 +252,16 @@ class ExportDiscord():
         return True
 
     def create_sql_tables(self):
-        from postgres_schema import create_table_queries
-        for tmp_query in create_table_queries:
-            # pprint(tmp_query)
-            self.cur.execute(tmp_query)
-            self.con.commit()
-        return True
+        if(self.db_select == "postgres"):
+            from schema_postgres import create_table_queries
+            for tmp_query in create_table_queries:
+                # pprint(tmp_query)
+                self.cur.execute(tmp_query)
+                self.con.commit()
+            return True
+        elif(self.db_select == "sqlalchemy"):
+            from schema_sqlalchemy import Base
+            Base.metadata.create_all(self.engine)
 
     def json_data_to_json_sql(self, guild_data):
         print(f"json_data_to_json_sql Inserting\n {guild_data['channels']}\n\n")
@@ -271,280 +298,405 @@ class ExportDiscord():
             pprint(discord_data.keys())
         # Guilds
         # pprint(discord_data["guilds"])
-        query = """
-        INSERT INTO guilds_t (id, guild_name, iconUrl, un_indexed_json)
-        VALUES (%s, %s, %s, %s) 
-        on conflict on constraint guilds_t_pkey do nothing;
-        """
-        insert_args = [[
-            discord_data["guilds"][0]["id"],
-            discord_data["guilds"][0]["name"],
-            discord_data["guilds"][0]["iconUrl"],
-            json.dumps(discord_data["guilds"][0])
-        ]]
-        execute_batch(self.cur, query, insert_args)
-        self.con.commit()
-        # Channels
-        query = """
-        INSERT INTO channels_t (
-            id, 
-            channel_name, 
-            channel_type, 
-            categoryId,
-            category,
-            guild_id,
-            topic,
-            channel_name_length,
-            un_indexed_json
-        )
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
-        on conflict (id) do nothing;
-        """
-        # pprint("Test Channels")
-        # pprint(discord_data["channels"])
-        insert_args = [[
-            discord_data["channels"][0]["id"],
-            discord_data["channels"][0]["name"],
-            discord_data["channels"][0]["type"],
-            discord_data["channels"][0]["categoryId"],
-            discord_data["channels"][0]["category"],
-            discord_data["channels"][0]["guild_id"],
-            discord_data["channels"][0]["topic"],
-            str(  len(discord_data["channels"][0]["name"])  ),
-            json.dumps(discord_data["channels"][0])
-        ]]
-        execute_batch(self.cur, query, insert_args)
-        self.con.commit()
-        # Messages
-        # pprint("Test Messages")
-        # pprint(discord_data["messages"][0])
-        query = """
-        INSERT INTO messages_t (
-            id           ,
-            guild_id     ,
-            attachments  ,
-            author_id   , -- 4
-            author_guild_id,
-            channel_id   ,
-            content      ,
-            -- interaction  ,
-            isBot        ,
-            isPinned     , -- 8
-            mentions     ,
-            msg_type     ,
-            msg_timestamp    ,
-            msg_timestampEdited , -- 12
-            content_length ,
-            un_indexed_json -- 14
-        )
-        VALUES (
-            %s, %s, %s, %s,
-            %s, %s, %s, %s,
-            %s, %s, %s, %s,
-            %s, %s, %s
-        )
-        on conflict on constraint messages_t_pkey do nothing
-        ;
-        """
-        if len(discord_data["messages"]) != 0:
-            messages_list = []
-            for message in discord_data["messages"]:
-                insert_data = [
-                    message["id"], # 1
-                    message["guild_id"], # 2
-                    str (  message["attachments"]  ), # 3
-                    message["author"], # 4
-                    message["author_guild_id"], # 5
-                    message["channel_id"], # 6
-                    message["content"], # 7
-                    # message["interaction"],
-                    message["isBot"],
-                    message["isPinned"], # 8
-                    message["mentions"],
-                    message["type"],
-                    message["timestamp"],
-                    message["timestampEdited"],
-                    str(  len(message["content"])  ),
-                    json.dumps(message)
-                ]
-                messages_list.append(tuple ( insert_data) )
-            execute_batch(self.cur, query, messages_list)
-            self.con.commit()
-            # Authors
-            # pprint("Authors Test")
-            # pprint(discord_data["authors"][0])
+        if self.db_select == "postgres":
             query = """
-            INSERT INTO authors_t (
-                id, 
-                author_id,
-                guild_id,
-                author_name,
-                nickname,       -- 5 
-                color,
-                isBot,
-                avatarUrl,
-                un_indexed_json -- 9
-            )
-            VALUES (
-                %s, %s, %s, %s,
-                %s, %s, %s, %s,
-                %s
-            ) 
-            on conflict (id) do nothing;
+            INSERT INTO guilds_t (id, guild_name, iconUrl, un_indexed_json)
+            VALUES (%s, %s, %s, %s) 
+            on conflict on constraint guilds_t_pkey do nothing;
             """
-            authors_list = []
-            for author in discord_data["authors"]:
-                # pprint(author["author_guild_id"])
-                authors_list.append([
-                    author["author_guild_id"], # 1
-                    author["author_id"],       # 2
-                    author["guild_id"],        # 3
-                    author["name"],             # 4
-                    author["nickname"],         # 5
-                    author["color"],            # 6
-                    author["isBot"],            # 7
-                    author["avatarUrl"],        # 8 
-                    json.dumps(author)          # 9
-                ])
-            # pprint("authors_list")
-            # pprint(authors_list)
-            execute_batch(self.cur, query, authors_list)
+            insert_args = [[
+                discord_data["guilds"][0]["id"],
+                discord_data["guilds"][0]["name"],
+                discord_data["guilds"][0]["iconUrl"],
+                json.dumps(discord_data["guilds"][0])
+            ]]
+            execute_batch(self.cur, query, insert_args)
             self.con.commit()
-        # Reactions
-        if len(discord_data["reactions"]) != 0:
+            # Channels
             query = """
-            INSERT INTO reactions_t (
-                id        , -- 1
-                message_id         ,
-                author_guild_id    ,
-                channel_id         ,
-                guild_id           ,
-                count              ,
-                emoji_id           ,
-                emoji_code         ,
-                emoji_name         ,
-                emoji_json         , -- 10
+            INSERT INTO channels_t (
+                id, 
+                channel_name, 
+                channel_type, 
+                category_id,
+                category,
+                guild_id,
+                topic,
+                channel_name_length,
                 un_indexed_json
             )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
+            on conflict (id) do nothing;
+            """
+            # pprint("Test Channels")
+            # pprint(discord_data["channels"])
+            insert_args = [[
+                discord_data["channels"][0]["id"],
+                discord_data["channels"][0]["name"],
+                discord_data["channels"][0]["type"],
+                discord_data["channels"][0]["categoryId"],
+                discord_data["channels"][0]["category"],
+                discord_data["channels"][0]["guild_id"],
+                discord_data["channels"][0]["topic"],
+                str(  len(discord_data["channels"][0]["name"])  ),
+                json.dumps(discord_data["channels"][0])
+            ]]
+            execute_batch(self.cur, query, insert_args)
+            self.con.commit()
+            # Messages
+            # pprint("Test Messages")
+            # pprint(discord_data["messages"][0])
+            query = """
+            INSERT INTO messages_t (
+                id           ,
+                guild_id     ,
+                attachments  ,
+                author_id   , -- 4
+                author_guild_id,
+                channel_id   ,
+                content      ,
+                -- interaction  ,
+                is_bot       ,
+                isPinned     , -- 8
+                mentions     ,
+                msg_type     ,
+                msg_timestamp    ,
+                msg_timestamp_edited , -- 12
+                content_length ,
+                un_indexed_json -- 14
+            )
             VALUES (
+                %s, %s, %s, %s,
                 %s, %s, %s, %s,
                 %s, %s, %s, %s,
                 %s, %s, %s
             )
-            on conflict (id) do nothing;
+            on conflict on constraint messages_t_pkey do nothing
+            ;
             """
-            reactions_list = []
-            for reaction in discord_data["reactions"]:
-                reactions_list.append([
-                    reaction['message_id'] + "-" + reaction['emoji']['code'] + "-" + str(reaction["count"]),
-                    reaction["message_id"],
-                    reaction["author_guild_id"],
-                    reaction["channel_id"], # 4
-                    reaction["guild_id"],
-                    reaction["count"],
-                    reaction["emoji"]["id"],
-                    reaction["emoji"]["code"], # 8
-                    reaction["emoji"]["name"],
-                    json.dumps(reaction["emoji"]),
-                    json.dumps(reaction) # 11
-                ])
-            execute_batch(self.cur, query, reactions_list)
-            self.con.commit()
-        # Attachments
-        if len(discord_data["attachments"]) != 0:
-            query = """
-            INSERT INTO attachments_t (
-                id                     , -- 1
-                attachment_url         ,
-                file_extension         ,
-                fileSizeBytes          , -- 4
-                message_id             ,
-                author_guild_id        ,
-                guild_id               ,
-                un_indexed_json        -- 8
-            )
-            VALUES (
-                %s, %s, %s, %s,
-                %s, %s, %s, %s
-            )
-            on conflict (id) do nothing;
-            """
-            attachments_list = []
-            for attachment in discord_data["attachments"]:
-                attachments_list.append([
-                    attachment["id"],
-                    attachment["url"],
-                    attachment["url"].split(".")[-1],
-                    attachment["fileSizeBytes"], # 4
-                    attachment["message_id"],
-                    attachment["author_guild_id"], # TODO missing channel_id
-                    attachment["guild_id"],
-                    json.dumps(reaction) # 8
-                ])
-            execute_batch(self.cur, query, attachments_list)
-            self.con.commit()
-        # Roles
-        # pprint("Test Roles")
-        # pprint(discord_data["roles"][0])
-        if(len(discord_data["roles"]) != 0) :
-            query = """
-            INSERT INTO roles_t (
-                id              , -- 1
-                role_id         ,
-                guild_id        ,
-                author_guild_id ,
-                name            ,
-                position        ,
-                un_indexed_json -- 7
-            )
-            VALUES (
-                %s, %s, %s, %s,
-                %s, %s, %s
-            )
-            on conflict (id) do nothing;
-            """
-            roles_list = []
-            for role in discord_data["roles"]:
-                roles_list.append([
-                    role["author_guild_id"] + "-" + role["id"], # 1
-                    role["id"],
-                    role["guild_id"],
-                    role["author_guild_id"],
-                    role["name"],
-                    role["position"],
-                    json.dumps(role) # 7
-                ])
-            execute_batch(self.cur, query, roles_list)
-            self.con.commit()
-        # mentions
-        # pprint("Test Mentions")
-        # pprint(discord_data["mentions"][0])
-        if(len(discord_data["mentions"]) != 0) :
-            query = """
-            INSERT INTO mentions_t (
-                id,
-                message_id,
-                guild_id,
-                author_guild_id
-            )
-            VALUES (
-                %s, %s, %s, %s
-            )
-            on conflict (id) do nothing;
-            """
-            mentions_list = []
-            for mention in discord_data["mentions"]:
-                mentions_list.append([
-                    mention["author_guild_id"] + "-" + mention["message_id"],
-                    mention["id"],
-                    mention["guild_id"],
-                    mention["author_guild_id"]
-                    # TODO, add channel_ID
-                ])
-            execute_batch(self.cur, query, mentions_list)
-            self.con.commit()
-        # embeds
-        # stickers
+            if len(discord_data["messages"]) != 0:
+                messages_list = []
+                for message in discord_data["messages"]:
+                    insert_data = [
+                        message["id"], # 1
+                        message["guild_id"], # 2
+                        str (  message["attachments"]  ), # 3
+                        message["author"], # 4
+                        message["author_guild_id"], # 5
+                        message["channel_id"], # 6
+                        message["content"], # 7
+                        str(  len(message["content"])  ),
+                        # message["interaction"],
+                        message["isBot"],
+                        message["isPinned"], # 8
+                        message["mentions"],
+                        message["type"],
+                        message["timestamp"],
+                        message["timestampEdited"],
+                        json.dumps(message)
+                    ]
+                    messages_list.append(tuple ( insert_data) )
+                execute_batch(self.cur, query, messages_list)
+                self.con.commit()
+                # Authors
+                # pprint("Authors Test")
+                # pprint(discord_data["authors"][0])
+                query = """
+                INSERT INTO authors_t (
+                    id, 
+                    author_id,
+                    guild_id,
+                    author_name,
+                    nickname,       -- 5 
+                    color,
+                    is_bot,
+                    avatar_url,
+                    un_indexed_json -- 9
+                )
+                VALUES (
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s
+                ) 
+                on conflict (id) do nothing;
+                """
+                authors_list = []
+                for author in discord_data["authors"]:
+                    # pprint(author["author_guild_id"])
+                    authors_list.append([
+                        author["author_guild_id"], # 1
+                        author["author_id"],       # 2
+                        author["guild_id"],        # 3
+                        author["name"],             # 4
+                        author["nickname"],         # 5
+                        author["color"],            # 6
+                        author["isBot"],            # 7
+                        author["avatarUrl"],        # 8 
+                        json.dumps(author)          # 9
+                    ])
+                # pprint("authors_list")
+                # pprint(authors_list)
+                execute_batch(self.cur, query, authors_list)
+                self.con.commit()
+            # Reactions
+            if len(discord_data["reactions"]) != 0:
+                query = """
+                INSERT INTO reactions_t (
+                    id        , -- 1
+                    message_id         ,
+                    author_guild_id    ,
+                    channel_id         ,
+                    guild_id           ,
+                    count              ,
+                    emoji_id           ,
+                    emoji_code         ,
+                    emoji_name         ,
+                    emoji_json         , -- 10
+                    un_indexed_json
+                )
+                VALUES (
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s
+                )
+                on conflict (id) do nothing;
+                """
+                reactions_list = []
+                for reaction in discord_data["reactions"]:
+                    reactions_list.append([
+                        reaction['message_id'] + "-" + reaction['emoji']['code'] + "-" + str(reaction["count"]),
+                        reaction["message_id"],
+                        reaction["author_guild_id"],
+                        reaction["channel_id"], # 4
+                        reaction["guild_id"],
+                        reaction["count"],
+                        reaction["emoji"]["id"],
+                        reaction["emoji"]["code"], # 8
+                        reaction["emoji"]["name"],
+                        json.dumps(reaction["emoji"]),
+                        json.dumps(reaction) # 11
+                    ])
+                execute_batch(self.cur, query, reactions_list)
+                self.con.commit()
+            # Attachments
+            if len(discord_data["attachments"]) != 0:
+                query = """
+                INSERT INTO attachments_t (
+                    id                     , -- 1
+                    attachment_url         ,
+                    file_extension         ,
+                    file_size_bytes        , -- 4
+                    message_id             ,
+                    author_guild_id        ,
+                    guild_id               ,
+                    un_indexed_json        -- 8
+                )
+                VALUES (
+                    %s, %s, %s, %s,
+                    %s, %s, %s, %s
+                )
+                on conflict (id) do nothing;
+                """
+                attachments_list = []
+                for attachment in discord_data["attachments"]:
+                    attachments_list.append([
+                        attachment["id"],
+                        attachment["url"],
+                        attachment["url"].split(".")[-1],
+                        attachment["fileSizeBytes"], # 4
+                        attachment["message_id"],
+                        attachment["author_guild_id"], # TODO missing channel_id
+                        attachment["guild_id"],
+                        json.dumps(attachment) # 8
+                    ])
+                execute_batch(self.cur, query, attachments_list)
+                self.con.commit()
+            # Roles
+            # pprint("Test Roles")
+            # pprint(discord_data["roles"][0])
+            if(len(discord_data["roles"]) != 0) :
+                query = """
+                INSERT INTO roles_t (
+                    id              , -- 1
+                    role_id         ,
+                    guild_id        ,
+                    author_guild_id ,
+                    name            ,
+                    position        ,
+                    un_indexed_json -- 7
+                )
+                VALUES (
+                    %s, %s, %s, %s,
+                    %s, %s, %s
+                )
+                on conflict (id) do nothing;
+                """
+                roles_list = []
+                for role in discord_data["roles"]:
+                    roles_list.append([
+                        role["author_guild_id"] + "-" + role["id"], # 1
+                        role["id"],
+                        role["guild_id"],
+                        role["author_guild_id"],
+                        role["name"],
+                        role["position"],
+                        json.dumps(role) # 7
+                    ])
+                execute_batch(self.cur, query, roles_list)
+                self.con.commit()
+            # mentions
+            # pprint("Test Mentions")
+            # pprint(discord_data["mentions"][0])
+            if(len(discord_data["mentions"]) != 0) :
+                query = """
+                INSERT INTO mentions_t (
+                    id,
+                    message_id,
+                    guild_id,
+                    author_guild_id
+                )
+                VALUES (
+                    %s, %s, %s, %s
+                )
+                on conflict (id) do nothing;
+                """
+                mentions_list = []
+                for mention in discord_data["mentions"]:
+                    mentions_list.append([
+                        mention["author_guild_id"] + "-" + mention["message_id"],
+                        mention["id"],
+                        mention["guild_id"],
+                        mention["author_guild_id"]
+                        # TODO, add channel_ID
+                    ])
+                execute_batch(self.cur, query, mentions_list)
+                self.con.commit()
+            # TODO embeds
+            # TODO stickers
+        if self.db_select == "sqlalchemy":
+            from schema_sqlalchemy import Guilds, Channels, Messages, Attachments, Authors, Reactions, Roles, Mentions
+            ins = insert(Guilds).values(
+                id = discord_data["guilds"][0]["id"],
+                guild_name = discord_data["guilds"][0]["name"],
+                iconUrl = discord_data["guilds"][0]["iconUrl"],
+                un_indexed_json = json.dumps(discord_data["guilds"][0])
+            ).on_conflict_do_nothing(index_elements=['id'])
+            self.session.execute(ins)
+            # self.session.commit()
+            ins = insert(Channels).values(
+                    id = discord_data["channels"][0]["id"],
+                    channel_name = discord_data["channels"][0]["name"],
+                    channel_type = discord_data["channels"][0]["type"],
+                    category_id = discord_data["channels"][0]["categoryId"],
+                    category = discord_data["channels"][0]["category"],
+                    guild_id = discord_data["channels"][0]["guild_id"],
+                    topic = discord_data["channels"][0]["topic"],
+                    channel_name_length = len(discord_data["channels"][0]["name"]),
+                    un_indexed_json = json.dumps(discord_data["channels"][0])
+                ).on_conflict_do_nothing(index_elements=['id'])
+            self.session.execute(ins)
+            self.session.commit()
+            for author in discord_data["authors"]:
+                # pprint(author["author_guild_id"])
+                ins = insert(Authors).values(
+                    id = author["author_guild_id"], # 1
+                    author_id = author["author_id"],       # 2
+                    guild_id = author["guild_id"],        # 3
+                    author_name = author["name"],             # 4
+                    nickname = author["nickname"],         # 5
+                    color = author["color"],            # 6
+                    isBot = author["isBot"],            # 7
+                    avatarUrl = author["avatarUrl"],        # 8 
+                    un_indexed_json = json.dumps(author)          # 9
+                ).on_conflict_do_nothing(index_elements=['id'])
+                self.session.execute(ins)
+            self.session.commit()
+            if len(discord_data["messages"]) != 0:
+                messages_list = []
+                for message in discord_data["messages"]:
+                    self.session.add(Messages(
+                        message["id"], # 1
+                        message["guild_id"], # 2
+                        str (  message["attachments"]  ), # 3
+                        message["author"], # 4
+                        message["author_guild_id"], # 5
+                        message["channel_id"], # 6
+                        message["content"], # 7
+                        len(message["content"]), # 8
+                        # message["interaction"],
+                        message["isBot"], # 9
+                        message["isPinned"],
+                        message["mentions"],
+                        message["type"],
+                        message["timestamp"],
+                        message["timestampEdited"],
+                        json.dumps(message)
+                    ))
+                    self.session.commit()
+            if len(discord_data["reactions"]) != 0:
+                for reaction in discord_data["reactions"]:
+                    self.session.add(Reactions(
+                        reaction['message_id'] + "-" + reaction['emoji']['code'] + "-" + str(reaction["count"]),
+                        reaction["message_id"],
+                        reaction["author_guild_id"],
+                        reaction["channel_id"], # 4
+                        reaction["guild_id"],
+                        reaction["count"],
+                        reaction["emoji"]["id"],
+                        reaction["emoji"]["code"], # 8
+                        reaction["emoji"]["name"],
+                        json.dumps(reaction["emoji"]),
+                        json.dumps(reaction) # 11
+                    ))
+                self.session.commit()
+            if len(discord_data["attachments"]) != 0:
+                for attachment in discord_data["attachments"]:
+                    self.session.add(Attachments(
+                        attachment["id"],
+                        attachment["url"],
+                        attachment["url"].split(".")[-1],
+                        attachment["fileSizeBytes"], # 4
+                        attachment["message_id"],
+                        attachment["author_guild_id"], # TODO missing channel_id
+                        attachment["guild_id"],
+                        json.dumps(attachment) # 8
+                    ))
+                self.session.commit()
+            # So slow not even worth running, # TODO optimize, maybe do a select for everything then only insert what can actually be inserted
+            # if(len(discord_data["roles"]) != 0) :
+            #     for role in discord_data["roles"]:
+            #         ins = insert(Roles).values(
+            #             id = role["author_guild_id"] + "-" + role["id"], # 1
+            #             role_id = role["id"],
+            #             guild_id = role["guild_id"],
+            #             author_guild_id = role["author_guild_id"],
+            #             name = role["name"],
+            #             position = role["position"],
+            #             un_indexed_json = json.dumps(role) # 7
+            #         ).on_conflict_do_nothing(index_elements=['id'])
+            #         # self.session.add(ins)
+            #         self.session.execute(ins)
+            #     self.session.commit()
+            if(len(discord_data["mentions"]) != 0) :
+                for mention in discord_data["mentions"]:
+                    print(f"\n\nMention\n\n{mention}\n\n")
+                    print(mention["channel_id"])
+                    print(mention["id"])
+                    print("\n\n")
+                    values = {
+                        'id' : mention["author_guild_id"] + "-" + mention["message_id"],
+                        'message_id' : mention["id"],
+                        'guild_id' : mention["guild_id"],
+                        'author_guild_id' : mention["author_guild_id"],
+                        'channel_id' : mention["channel_id"]
+                    }
+                    print(values)
+                    ins = insert(Mentions).values(values).on_conflict_do_nothing(index_elements=['id'])
+                    self.session.execute(ins)
+                self.session.commit()
+            # TODO embeds
+            # TODO stickers
+                
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
         for json_file in json_files:
