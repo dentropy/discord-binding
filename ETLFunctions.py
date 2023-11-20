@@ -180,6 +180,7 @@ class ETLFunctions():
           pprint(e)
           logging.debug(f"Error Reading JSON Filename: {discord_object_json_path}")
           logging.debug(f"READ JSON Error Description : {e}")
+        
         # For Testing
         # mah_json = json.load(json_file)
         # processed_json = ex_dis.process_discord_json(mah_json)

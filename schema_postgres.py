@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS messages_t (
   channel_id            VARCHAR,
   content               TEXT,
   content_length        INT,
-  interaction           TEXT,
+  -- interaction        TEXT,
   is_bot                BOOLEAN,
   isPinned              BOOLEAN,
   mentions              BOOLEAN,

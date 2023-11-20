@@ -64,7 +64,8 @@ class ExportDiscord():
                 result = self.cur.fetchone()
                 pprint(result)
                 return True
-            except:
+            except Exception as e:
+                print(e)
                 return False
         elif(self.db_select == "sqlalchemy"):
             from sqlalchemy import create_engine
@@ -370,6 +371,7 @@ class ExportDiscord():
                 author_guild_id,
                 channel_id   ,
                 content      ,
+                content_length ,
                 -- interaction  ,
                 is_bot       ,
                 isPinned     , -- 8
@@ -377,7 +379,6 @@ class ExportDiscord():
                 msg_type     ,
                 msg_timestamp    ,
                 msg_timestamp_edited , -- 12
-                content_length ,
                 un_indexed_json -- 14
             )
             VALUES (
@@ -712,46 +713,79 @@ class ExportDiscord():
             # TODO embeds
             # TODO stickers
         if self.db_select == "neo4j":
-            from schema_neo4j import Guilds, Channels, Authors
+            from schema_neo4j import Guilds, Channels, Authors, Messages
             from neomodel import db
+            from dateutil import parser
             db.set_connection(url=self.db_url)
-            with db.transaction:
-                guild = Guilds(
-                    identifier = discord_data["guilds"][0]["id"],
-                    guild_name = discord_data["guilds"][0]["name"],
-                    iconUrl = discord_data["guilds"][0]["iconUrl"]
+            #with db.transaction:
+            # TODO, check if guild is already inserted or not
+            guild = Guilds(
+                identifier = discord_data["guilds"][0]["id"],
+                guild_name = discord_data["guilds"][0]["name"],
+                iconUrl = discord_data["guilds"][0]["iconUrl"]
+            ).save()
+            # inserted_guild = Guilds.nodes.get(identifier=discord_data["guilds"][0]["id"])
+            channel = Channels(
+                identifier = discord_data["channels"][0]["id"],
+                channel_name = discord_data["channels"][0]["name"],
+                channel_type = discord_data["channels"][0]["type"],
+                category_id = discord_data["channels"][0]["categoryId"],
+                category = discord_data["channels"][0]["category"],
+                # guild_id = discord_data["channels"][0]["guild_id"],
+                # discord_topic = discord_data["channels"][0]["topic"],
+                channel_name_length = len(discord_data["channels"][0]["name"])
+            ).save()
+            # inserted_channel = Channels.nodes.get(identifier = discord_data["channels"][0]["id"])
+            pprint(channel)
+            pprint(channel.guild_id)
+            channel.guild_id.connect(guild)
+            for author in discord_data["authors"]:
+                author = Authors(
+                    identifier = author["author_guild_id"], # 1
+                    author_id = author["author_id"],       # 2
+                    # guild_id = author["guild_id"],        # 3
+                    author_name = author["name"],             # 4
+                    nickname = author["nickname"],         # 5
+                    # color = author["color"],            # 6
+                    isBot = author["isBot"],            # 7
+                    avatarUrl = author["avatarUrl"],        # 8 
+                    un_indexed_json = json.dumps(author)          # 9
                 ).save()
-                # inserted_guild = Guilds.nodes.get(identifier=discord_data["guilds"][0]["id"])
-                channel = Channels(
-                    identifier = discord_data["channels"][0]["id"],
-                    channel_name = discord_data["channels"][0]["name"],
-                    channel_type = discord_data["channels"][0]["type"],
-                    category_id = discord_data["channels"][0]["categoryId"],
-                    category = discord_data["channels"][0]["category"],
-                    guild_id = discord_data["channels"][0]["guild_id"],
-                    # discord_topic = discord_data["channels"][0]["topic"],
-                    channel_name_length = len(discord_data["channels"][0]["name"])
-                ).save()
-                # inserted_channel = Channels.nodes.get(identifier = discord_data["channels"][0]["id"])
-                # inserted_channel.guild_id.connect(inserted_guild)
-                # pprint(discord_data["authors"])
-                for author in discord_data["authors"]:
-                    author = Authors(
-                        identifier = author["author_guild_id"], # 1
-                        author_id = author["author_id"],       # 2
-                        guild_id = author["guild_id"],        # 3
-                        author_name = author["name"],             # 4
-                        nickname = author["nickname"],         # 5
-                        # color = author["color"],            # 6
-                        isBot = author["isBot"],            # 7
-                        avatarUrl = author["avatarUrl"],        # 8 
-                        un_indexed_json = json.dumps(author)          # 9
-                    ).save()
-                    # inserted_author = Authors.nodes.get(identifier = author["author_guild_id"])
-                    # pprint(inserted_author)
-                    # inserted_author.guild_id.connect(inserted_guild)
-                    break
-
+                author.guild_id.connect(guild)
+            if len(discord_data["messages"]) != 0:
+                messages_list = []
+                for message in discord_data["messages"]:
+                    insert_message = (Messages(
+                        identifier = message["id"], # 1
+                        # guild_id = message["guild_id"], # 2
+                        attachments = str (  message["attachments"]  ), # 3
+                        # author_id = message["author"], # 4
+                        # author_guild_id = message["author_guild_id"], # 5
+                        # channel_id = message["channel_id"], # 6
+                        content = message["content"], # 7
+                        content_length = len(message["content"]), # 8
+                        # message["interaction"],
+                        isBot = message["isBot"], # 9
+                        isPinned = message["isPinned"],
+                        mentions = message["mentions"],
+                        msg_type = message["type"],
+                        msg_timestamp = parser.parse(message["timestamp"]),
+                        # msg_timestamp_edited= parser.parse(message["timestampEdited"])
+                    )).save()
+                    insert_message.guild_id.connect(guild)
+                    # pprint(dir(Authors.nodes))
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    # print(f"\n\n{author_to_connect}\n\n")
+                    insert_message.author_guild_id.connect(author_to_connect)
+                    channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
+                    # print(f"\n\n{channel_to_connect}\n\n")
+                    insert_message.channel_id.connect(channel_to_connect)                   
+            # TODO reactions
+                # TODO Create a reaction type and link to it
+            # TODO attachments
+                # TODO Create a attachment ending and link to it
+            # TODO roles
+            # TODO mentions
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
         for json_file in json_files:
