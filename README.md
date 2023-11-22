@@ -22,6 +22,8 @@ Steps:
 
 **Setup python virtual environment and install requirements.txt**
 
+python3.10 minimum unless you install deps manually
+
 ``` bash
 # install pip
 curl https://bootstrap.pypa.io/get-pip.py | python3 $1
