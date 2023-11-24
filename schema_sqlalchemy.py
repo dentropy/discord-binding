@@ -200,5 +200,30 @@ class Mentions(Base):
         self.author_guild_id = author_guild_id
         self.channel_id = channel_id
 
+class Mentions(Base):
+   __tablename__ = 'message_replies_t'
+   id = Column(String, primary_key=True)
+
+   guild_id                 = Column(String) # , ForeignKey('messages_t.id') 
+   channel_id               = Column(String)
+   author_id                = Column(String)
+   author_guild_id          = Column(String)
+   reply_to_channel_id      = Column(String)
+   reply_to_message_id      = Column(String)
+   reply_to_author_id       = Column(String)
+   reply_to_author_guild_id = Column(String)
+   def __init__(self, id, guild_id, channel_id, author_id, 
+   author_guild_id, reply_to_channel_id, reply_to_message_id, reply_to_author_id
+   reply_to_author_guild_id):
+        self.id = id
+        self.guild_id = guild_id
+        self.channel_id = channel_id
+        self.author_id = author_id
+        self.author_guild_id = author_guild_id
+        self.reply_to_channel_id = reply_to_channel_id
+        self.reply_to_message_id = reply_to_message_id
+        self.reply_to_author_id = reply_to_author_id
+        self.reply_to_author_guild_id = reply_to_author_guild_id
+
 # Base.metadata.create_all(engine)
 # session = Session(engine)
