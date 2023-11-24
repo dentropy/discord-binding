@@ -12,7 +12,7 @@ create_table_queries = [
 CREATE TABLE IF NOT EXISTS guilds_t (
   id                VARCHAR PRIMARY KEY,
   guild_name        TEXT,
-  iconUrl           TEXT,
+  icon_url          TEXT,
   un_indexed_json   TEXT
 )
 """,
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS messages_t (
   -- interaction        TEXT,
   attachments           TEXT,
   is_bot                BOOLEAN,
-  isPinned              BOOLEAN,
+  is_pinned             BOOLEAN,
   mentions              BOOLEAN,
   msg_type              TEXT,
   msg_timestamp         timestamp,
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS reactions_t (
   author_guild_id    VARCHAR,
   channel_id         VARCHAR,
   guild_id           VARCHAR,
-  count              INTEGER,
+  reaction_count     INTEGER,
   emoji_id           VARCHAR,
   emoji_code         VARCHAR,
   emoji_name         VARCHAR,

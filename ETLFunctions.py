@@ -18,9 +18,15 @@ import boto3
 class ETLFunctions():
   now = datetime.now()
   formatted_date = now.strftime("%Y-%m-%d %H:%M:%S")
+  folder_name = "./logs/"
+  if not os.path.exists(folder_name):
+      os.makedirs(folder_name)
+      print(f"Folder '{folder_name}' created successfully!")
+  else:
+      print(f"Folder '{folder_name}' already exists.")
   logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    filename=f'{formatted_date}-run_dag.log', 
+    filename=f'{folder_name}/{formatted_date}-run_dag.log', 
     level=logging.INFO
   )
   logging.info("Starting Discord-to-SQL-Migration")

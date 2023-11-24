@@ -15,12 +15,12 @@ class Guilds(Base):
    id = Column(String, primary_key=True)
 
    guild_name      = Column(String)
-   iconUrl         = Column(TEXT)
+   icon_url        = Column(TEXT)
    un_indexed_json = Column(TEXT)
-   def __init__(self, id, guild_name, iconUrl, un_indexed_json):
+   def __init__(self, id, guild_name, icon_url, un_indexed_json):
         self.id = id
         self.guild_name = guild_name
-        self.iconUrl = iconUrl
+        self.icon_url = icon_url
         self.un_indexed_json = un_indexed_json
 
 
@@ -84,8 +84,8 @@ class Messages(Base):
    channel_id           = Column(String, ForeignKey('channels_t.id')) 
    msg_content          = Column(TEXT) 
    msg_content_length   = Column(INTEGER) 
-   isBot                = Column(BOOLEAN) 
-   isPinned             = Column(BOOLEAN) 
+   is_bot               = Column(BOOLEAN) 
+   is_pinned            = Column(BOOLEAN) 
    mentions             = Column(BOOLEAN) 
    msg_type             = Column(TEXT) 
    msg_timestamp        = Column(DateTime) 
@@ -93,7 +93,7 @@ class Messages(Base):
    un_indexed_json      = Column(TEXT) 
    def __init__(self, id, guild_id, attachments, author_id, 
       author_guild_id, channel_id, content, content_length,
-      isBot, isPinned, mentions, msg_type,
+      is_bot, is_pinned, mentions, msg_type,
       msg_timestamp, msg_timestamp_edited, un_indexed_json):
       self.id                   = id
       self.guild_id             = guild_id
@@ -104,7 +104,8 @@ class Messages(Base):
       self.content              = content
       self.content_length       = int(content_length)
       self.msg_timestamp        = msg_timestamp
-      self.isBot                = isBot
+      self.is_bot               = is_bot
+      self.is_pinned            = is_pinned
       self.mentions             = mentions
       self.msg_type             = msg_type
       self.msg_timestamp        = parser.parse(msg_timestamp)
@@ -145,7 +146,7 @@ class Reactions(Base):
    author_guild_id    = Column(String, ForeignKey('authors_t.id')) 
    channel_id         = Column(String, ForeignKey('channels_t.id')) 
    guild_id           = Column(String, ForeignKey('guilds_t.id')) 
-   count              = Column(INTEGER) 
+   reaction_count     = Column(INTEGER) 
    emoji_id           = Column(String) 
    emoji_code         = Column(String) 
    emoji_name         = Column(String)

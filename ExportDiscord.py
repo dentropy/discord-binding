@@ -327,22 +327,23 @@ class ExportDiscord():
         #     pprint(len(discord_data))
         # if type(discord_data) == type({}):
         #     pprint(discord_data.keys())
-        # Guilds
-        # pprint(discord_data["guilds"])
         if self.db_select == "postgres":
-            query = """
-            INSERT INTO guilds_t (id, guild_name, iconUrl, un_indexed_json)
-            VALUES (%s, %s, %s, %s) 
-            on conflict on constraint guilds_t_pkey do nothing;
-            """
-            insert_args = [[
-                discord_data["guilds"][0]["id"],
-                discord_data["guilds"][0]["name"],
-                discord_data["guilds"][0]["iconUrl"],
-                json.dumps(discord_data["guilds"][0])
-            ]]
-            execute_batch(self.cur, query, insert_args)
-            self.con.commit()
+            if ("guilds" in discord_data):
+                print("Guilds Data")
+                pprint(discord_data["guilds"])
+                query = """
+                INSERT INTO guilds_t (id, guild_name, icon_url, un_indexed_json)
+                VALUES (%s, %s, %s, %s) 
+                on conflict on constraint guilds_t_pkey do nothing;
+                """
+                insert_args = [[
+                    discord_data["guilds"][0]["id"],
+                    discord_data["guilds"][0]["name"],
+                    discord_data["guilds"][0]["iconUrl"],
+                    json.dumps(discord_data["guilds"][0])
+                ]]
+                execute_batch(self.cur, query, insert_args)
+                self.con.commit()
             # Channels
             query = """
             INSERT INTO channels_t (
@@ -389,7 +390,7 @@ class ExportDiscord():
                 -- interaction  ,
                 attachments  ,
                 is_bot       ,
-                isPinned     , -- 10
+                is_pinned    , -- 10
                 mentions     ,
                 msg_type     ,
                 msg_timestamp,
@@ -524,7 +525,7 @@ class ExportDiscord():
                     author_guild_id    ,
                     channel_id         ,
                     guild_id           ,
-                    count              ,
+                    reaction_count     ,
                     emoji_id           ,
                     emoji_code         ,
                     emoji_name         ,
@@ -655,7 +656,7 @@ class ExportDiscord():
             ins = insert(Guilds).values(
                 id = discord_data["guilds"][0]["id"],
                 guild_name = discord_data["guilds"][0]["name"],
-                iconUrl = discord_data["guilds"][0]["iconUrl"],
+                icon_url = discord_data["guilds"][0]["iconUrl"],
                 un_indexed_json = json.dumps(discord_data["guilds"][0])
             ).on_conflict_do_nothing(index_elements=['id'])
             self.session.execute(ins)
@@ -774,7 +775,7 @@ class ExportDiscord():
             # TODO embeds
             # TODO stickers
         if self.db_select == "neo4j":
-            from schema_neo4j import Guilds, Channels, Authors, Messages
+            c
             from neomodel import db
             from dateutil import parser
             db.set_connection(url=self.db_url)
@@ -783,7 +784,7 @@ class ExportDiscord():
             guild = Guilds(
                 identifier = discord_data["guilds"][0]["id"],
                 guild_name = discord_data["guilds"][0]["name"],
-                iconUrl = discord_data["guilds"][0]["iconUrl"]
+                icon_url = discord_data["guilds"][0]["iconUrl"]
             ).save()
             # inserted_guild = Guilds.nodes.get(identifier=discord_data["guilds"][0]["id"])
             channel = Channels(
