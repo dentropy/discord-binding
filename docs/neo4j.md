@@ -23,3 +23,12 @@ Match (Authors)-[Guilds]->(Channels)
 Return Authors,Guilds,Channels;
 
 ```
+
+## Delete everything in database
+
+``` bash
+
+MATCH (n)
+DETACH DELETE n
+
+```

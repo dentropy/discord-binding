@@ -59,10 +59,10 @@ class Authors(Base):
    nickname         = Column(TEXT) 
    color            = Column(TEXT) 
    isBot            = Column(BOOLEAN) 
-   avatarUrl        = Column(TEXT) 
+   avatar_url        = Column(TEXT) 
    un_indexed_json  = Column(TEXT) 
    def __init__(self, id, author_id, guild_id, author_name, nickname, color, isBot, 
-      avatarUrl, un_indexed_json  ):
+      avatar_url, un_indexed_json  ):
       self.id                = id
       self.author_id         = author_id  
       self.guild_id          = guild_id  
@@ -70,7 +70,7 @@ class Authors(Base):
       self.nickname          = nickname
       self.color             = color
       self.isBot             = isBot
-      self.avatarUrl         = avatarUrl
+      self.avatar_url         = avatar_url
       self.un_indexed_json   = un_indexed_json
 
 class Messages(Base):
@@ -200,7 +200,7 @@ class Mentions(Base):
         self.author_guild_id = author_guild_id
         self.channel_id = channel_id
 
-class Mentions(Base):
+class Replies(Base):
    __tablename__ = 'message_replies_t'
    id = Column(String, primary_key=True)
 

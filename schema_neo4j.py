@@ -1,14 +1,14 @@
-from neomodel import (config, db, StructuredNode, StringProperty, IntegerProperty,
+from neomodel import (config, db, StructuredNode, BooleanProperty, StringProperty, IntegerProperty,
     UniqueIdProperty, DateProperty, RelationshipTo, Relationship, StructuredRel, IntegerProperty)
 from pprint import pprint
 
 class DiscordRelationship(StructuredRel):
-    on_date = DateProperty(default_now = True)
+  on_date = DateProperty(default_now = True)
 
 class Guilds(StructuredNode):
-    identifier  = StringProperty(unique_index=True, required=True)
-    guild_name  = StringProperty(required=True)
-    iconUrl     = StringProperty(required=True)
+  identifier  = StringProperty(unique_index=True, required=True)
+  guild_name  = StringProperty(required=True)
+  icon_url    = StringProperty(required=True)
 
 class Channels(StructuredNode):
   identifier          = StringProperty(unique_index=True, required=True)
@@ -27,27 +27,70 @@ class Authors(StructuredNode):
   author_name      = StringProperty(required=True)
   nickname         = StringProperty(required=True)
   # color            = StringProperty(required=True)
-  isBot            = StringProperty(required=True)
-  avatarUrl        = StringProperty(required=True)
+  is_bot            = StringProperty(required=True)
+  avatar_url        = StringProperty(required=True)
 
 class Messages(StructuredNode):
   identifier           = StringProperty(unique_index=True, required=True)
   guild_id             = RelationshipTo('Guilds', 'message_guild')
   attachments          = StringProperty(required=True)
-  # author_id            = RelationshipTo('Authors',  'message_author')
   author_guild_id      = RelationshipTo('Authors',   'message_author_id')
   channel_id           = RelationshipTo('Channels',  'message_channel')
-  content              = StringProperty(required=True)
-  content_length       = IntegerProperty(required=True)
-  isBot                = StringProperty(required=True)
+  msg_content          = StringProperty(required=True)
+  msg_content_length   = IntegerProperty(required=True)
+  is_bot               = StringProperty(required=True)
   isPinned             = StringProperty(required=True)
   mentions             = StringProperty(required=True)
   msg_type             = StringProperty(required=True)
   msg_timestamp        = DateProperty(required=True)
   # msg_timestamp_edited = DateProperty(required=True)
 
+class Attachments(StructuredNode):
+  identifier       = StringProperty(unique_index=True, required=True)
+  attachment_url      = StringProperty(required=True) 
+  file_extension      = StringProperty(required=True) 
+  file_size_bytes     = IntegerProperty(required=True) 
+  message_id          = RelationshipTo('Messages',  'attachment_message') 
+  author_guild_id     = RelationshipTo('Authors',   'attachment_author')
+  guild_id            = RelationshipTo('Guilds',    'attachment_guild') 
 
-# config.AUTO_INSTALL_LABELS = True
+
+class Reactions(StructuredNode):
+  identifier       = StringProperty(unique_index=True, required=True)
+  message_id         = RelationshipTo('Messages', 'reaction_message') 
+  author_guild_id    = RelationshipTo('Authors',  'reaction_author')
+  channel_id         = RelationshipTo('Channels', 'reaction_channel')
+  guild_id           = RelationshipTo('Guilds',   'reaction_guild') 
+  reaction_count     = IntegerProperty(required=True) 
+  emoji_id           = StringProperty(required=True) 
+  emoji_code         = StringProperty(required=True) 
+  emoji_name         = StringProperty(required=True)
+  emoji_json         = StringProperty(required=True)  
+
+class Emoji(StructuredNode):
+  identifier         = StringProperty(unique_index=True, required=True)
+  emoji_code         = StringProperty(required=True) 
+  emoji_name         = StringProperty(required=True)
+  emoji_json         = StringProperty(required=True)  
+
+
+class Replies(StructuredNode):
+  identifier               = StringProperty(unique_index=True, required=True)
+  guild_id                 = RelationshipTo('Guilds',   'reply_guild') 
+  channel_id               = RelationshipTo('Channels', 'reply_channel')
+  author_id                = StringProperty(required=True)
+  author_guild_id          = RelationshipTo('Guilds',   'reply_author') 
+  reply_to_channel_id      = RelationshipTo('Channels', 'reply_channel')
+  reply_to_message_id      = RelationshipTo('Messages', 'reply_message') 
+  reply_to_author_id       = StringProperty(required=True)
+  reply_to_author_guild_id = RelationshipTo('Authors',  'reply_op')
+
+class Mentions(StructuredNode):
+  identifier = StringProperty(unique_index=True, required=True)
+  message_id         = RelationshipTo('Messages', 'mention_message') 
+  author_guild_id    = RelationshipTo('Authors',  'mention_author')
+  channel_id         = RelationshipTo('Channels', 'mention_channel')
+  guild_id           = RelationshipTo('Guilds',   'mention_guild') 
 # config.DATABASE_URL = 'bolt://neo4j:neo4j@localhost:7687'  # default
 # db.set_connection()
 

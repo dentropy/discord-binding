@@ -163,7 +163,8 @@ class ExportDiscord():
                     attachment["guild_id"] = data["guild"]["id"]
                     attachment["author_id"] = message["author"]["id"] 
                     attachment["author_guild_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
-                    attachment["guild_id"] = data["guild"]["id"]
+                    attachment["guild_id"] = data["guild"]["id"],
+                    attachment["channel_id"] = data["channel"]["id"],
                     root_dict["attachments"].append(attachment)
                 message["attachments"] = True
             else:
@@ -775,7 +776,7 @@ class ExportDiscord():
             # TODO embeds
             # TODO stickers
         if self.db_select == "neo4j":
-            c
+            from schema_neo4j import Guilds, Channels, Authors, Messages, Reactions, Emoji, Replies, Attachments, Mentions
             from neomodel import db
             from dateutil import parser
             db.set_connection(url=self.db_url)
@@ -809,8 +810,8 @@ class ExportDiscord():
                     author_name = author["name"],             # 4
                     nickname = author["nickname"],         # 5
                     # color = author["color"],            # 6
-                    isBot = author["isBot"],            # 7
-                    avatarUrl = author["avatarUrl"],        # 8 
+                    is_bot = author["isBot"],            # 7
+                    avatar_url = author["avatarUrl"],        # 8 
                     un_indexed_json = json.dumps(author)          # 9
                 ).save()
                 author.guild_id.connect(guild)
@@ -827,7 +828,7 @@ class ExportDiscord():
                         msg_content = message["content"], # 7
                         msg_content_length = len(message["content"]), # 8
                         # message["interaction"],
-                        isBot = message["isBot"], # 9
+                        is_bot = message["isBot"], # 9
                         isPinned = message["isPinned"],
                         mentions = message["mentions"],
                         msg_type = message["type"],
@@ -842,12 +843,88 @@ class ExportDiscord():
                     channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
                     # print(f"\n\n{channel_to_connect}\n\n")
                     insert_message.channel_id.connect(channel_to_connect)                   
-            # TODO reactions
-                # TODO Create a reaction type and link to it
-            # TODO attachments
-                # TODO Create a attachment ending and link to it
+            if len(discord_data["reactions"]) != 0:
+                for reaction in discord_data["reactions"]:
+                    insert_message = (Reactions(
+                        identifier = reaction['message_id'] + "-" + reaction['emoji']['code'] + "-" + str(reaction["count"]),
+                        message_id = reaction["message_id"],
+                        # author_guild_id = reaction["author_guild_id"],
+                        # channel_id = reaction["channel_id"], # 4
+                        # guild_id = reaction["guild_id"],
+                        reaction_count = reaction["count"],
+                        emoji_id = reaction["emoji"]["id"],
+                        emoji_code = reaction["emoji"]["code"], # 8
+                        emoji_name = reaction["emoji"]["name"],
+                        emoji_json = json.dumps(reaction["emoji"])
+                    )).save()
+                    insert_message.guild_id.connect(guild)
+                    # pprint(dir(Authors.nodes))
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    # print(f"\n\n{author_to_connect}\n\n")
+                    insert_message.author_guild_id.connect(author_to_connect)
+                    channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
+                    # print(f"\n\n{channel_to_connect}\n\n")
+                    insert_message.channel_id.connect(channel_to_connect)
+                    
+                    # TODO Create a reaction type and link to it
+            if len(discord_data["attachments"]) != 0:
+                for attachment in discord_data["attachments"]:
+                    insert_message = (Attachments(
+                        identifier = attachment["id"],
+                        attachment_url = attachment["url"],
+                        file_extension = attachment["url"].split(".")[-1],
+                        file_size_bytes = attachment["fileSizeBytes"], # 4
+                        # message_id = attachment["message_id"],
+                        # author_guild_id = attachment["author_guild_id"], # TODO missing channel_id
+                        # guild_id = attachment["guild_id"]
+                    )).save()
+                    insert_message.guild_id.connect(guild)
+                    # pprint(dir(Authors.nodes))
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    # print(f"\n\n{author_to_connect}\n\n")
+                    insert_message.author_guild_id.connect(author_to_connect)
+                    # channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
+                    # print(f"\n\n{channel_to_connect}\n\n")
+                    # insert_message.channel_id.connect(channel_to_connect)
+                # TODO Create a attachment ending node and link to it
             # TODO roles
-            # TODO mentions
+            if(len(discord_data["replies"]) != 0) :
+                # TODO replies
+                for reply in discord_data["mentions"]:
+                    insert_message = Mentions(
+                        identifier = reply["id"]
+                    ).save()
+                    insert_message.guild_id.connect(guild)
+                    # pprint(dir(Authors.nodes))
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    # print(f"\n\n{author_to_connect}\n\n")
+                    insert_message.author_guild_id.connect(author_to_connect)
+                    channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
+                    # print(f"\n\n{channel_to_connect}\n\n")
+                    insert_message.channel_id.connect(channel_to_connect)
+
+                    # TODO make sure all Relationships are filled, that are not currently
+                    
+                    # author_to_connect = Authors.nodes.first_or_none(identifier=message["reply_to_author_guild_id"])
+                    # insert_message.author_guild_id.connect(author_to_connect)
+                    # insert_message.reply_to_author_guild_id.connect(channel_to_connect)
+            if(len(discord_data["mentions"]) != 0) :
+                for mention in discord_data["mentions"]:
+                    # print(f"\n\nMention\n\n{mention}\n\n")
+                    # print(mention["channel_id"])
+                    # print(mention["id"])
+                    # print("\n\n")
+                    insert_message = Mentions(
+                        identifier = mention["author_guild_id"] + "-" + mention["message_id"]
+                    ).save()
+                    insert_message.guild_id.connect(guild)
+                    # pprint(dir(Authors.nodes))
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    # print(f"\n\n{author_to_connect}\n\n")
+                    insert_message.author_guild_id.connect(author_to_connect)
+                    channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
+                    # print(f"\n\n{channel_to_connect}\n\n")
+                    insert_message.channel_id.connect(channel_to_connect)
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
         for json_file in json_files:
