@@ -68,7 +68,7 @@ class ExportDiscord():
                 print(e)
                 return False
         elif(self.db_select == "sqlalchemy"):
-            from sqlalchemy import create_engine
+            from schemas.sqlalchemy import create_engine
             # [SQLAlchemy Connection Test](https://chat.openai.com/share/f6e511fe-2db5-4de8-aa05-9df38efea672)
             try:
                 # Create an engine
@@ -285,14 +285,14 @@ class ExportDiscord():
 
     def create_sql_tables(self):
         if(self.db_select == "postgres"):
-            from schema_postgres import create_table_queries
+            from schemas.schema_postgres import create_table_queries
             for tmp_query in create_table_queries:
                 # pprint(tmp_query)
                 self.cur.execute(tmp_query)
                 self.con.commit()
             return True
         elif(self.db_select == "sqlalchemy"):
-            from schema_sqlalchemy import Base
+            from schemas.schema_sqlalchemy import Base
             Base.metadata.create_all(self.engine)
 
     def json_data_to_json_sql(self, guild_data):
@@ -776,7 +776,7 @@ class ExportDiscord():
             # TODO embeds
             # TODO stickers
         if self.db_select == "neo4j":
-            from schema_neo4j import Guilds, Channels, Authors, Messages, Reactions, Emoji, Replies, Attachments, Mentions
+            from schemas.schema_neo4j import Guilds, Channels, Authors, Messages, Reactions, Emoji, Replies, Attachments, Mentions
             from neomodel import db
             from dateutil import parser
             db.set_connection(url=self.db_url)

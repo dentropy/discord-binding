@@ -71,6 +71,16 @@ select * from guilds_t;
 
 select * from channels_t;
 
+select * from authors_t;
+
 select * from messages_t limit 100;
+
+select * from message_replies_t limit 100;
+
+select * from reactions_t limit 100;
+
+select * from roles_t limit 100;
+
+select * from mentions_t limit 100;
 
 ```

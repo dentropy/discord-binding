@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from ExportDiscord import ExportDiscord
+from modules.ExportDiscord import ExportDiscord
 # from fix_schema_postgres import fix_schema_postgres
 
 import boto3
@@ -176,22 +176,22 @@ class ETLFunctions():
     for discord_object_json_path in json_object_paths:
       logging.info(f"discord_object_json_path {discord_object_json_path}")
       with open(discord_object_json_path, 'r') as json_file:
-      #   try:
-      #     mah_json = json.load(json_file)
-      #     processed_json = ex_dis.process_discord_json(mah_json)
-      #     ex_dis.json_data_to_sql(processed_json)
-      #     logging.info(f"Successfully Indexed: {discord_object_json_path}")
-      #   except Exception as e:
-      #     print("Error with processing JSON file")
-      #     pprint(e)
-      #     logging.debug(f"Error Reading JSON Filename: {discord_object_json_path}")
-      #     logging.debug(f"READ JSON Error Description : {e}")
+        try:
+          mah_json = json.load(json_file)
+          processed_json = ex_dis.process_discord_json(mah_json)
+          ex_dis.json_data_to_sql(processed_json)
+          logging.info(f"Successfully Indexed: {discord_object_json_path}")
+        except Exception as e:
+          print("Error with processing JSON file")
+          pprint(e)
+          logging.debug(f"Error Reading JSON Filename: {discord_object_json_path}")
+          logging.debug(f"READ JSON Error Description : {e}")
         
         # For Testing
-        mah_json = json.load(json_file)
-        processed_json = ex_dis.process_discord_json(mah_json)
-        ex_dis.json_data_to_sql(processed_json)
-        logging.info(f"Successfully Indexed: {discord_object_json_path}")
+        # mah_json = json.load(json_file)
+        # processed_json = ex_dis.process_discord_json(mah_json)
+        # ex_dis.json_data_to_sql(processed_json)
+        # logging.info(f"Successfully Indexed: {discord_object_json_path}")
     logging.info("Successfully Transformed JSON files to Postgres")
   # def transform_tables_in_database(self):
   #   fix_schema_postgres(os.environ.get("db_url"))

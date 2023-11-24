@@ -1,4 +1,4 @@
-from ETLFunctions import ETLFunctions
+from modules.ETLFunctions import ETLFunctions
 import json
 import os
 import glob
