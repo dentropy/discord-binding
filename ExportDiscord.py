@@ -119,6 +119,7 @@ class ExportDiscord():
         root_dict["authors"] = []
         root_dict["roles"] = []
         root_dict["attachments"] = []
+        root_dict["replies"] = []
         root_dict["embeds"] = []
         root_dict["stickers"] = []
         root_dict["reactions"] = []
@@ -141,6 +142,20 @@ class ExportDiscord():
                     role["guild_id"] = data["guild"]["id"]
                     role["author_guild_id"] = data["guild"]["id"] + "-" + message["author"]["id"]
                     root_dict["roles"].append(role)
+            if "reference" in message.keys():
+                reply_msg = {}
+                if "messageId" in message["reference"].keys():
+                    reply_msg["id"] = message["id"],
+                    reply_msg["guild_id"] = data["guild"]["id"],
+                    reply_msg["channel_id"] = data["channel"]["id"],
+                    reply_msg["author_id"] = message["author"]["id"] 
+                    reply_msg["author_guild_id"] = message["author"]["id"] + "-" + data["guild"]["id"]
+                    reply_msg["reply_to_channel_id"] = message["reference"]["channelId"]
+                    reply_msg["reply_to_message_id"] = message["reference"]["messageId"]
+                root_dict["replies"].append(reply_msg)
+                message["reference"] = str(message["reference"]["messageId"])
+            else:
+                message["reference"] = None
             if message["attachments"] != []:
                 for attachment in message["attachments"]:
                     attachment["message_id"] = message["id"]
@@ -307,11 +322,11 @@ class ExportDiscord():
         self.con.commit()
 
     def json_data_to_sql(self, discord_data):
-        pprint("json_data_to_sql")
-        if type(discord_data) == type([]):
-            pprint(len(discord_data))
-        if type(discord_data) == type({}):
-            pprint(discord_data.keys())
+        # pprint("json_data_to_sql")
+        # if type(discord_data) == type([]):
+        #     pprint(len(discord_data))
+        # if type(discord_data) == type({}):
+        #     pprint(discord_data.keys())
         # Guilds
         # pprint(discord_data["guilds"])
         if self.db_select == "postgres":
@@ -344,7 +359,7 @@ class ExportDiscord():
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
             on conflict (id) do nothing;
             """
-            # pprint("Test Channels")
+            # pprint("\n\nTest Channels")
             # pprint(discord_data["channels"])
             insert_args = [[
                 discord_data["channels"][0]["id"],
@@ -360,32 +375,33 @@ class ExportDiscord():
             execute_batch(self.cur, query, insert_args)
             self.con.commit()
             # Messages
-            # pprint("Test Messages")
+            # pprint("\n\nTest Messages")
             # pprint(discord_data["messages"][0])
             query = """
             INSERT INTO messages_t (
                 id           ,
                 guild_id     ,
-                attachments  ,
-                author_id   , -- 4
-                author_guild_id,
                 channel_id   ,
-                content      ,
-                content_length ,
+                author_id    ,
+                author_guild_id,
+                msg_content      ,
+                msg_content_length ,
                 -- interaction  ,
+                attachments  ,
                 is_bot       ,
-                isPinned     , -- 8
+                isPinned     , -- 10
                 mentions     ,
                 msg_type     ,
-                msg_timestamp    ,
-                msg_timestamp_edited , -- 12
-                un_indexed_json -- 14
+                msg_timestamp,
+                msg_timestamp_edited,
+                reply_to_message_id,
+                un_indexed_json
             )
             VALUES (
                 %s, %s, %s, %s,
                 %s, %s, %s, %s,
                 %s, %s, %s, %s,
-                %s, %s, %s
+                %s, %s, %s, %s
             )
             on conflict on constraint messages_t_pkey do nothing
             ;
@@ -393,27 +409,72 @@ class ExportDiscord():
             if len(discord_data["messages"]) != 0:
                 messages_list = []
                 for message in discord_data["messages"]:
+                    # print(f"\nMessage\n{message}\n\n")
+                    # tmp = message["reference"]
+                    # print(f"\nreference\n{tmp}\n\n")
                     insert_data = [
                         message["id"], # 1
                         message["guild_id"], # 2
-                        str (  message["attachments"]  ), # 3
+                        message["channel_id"], # 3
                         message["author"], # 4
                         message["author_guild_id"], # 5
-                        message["channel_id"], # 6
-                        message["content"], # 7
-                        str(  len(message["content"])  ),
+                        message["content"], # 6
+                        str(  len(message["content"])  ), # 7
                         # message["interaction"],
+                        str (  message["attachments"]  ), # 8
                         message["isBot"],
-                        message["isPinned"], # 8
-                        message["mentions"],
+                        message["isPinned"], # 9
+                        message["mentions"], # 10
                         message["type"],
                         message["timestamp"],
                         message["timestampEdited"],
+                        message["reference"][1:-1],
                         json.dumps(message)
                     ]
                     messages_list.append(tuple ( insert_data) )
                 execute_batch(self.cur, query, messages_list)
                 self.con.commit()
+
+
+            query = """
+            INSERT INTO message_replies_t (
+                id           ,
+                guild_id     ,
+                channel_id   ,
+                author_id   , 
+                author_guild_id,
+                reply_to_channel_id,
+                reply_to_message_id
+            )
+            VALUES (
+                %s, %s, %s, %s,
+                %s, %s, %s
+            )
+            on conflict on constraint message_replies_t_pkey do nothing
+            ;
+            """
+            if len(discord_data["replies"]) != 0:
+                messages_list = []
+                for reply_msg in discord_data["replies"]:
+                    print(f"\nMessage Reply\n{reply_msg}\n\n")
+                    import uuid
+                    random_uuid = uuid.uuid4()
+                    insert_data = [
+                        reply_msg["id"], # 1
+                        reply_msg["guild_id"], # 2
+                        reply_msg["channel_id"], # 3
+                        reply_msg["author_id"], # 4
+                        reply_msg["author_guild_id"], # 5,
+                        reply_msg["reply_to_channel_id"], # 6
+                        reply_msg["reply_to_message_id"] # 7
+
+                    ]
+                    pprint(tuple ( insert_data))
+                    messages_list.append(tuple ( insert_data) )
+                execute_batch(self.cur, query, messages_list)
+                self.con.commit()
+
+
                 # Authors
                 # pprint("Authors Test")
                 # pprint(discord_data["authors"][0])
@@ -695,10 +756,10 @@ class ExportDiscord():
             #     self.session.commit()
             if(len(discord_data["mentions"]) != 0) :
                 for mention in discord_data["mentions"]:
-                    print(f"\n\nMention\n\n{mention}\n\n")
-                    print(mention["channel_id"])
-                    print(mention["id"])
-                    print("\n\n")
+                    # print(f"\n\nMention\n\n{mention}\n\n")
+                    # print(mention["channel_id"])
+                    # print(mention["id"])
+                    # print("\n\n")
                     values = {
                         'id' : mention["author_guild_id"] + "-" + mention["message_id"],
                         'message_id' : mention["id"],
@@ -736,8 +797,8 @@ class ExportDiscord():
                 channel_name_length = len(discord_data["channels"][0]["name"])
             ).save()
             # inserted_channel = Channels.nodes.get(identifier = discord_data["channels"][0]["id"])
-            pprint(channel)
-            pprint(channel.guild_id)
+            # pprint(channel)
+            # pprint(channel.guild_id)
             channel.guild_id.connect(guild)
             for author in discord_data["authors"]:
                 author = Authors(
@@ -762,8 +823,8 @@ class ExportDiscord():
                         # author_id = message["author"], # 4
                         # author_guild_id = message["author_guild_id"], # 5
                         # channel_id = message["channel_id"], # 6
-                        content = message["content"], # 7
-                        content_length = len(message["content"]), # 8
+                        msg_content = message["content"], # 7
+                        msg_content_length = len(message["content"]), # 8
                         # message["interaction"],
                         isBot = message["isBot"], # 9
                         isPinned = message["isPinned"],

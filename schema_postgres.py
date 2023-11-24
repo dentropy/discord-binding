@@ -36,21 +36,36 @@ CREATE TABLE IF NOT EXISTS channels_t (
 CREATE TABLE IF NOT EXISTS messages_t (
   id                    VARCHAR PRIMARY KEY,
   guild_id              VARCHAR,
-  attachments           TEXT,
+  channel_id            VARCHAR,
   author_id             VARCHAR,
   author_guild_id       VARCHAR,
-  channel_id            VARCHAR,
-  content               TEXT,
-  content_length        INT,
+  msg_content           TEXT,
+  msg_content_length    INT,
   -- interaction        TEXT,
+  attachments           TEXT,
   is_bot                BOOLEAN,
   isPinned              BOOLEAN,
   mentions              BOOLEAN,
   msg_type              TEXT,
   msg_timestamp         timestamp,
   msg_timestamp_edited  timestamp,
+  reply_to_message_id   VARCHAR,
   un_indexed_json       TEXT,
   FOREIGN KEY (channel_id) REFERENCES channels_t(id)
+)
+""",
+
+"""
+CREATE TABLE IF NOT EXISTS message_replies_t (
+  id                       VARCHAR PRIMARY KEY,
+  guild_id                 VARCHAR,
+  channel_id               VARCHAR,
+  author_id                VARCHAR,
+  author_guild_id          VARCHAR,
+  reply_to_channel_id      VARCHAR,
+  reply_to_message_id      VARCHAR,
+  reply_to_author_id       VARCHAR,
+  reply_to_author_guild_id VARCHAR
 )
 """,
 
