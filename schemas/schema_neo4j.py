@@ -90,6 +90,19 @@ class Mentions(StructuredNode):
   channel_id         = RelationshipTo('Channels', 'mention_channel')
   guild_id           = RelationshipTo('Guilds',   'mention_guild')
 
+class URLDomain():
+  identifier         = StringProperty(unique_index=True, required=True)
+  domain             = StringProperty(required=True)
+
+class RawURL():
+  identifier         = StringProperty(unique_index=True, required=True)
+  domain             = RelationshipTo('URLDomain', 'raw_url_to_domain') 
+  message_id         = RelationshipTo("Messages", "url_to_message")
+  scheme             = StringProperty(required=True)
+  path               = StringProperty(required=True)
+  params             = StringProperty(required=True)
+  query              = StringProperty(required=True)
+  fragment           = StringProperty(required=True)
 
 # config.DATABASE_URL = 'bolt://neo4j:neo4j@localhost:7687'  # default
 # db.set_connection()
