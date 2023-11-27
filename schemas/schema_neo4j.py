@@ -22,13 +22,12 @@ class Channels(StructuredNode):
 
 class Authors(StructuredNode):
   identifier       = StringProperty(unique_index=True, required=True)
-  author_id        = StringProperty(unique_index=True)
   guild_id         = RelationshipTo('Guilds', 'author_guild')
   author_name      = StringProperty(required=True)
   nickname         = StringProperty(required=True)
   # color            = StringProperty(required=True)
-  is_bot            = StringProperty(required=True)
-  avatar_url        = StringProperty(required=True)
+  is_bot           = StringProperty(required=True)
+  avatar_url       = StringProperty(required=True)
 
 class Messages(StructuredNode):
   identifier           = StringProperty(unique_index=True, required=True)
@@ -55,23 +54,21 @@ class Attachments(StructuredNode):
   guild_id            = RelationshipTo('Guilds',    'attachment_guild') 
 
 
-class Reactions(StructuredNode):
-  identifier       = StringProperty(unique_index=True, required=True)
-  message_id         = RelationshipTo('Messages', 'reaction_message') 
-  author_guild_id    = RelationshipTo('Authors',  'reaction_author')
-  channel_id         = RelationshipTo('Channels', 'reaction_channel')
-  guild_id           = RelationshipTo('Guilds',   'reaction_guild') 
-  reaction_count     = IntegerProperty(required=True) 
-  emoji_id           = StringProperty(required=True) 
-  emoji_code         = StringProperty(required=True) 
-  emoji_name         = StringProperty(required=True)
-  emoji_json         = StringProperty(required=True)  
-
 class Emoji(StructuredNode):
   identifier         = StringProperty(unique_index=True, required=True)
   emoji_code         = StringProperty(required=True) 
   emoji_name         = StringProperty(required=True)
   emoji_json         = StringProperty(required=True)  
+
+
+class Reactions(StructuredNode):
+  identifier         = StringProperty(unique_index=True, required=True)
+  message_id         = RelationshipTo('Messages', 'reaction_message') 
+  author_guild_id    = RelationshipTo('Authors',  'reaction_author')
+  channel_id         = RelationshipTo('Channels', 'reaction_channel')
+  guild_id           = RelationshipTo('Guilds',   'reaction_guild') 
+  reaction_count     = IntegerProperty(required=True) 
+  emoji              = RelationshipTo('Emoji',   'reaction_emoji') 
 
 
 class Replies(StructuredNode):
@@ -86,11 +83,13 @@ class Replies(StructuredNode):
   reply_to_author_guild_id = RelationshipTo('Authors',  'reply_op')
 
 class Mentions(StructuredNode):
-  identifier = StringProperty(unique_index=True, required=True)
+  identifier         = StringProperty(unique_index=True, required=True)
   message_id         = RelationshipTo('Messages', 'mention_message') 
   author_guild_id    = RelationshipTo('Authors',  'mention_author')
   channel_id         = RelationshipTo('Channels', 'mention_channel')
-  guild_id           = RelationshipTo('Guilds',   'mention_guild') 
+  guild_id           = RelationshipTo('Guilds',   'mention_guild')
+
+
 # config.DATABASE_URL = 'bolt://neo4j:neo4j@localhost:7687'  # default
 # db.set_connection()
 

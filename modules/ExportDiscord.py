@@ -862,18 +862,19 @@ class ExportDiscord():
             # pprint(channel.guild_id)
             channel.guild_id.connect(guild)
             for author in discord_data["authors"]:
-                author = Authors(
-                    identifier = author["author_guild_id"], # 1
-                    author_id = author["author_id"],       # 2
-                    # guild_id = author["guild_id"],        # 3
-                    author_name = author["name"],             # 4
-                    nickname = author["nickname"],         # 5
-                    # color = author["color"],            # 6
-                    is_bot = author["isBot"],            # 7
-                    avatar_url = author["avatarUrl"],        # 8 
-                    un_indexed_json = json.dumps(author)          # 9
-                ).save()
-                author.guild_id.connect(guild)
+                # Check Author Exists
+                author_data = Authors.nodes.first_or_none(identifier=author["author_id"])
+                if author_data == None:
+                    author = Authors(
+                        identifier = author["author_id"],       # 1
+                        # guild_id = author["guild_id"],        
+                        author_name = author["name"],           # 2
+                        nickname = author["nickname"],          # 3
+                        # color = author["color"],              
+                        is_bot = author["isBot"],               # 5
+                        avatar_url = author["avatarUrl"],       # 6 
+                    ).save()
+                    author.guild_id.connect(guild)
             if len(discord_data["messages"]) != 0:
                 messages_list = []
                 for message in discord_data["messages"]:
@@ -896,7 +897,7 @@ class ExportDiscord():
                     )).save()
                     insert_message.guild_id.connect(guild)
                     # pprint(dir(Authors.nodes))
-                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_id"])
                     # print(f"\n\n{author_to_connect}\n\n")
                     insert_message.author_guild_id.connect(author_to_connect)
                     channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
@@ -910,15 +911,23 @@ class ExportDiscord():
                         # author_guild_id = reaction["author_guild_id"],
                         # channel_id = reaction["channel_id"], # 4
                         # guild_id = reaction["guild_id"],
-                        reaction_count = reaction["count"],
-                        emoji_id = reaction["emoji"]["id"],
-                        emoji_code = reaction["emoji"]["code"], # 8
-                        emoji_name = reaction["emoji"]["name"],
-                        emoji_json = json.dumps(reaction["emoji"])
+                        reaction_count = reaction["count"]
                     )).save()
+                    check_emoji = Emoji.nodes.first_or_none(identifier=reaction["emoji"]["id"])
+                    if check_emoji == None:
+                        check_emoji = (Emoji(
+                            identifier = reaction["emoji"]["code"],
+                            emoji_code = reaction["emoji"]["code"],
+                            emoji_name = reaction["emoji"]["name"],
+                            emoji_json = json.dumps(reaction["emoji"])
+                        )).save()
+                    # print("check_emoji")
+                    # print(check_emoji)
+                    # print(reaction["emoji"])
                     insert_message.guild_id.connect(guild)
+                    insert_message.emoji.connect(check_emoji)
                     # pprint(dir(Authors.nodes))
-                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_id"])
                     # print(f"\n\n{author_to_connect}\n\n")
                     insert_message.author_guild_id.connect(author_to_connect)
                     channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
@@ -939,7 +948,7 @@ class ExportDiscord():
                     )).save()
                     insert_message.guild_id.connect(guild)
                     # pprint(dir(Authors.nodes))
-                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_id"])
                     # print(f"\n\n{author_to_connect}\n\n")
                     insert_message.author_guild_id.connect(author_to_connect)
                     # channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
@@ -955,7 +964,7 @@ class ExportDiscord():
                     ).save()
                     insert_message.guild_id.connect(guild)
                     # pprint(dir(Authors.nodes))
-                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_id"])
                     # print(f"\n\n{author_to_connect}\n\n")
                     insert_message.author_guild_id.connect(author_to_connect)
                     channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
@@ -978,7 +987,7 @@ class ExportDiscord():
                     ).save()
                     insert_message.guild_id.connect(guild)
                     # pprint(dir(Authors.nodes))
-                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_guild_id"])
+                    author_to_connect = Authors.nodes.first_or_none(identifier=message["author_id"])
                     # print(f"\n\n{author_to_connect}\n\n")
                     insert_message.author_guild_id.connect(author_to_connect)
                     channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
