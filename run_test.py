@@ -60,13 +60,105 @@ result = query_resolver(cursor, queries, "channel_authors", {
 assert result.shape[1] == 4
 
 
-result = query_resolver(cursor, queries, "channel_messages", {
+query_name = "channel_messages"
+result = query_resolver(cursor, queries, query_name, {
     "channel_id" : channel_id,
     "order"      : "desc",
     "offset"     : 1
 })
-# print("channel_messages")
+# print(query_name)
+# pprint(result)
+assert result.shape[1] == 10
+
+
+result = query_resolver(cursor, queries, "user_longest_avg_msg_length", {
+    "guild_id" : guild_id
+})
+# print("user_longest_avg_msg_length")
+# pprint(result)
+assert result.shape[1] == 5
+
+result = query_resolver(cursor, queries, "user_longest_avg_msg_length", {
+    "guild_id" : guild_id
+})
+# print("user_longest_avg_msg_length")
+# pprint(result)
+assert result.shape[1] == 5
+
+
+result = query_resolver(cursor, queries, "guild_author_most_messages", {
+    "guild_id" : guild_id
+})
+# print("guild_author_most_messages")
+# pprint(result)
+assert result.shape[1] == 6
+
+result = query_resolver(cursor, queries, "guild_author_consistent", {
+    "guild_id" : guild_id
+})
+# print("guild_author_most_messages")
 # pprint(result)
 assert result.shape[1] == 6
 
 
+result = query_resolver(cursor, queries, "guild_author_most_reactions", {
+    "guild_id" : guild_id
+})
+# print("guild_author_most_messages")
+# pprint(result)
+assert result.shape[1] == 6
+
+
+result = query_resolver(cursor, queries, "guild_author_distinct_reaction_count", {
+    "guild_id" : guild_id
+})
+# print("guild_author_most_messages")
+# pprint(result)
+assert result.shape[1] == 6
+
+
+query_name = "guild_author_most_messages_single_day"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id" : guild_id
+})
+# print(query_name)
+# pprint(result)
+assert result.shape[1] == 6
+
+
+query_name = "guild_author_most_messages_single_day"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id" : guild_id
+})
+# print(query_name)
+# pprint(result)
+assert result.shape[1] == 6
+
+
+query_name = "guild_author_most_attachments"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id" : guild_id
+})
+# print(query_name)
+# pprint(result)
+assert result.shape[1] == 6
+
+
+query_name = "guild_author_edit_percentage"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id" : guild_id
+})
+# print(query_name)
+# pprint(result)
+assert result.shape[1] == 8
+
+
+query_name = "guild_author_most_question_messages"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id" : guild_id
+})
+# print(query_name)
+# pprint(result)
+assert result.shape[1] == 5
+
+print("TEST SUCCESS")
