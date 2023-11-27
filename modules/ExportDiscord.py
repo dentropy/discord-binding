@@ -12,7 +12,6 @@ import sqlite3
 import time
 import glob
 from psycopg2.extras import execute_batch
-import uuid
 from sqlalchemy.dialects.postgresql import insert
 
 from urlextract import URLExtract
@@ -518,8 +517,6 @@ class ExportDiscord():
                 messages_list = []
                 for reply_msg in discord_data["replies"]:
                     print(f"\nMessage Reply\n{reply_msg}\n\n")
-                    import uuid
-                    random_uuid = uuid.uuid4()
                     insert_data = [
                         reply_msg["id"], # 1
                         reply_msg["guild_id"], # 2
@@ -528,7 +525,6 @@ class ExportDiscord():
                         reply_msg["author_guild_id"], # 5,
                         reply_msg["reply_to_channel_id"], # 6
                         reply_msg["reply_to_message_id"] # 7
-
                     ]
                     pprint(tuple ( insert_data))
                     messages_list.append(tuple ( insert_data) )
@@ -993,6 +989,28 @@ class ExportDiscord():
                     channel_to_connect = Channels.nodes.first_or_none(identifier=message["channel_id"])
                     # print(f"\n\n{channel_to_connect}\n\n")
                     insert_message.channel_id.connect(channel_to_connect)
+            if len(discord_data["replies"]) != 0:
+                for reply_msg in discord_data["replies"]:
+                    # print(f"\nMessage Reply\n{reply_msg}\n\n")
+                    # Look for og message
+                    origional_message = Messages.nodes.first_or_none(identifier=reply_msg["reply_to_message_id"])
+                    # Look for new message
+                    reply_message = Messages.nodes.first_or_none(identifier=reply_msg["id"][0])
+                    # Link the messages
+                    if(origional_message != None and reply_message != None):
+                        reply_message.reply_to_message.connect(origional_message)
+                        # print("Sucess Linking Reply")
+                    else:
+                        print("Failure to link reply")
+                        # print("origional_message")
+                        # print(origional_message)
+                        # print("reply_message")
+                        # print(reply_message)
+                        # print('reply_msg["id"]')
+                        # print(reply_msg["id"][0])
+                        # print('reply_msg["reply_to_message_id"]')
+                        # print(reply_msg["reply_to_message_id"])
+                        # print("\n\n")
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
         for json_file in json_files:

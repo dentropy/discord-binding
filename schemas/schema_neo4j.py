@@ -43,6 +43,7 @@ class Messages(StructuredNode):
   msg_type             = StringProperty(required=True)
   msg_timestamp        = DateProperty(required=True)
   # msg_timestamp_edited = DateProperty(required=True)
+  reply_to_message     = RelationshipTo('Messages',  'reply_to_message')
 
 class Attachments(StructuredNode):
   identifier       = StringProperty(unique_index=True, required=True)
