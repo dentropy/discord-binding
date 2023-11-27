@@ -143,6 +143,10 @@ class ETLFunctions():
         logging.debug(f"S3 JSON Error Description : {e}")
     logging.info("Successfully Transformed S3 JSON files to Postgres")
 
+  def create_sql_tables(self):
+    ex_dis = ExportDiscord(self.db_select, self.db_url)
+    create_tables_status = ex_dis.create_sql_tables()
+
   def transform_s3_json_to_database_sql(self, json_object_paths):
     logging.info("Transforming S3 JSON files to Postgres SQL")
     ex_dis = ExportDiscord(self.db_select, self.db_url)
