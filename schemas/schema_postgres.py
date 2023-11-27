@@ -134,34 +134,156 @@ CREATE TABLE IF NOT EXISTS mentions_t (
   author_guild_id   VARCHAR,
   channel_id        VARCHAR
 )
+"""
+]
+
+constraint_queries = [
+
+"""
+ALTER TABLE channels_t
+  ADD CONSTRAINT channels_t_guild_id_to_guilds_t
+  FOREIGN KEY (guild_id)
+  REFERENCES guilds_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON channels_t (guild_id);
 """,
 
-# """
-# ALTER TABLE channels_t
-#   ADD CONSTRAINT channels_t_guild_id_to_guilds_t
-#   FOREIGN KEY (guild_id)
-#   REFERENCES guilds_t(id)
-#   ON DELETE CASCADE;
-# CREATE INDEX ON channels_t (guild_id);
-# """,
+"""
+ALTER TABLE messages_t
+  ADD CONSTRAINT message_id_to_channel_id
+  FOREIGN KEY (channel_id)
+  REFERENCES channels_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON messages_t (channel_id);
+""",
 
-# """
-# ALTER TABLE messages_t
-#   ADD CONSTRAINT message_id_to_channel_id
-#   FOREIGN KEY (channel_id)
-#   REFERENCES channels_t(id)
-#   ON DELETE CASCADE;
-# CREATE INDEX ON messages_t (channel_id);
-# """,
+"""
+ALTER TABLE messages_t
+  ADD CONSTRAINT message_id_to_author_id
+  FOREIGN KEY (author_guild_id)
+  REFERENCES authors_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON messages_t (channel_id);
+""",
 
-# """
-# ALTER TABLE attachments_t
-#   ADD CONSTRAINT attachment_id_to_message_id
-#   FOREIGN KEY (message_id)
-#   REFERENCES messages_t(id)
-#   ON DELETE CASCADE;
-# CREATE INDEX ON attachments_t (message_id);
-# """
+"""
+ALTER TABLE attachments_t
+  ADD CONSTRAINT attachment_id_to_message_id
+  FOREIGN KEY (message_id)
+  REFERENCES messages_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON attachments_t (message_id);
+""",
+
+"""
+ALTER TABLE mentions_t
+  ADD CONSTRAINT mentions_t_to_messages_t
+  FOREIGN KEY (message_id)
+  REFERENCES messages_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON mentions_t (message_id);
+""",
+
+"""
+ALTER TABLE mentions_t
+  ADD CONSTRAINT mentions_t_to_guilds_t
+  FOREIGN KEY (guild_id)
+  REFERENCES guilds_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON mentions_t (guild_id);
+""",
+
+"""
+ALTER TABLE mentions_t
+  ADD CONSTRAINT mentions_t_to_channels_t
+  FOREIGN KEY (channel_id)
+  REFERENCES channels_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON mentions_t (channel_id);
+""",
+
+"""
+ALTER TABLE reactions_t
+  ADD CONSTRAINT reactions_t_to_messages_t
+  FOREIGN KEY (message_id)
+  REFERENCES messages_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON reactions_t (message_id);
+""",
+
+"""
+ALTER TABLE reactions_t
+  ADD CONSTRAINT reactions_t_to_channels_t
+  FOREIGN KEY (channel_id)
+  REFERENCES channels_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON reactions_t (channel_id);
+""",
+
+"""
+ALTER TABLE reactions_t
+  ADD CONSTRAINT reactions_t_to_authors_t
+  FOREIGN KEY (author_guild_id)
+  REFERENCES authors_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON reactions_t (author_guild_id);
+""",
+
+"""
+ALTER TABLE roles_t
+  ADD CONSTRAINT roles_t_to_guilds_t
+  FOREIGN KEY (guild_id)
+  REFERENCES guilds_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON roles_t (guild_id);
+""",
+
+# Error on this one
+"""
+ALTER TABLE roles_t
+  ADD CONSTRAINT roles_t_to_authors_t
+  FOREIGN KEY (author_guild_id)
+  REFERENCES authors_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON roles_t (author_guild_id);
+""",
+
+"""
+ALTER TABLE message_replies_t
+  ADD CONSTRAINT message_replies_t_to_channels_t
+  FOREIGN KEY (channel_id)
+  REFERENCES channels_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON message_replies_t (channel_id);
+""",
+
+"""
+ALTER TABLE message_replies_t
+  ADD CONSTRAINT message_replies_t_to_authors_t
+  FOREIGN KEY (author_guild_id)
+  REFERENCES authors_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON message_replies_t (author_guild_id);
+""",
+
+"""
+ALTER TABLE message_replies_t
+  ADD CONSTRAINT message_replies_t_to_authors_t_for_reply
+  FOREIGN KEY (reply_to_author_guild_id)
+  REFERENCES authors_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON message_replies_t (reply_to_author_guild_id);
+""",
+
+# This Query Fails
+"""
+ALTER TABLE message_replies_t
+  ADD CONSTRAINT message_replies_t_to_channels_t_for_reply
+  FOREIGN KEY (reply_to_channel_id)
+  REFERENCES channels_t(id)
+  ON DELETE CASCADE;
+CREATE INDEX ON message_replies_t (reply_to_channel_id);
+"""
 ]
 
 # try:
