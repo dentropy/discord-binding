@@ -158,7 +158,7 @@ ALTER TABLE channels_t
   FOREIGN KEY (guild_id)
   REFERENCES guilds_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON channels_t (guild_id);
+-- CREATE INDEX ON channels_t (guild_id);
 """,
 
 """
@@ -167,7 +167,7 @@ ALTER TABLE messages_t
   FOREIGN KEY (channel_id)
   REFERENCES channels_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON messages_t (channel_id);
+-- CREATE INDEX ON messages_t (channel_id);
 """,
 
 """
@@ -176,7 +176,7 @@ ALTER TABLE messages_t
   FOREIGN KEY (author_guild_id)
   REFERENCES authors_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON messages_t (channel_id);
+-- CREATE INDEX ON messages_t (channel_id);
 """,
 
 """
@@ -185,7 +185,7 @@ ALTER TABLE attachments_t
   FOREIGN KEY (message_id)
   REFERENCES messages_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON attachments_t (message_id);
+-- CREATE INDEX ON attachments_t (message_id);
 """,
 
 """
@@ -194,7 +194,7 @@ ALTER TABLE mentions_t
   FOREIGN KEY (message_id)
   REFERENCES messages_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON mentions_t (message_id);
+-- CREATE INDEX ON mentions_t (message_id);
 """,
 
 """
@@ -203,7 +203,7 @@ ALTER TABLE mentions_t
   FOREIGN KEY (guild_id)
   REFERENCES guilds_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON mentions_t (guild_id);
+-- CREATE INDEX ON mentions_t (guild_id);
 """,
 
 """
@@ -212,7 +212,7 @@ ALTER TABLE mentions_t
   FOREIGN KEY (channel_id)
   REFERENCES channels_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON mentions_t (channel_id);
+-- CREATE INDEX ON mentions_t (channel_id);
 """,
 
 """
@@ -221,7 +221,7 @@ ALTER TABLE reactions_t
   FOREIGN KEY (message_id)
   REFERENCES messages_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON reactions_t (message_id);
+-- CREATE INDEX ON reactions_t (message_id);
 """,
 
 """
@@ -230,7 +230,7 @@ ALTER TABLE reactions_t
   FOREIGN KEY (channel_id)
   REFERENCES channels_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON reactions_t (channel_id);
+-- CREATE INDEX ON reactions_t (channel_id);
 """,
 
 """
@@ -239,7 +239,7 @@ ALTER TABLE reactions_t
   FOREIGN KEY (author_guild_id)
   REFERENCES authors_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON reactions_t (author_guild_id);
+-- CREATE INDEX ON reactions_t (author_guild_id);
 """,
 
 """
@@ -248,7 +248,7 @@ ALTER TABLE roles_t
   FOREIGN KEY (guild_id)
   REFERENCES guilds_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON roles_t (guild_id);
+-- CREATE INDEX ON roles_t (guild_id);
 """,
 
 # Error on this one
@@ -258,7 +258,7 @@ ALTER TABLE roles_t
   FOREIGN KEY (author_guild_id)
   REFERENCES authors_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON roles_t (author_guild_id);
+-- CREATE INDEX ON roles_t (author_guild_id);
 """,
 
 """
@@ -267,7 +267,7 @@ ALTER TABLE message_replies_t
   FOREIGN KEY (channel_id)
   REFERENCES channels_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON message_replies_t (channel_id);
+-- CREATE INDEX ON message_replies_t (channel_id);
 """,
 
 """
@@ -276,7 +276,7 @@ ALTER TABLE message_replies_t
   FOREIGN KEY (author_guild_id)
   REFERENCES authors_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON message_replies_t (author_guild_id);
+-- CREATE INDEX ON message_replies_t (author_guild_id);
 """,
 
 """
@@ -285,7 +285,7 @@ ALTER TABLE message_replies_t
   FOREIGN KEY (reply_to_author_guild_id)
   REFERENCES authors_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON message_replies_t (reply_to_author_guild_id);
+-- CREATE INDEX ON message_replies_t (reply_to_author_guild_id);
 """,
 
 # This Query Fails
@@ -295,7 +295,7 @@ ALTER TABLE message_replies_t
   FOREIGN KEY (reply_to_channel_id)
   REFERENCES channels_t(id)
   ON DELETE CASCADE;
-CREATE INDEX ON message_replies_t (reply_to_channel_id);
+-- CREATE INDEX ON message_replies_t (reply_to_channel_id);
 """
 ]
 
