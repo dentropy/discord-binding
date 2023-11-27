@@ -25,7 +25,12 @@ def query_resolver(pg_cursor, queries, query_name, query_args_dict = {}):
             # print("query_args")
             # pprint(query_args)
             # print("\n\n")
-            pg_cursor.execute(query["sql_query"], tuple(query_args))
+            
+            # pg_cursor.execute(query["sql_query"], tuple(query_args))
+            query_to_run = query["sql_query"].format(*query_args)
+            # print(query_to_run)
+            pg_cursor.execute(query_to_run)
+            
             query_results = pg_cursor.fetchall()
             result_df = pd.DataFrame(query_results)
             elapsed = timeit.default_timer() - start_time

@@ -32,7 +32,7 @@ from modules.queries import queries
 result = query_resolver(cursor, queries, "list_guilds")
 guild_id = result.iloc[0]["guild_id"]
 # print("list_guilds")
-# print(f"guild_id = {guild_id}"")
+print(f"guild_id = {guild_id}")
 # pprint(result)
 assert result.shape[1] == 2
 
@@ -41,7 +41,7 @@ result = query_resolver(cursor, queries, "guild_channels", {
 })
 channel_id = result.iloc[0]["channel_id"]
 # print("guild_channels")
-# print(f"channel_id = {channel_id}"")
+print(f"channel_id = {channel_id}")
 # pprint(result)
 assert result.shape[1] == 4
 
@@ -58,3 +58,15 @@ result = query_resolver(cursor, queries, "channel_authors", {
 # print("channel_authors")
 # pprint(result)
 assert result.shape[1] == 4
+
+
+result = query_resolver(cursor, queries, "channel_messages", {
+    "channel_id" : channel_id,
+    "order"      : "desc",
+    "offset"     : 1
+})
+# print("channel_messages")
+# pprint(result)
+assert result.shape[1] == 6
+
+
