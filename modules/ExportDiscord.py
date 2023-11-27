@@ -831,7 +831,7 @@ class ExportDiscord():
             # TODO embeds
             # TODO stickers
         if self.db_select == "neo4j":
-            from schemas.schema_neo4j import URLDomain, RawURL, Guilds, Channels, Authors, Messages, Reactions, Emoji, Replies, Attachments, Mentions
+            from schemas.schema_neo4j import URLDomains, RawURLs, Guilds, Channels, Authors, Messages, Reactions, Emoji, Replies, Attachments, Mentions
             from neomodel import db
             from dateutil import parser
             db.set_connection(url=self.db_url)
@@ -1014,27 +1014,26 @@ class ExportDiscord():
             if len(discord_data["urls"]) != 0:
                 messages_list = []
                 for tmp_url in discord_data["urls"]:
-                    # print(f"\nMessage\n{message}\n\n")
-                    # tmp = message["reference"]
-                    # print(f"\nreference\n{tmp}\n\n")
-                    insert_url = (RawURL(
+                    # print(f"\ntmp_url\n{tmp_url}\n\n")
+                    check_domain = URLDomains.nodes.first_or_none(identifier=tmp_url["netloc"])
+                    if check_domain == None:
+                        check_domain = (URLDomains(
+                            identifier      = tmp_url["netloc"],
+                            domain          = tmp_url["netloc"]
+                        )).save()
+                    insert_url = RawURLs(
                         identifier      = tmp_url["raw_url"],
                         scheme          = tmp_url["scheme"],
                         path            = tmp_url["path"],
                         params          = tmp_url["params"],
-                        mesquerysage_id = tmp_url["query"],
+                        query           = tmp_url["query"],
                         fragment        = tmp_url["fragment"] 
-                    )).save()
-                    check_domain = URLDomain.nodes.first_or_none(identifier=tmp_url["netloc"])
-                    if check_domain == None:
-                        check_domain = (URLDomain(
-                            identifier      = tmp_url["netloc"],
-                            domain          = tmp_url["netloc"]
-                        )).save()
+                    ).save()
                     insert_url.domain.connect(check_domain)
                     check_message = Messages.nodes.first_or_none(identifier=tmp_url["message_id"])
                     if check_message != None:
                         insert_url.message_id.connect(check_message)
+                    print("Sucessfully inserted tmp_url into neo4j")
     def process_json_files(self, base_directory):
         json_files = glob.glob(os.path.join(base_directory, '*.json'), recursive=True)
         for json_file in json_files:
