@@ -6,7 +6,6 @@ from glob import glob
 import os
 from pprint import pprint
 # from database import DB, Messages, Users
-# from urlextract import URLExtract
 # from sqlalchemy import distinct, desc
 from pathlib import Path
 import sqlite3
@@ -16,6 +15,9 @@ from psycopg2.extras import execute_batch
 import uuid
 from sqlalchemy.dialects.postgresql import insert
 
+from urlextract import URLExtract
+from urllib.parse import urlparse
+
 class ExportDiscord():
     def __init__(
         self, 
@@ -23,7 +25,6 @@ class ExportDiscord():
         db_url="./discord_guild_export.sqlite"
     ):
         """Initialize the ExportKeybase object."""
-        # self.extractor = URLExtract()
         # Make folders if they do not exist
         # self.save_dir = save_dir
         # Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -34,6 +35,7 @@ class ExportDiscord():
         #    files_in_dir.append( path.split("/")[-1] )
         self.db_url = db_url
         self.db_select = db_select
+        self.url_extractor = URLExtract()
         if(db_select == "sqlite"):
             self.con = sqlite3.connect(self.db_url)
             # self.con = sqlite3.connect(':memory:')
@@ -125,6 +127,7 @@ class ExportDiscord():
         root_dict["reactions"] = []
         root_dict["mentions"] = []
         root_dict["roles_metadata"] = []
+        root_dict["urls"] = []
         if("guild" not in data):
             return False
         root_dict["guilds"].append(data["guild"])
@@ -218,6 +221,23 @@ class ExportDiscord():
             message["author"] = message["author"]["id"]
             message["guild_id"] = data["guild"]["id"]
             root_dict["messages"].append(message)
+            if self.url_extractor.has_urls(message["content"]):
+                tmp_urls = self.url_extractor.gen_urls(message["content"])
+                for tmp_url in tmp_urls:
+                    tmp_url_parsed = urlparse(tmp_url)
+                    # print(tmp_url_parsed)
+                    url_dict = {
+                        "raw_url"    : tmp_url,
+                        "message_id" : message["id"],
+                        "scheme"     : tmp_url_parsed.scheme,
+                        "netloc"     : tmp_url_parsed.netloc,
+                        "path"       : tmp_url_parsed.path,
+                        "params"     : tmp_url_parsed.params,
+                        "query"      : tmp_url_parsed.query,
+                        "fragment"   : tmp_url_parsed.fragment
+                    }
+                    # print(url_dict)
+                    root_dict["urls"].append(url_dict)
         # print("\nauthors_dict.values()")
         # pprint(len ( authors_dict.keys())  )
         for author in authors_dict.keys(): 
@@ -436,7 +456,46 @@ class ExportDiscord():
                     messages_list.append(tuple ( insert_data) )
                 execute_batch(self.cur, query, messages_list)
                 self.con.commit()
-
+            # Messages
+            # pprint("\n\nTest Messages")
+            # pprint(discord_data["messages"][0])
+            query = """
+            INSERT INTO message_urls_t (
+                id          ,
+                message_id  ,
+                scheme      ,
+                netloc      ,
+                path        ,
+                params      ,
+                query       ,
+                fragment    
+            )
+            VALUES (
+                %s, %s, %s, %s,
+                %s, %s, %s, %s
+            )
+            on conflict on constraint message_urls_t_pkey do nothing
+            ;
+            """
+            if len(discord_data["urls"]) != 0:
+                messages_list = []
+                for tmp_url in discord_data["urls"]:
+                    # print(f"\nMessage\n{message}\n\n")
+                    # tmp = message["reference"]
+                    # print(f"\nreference\n{tmp}\n\n")
+                    insert_data = [
+                        tmp_url["raw_url"]    ,
+                        tmp_url["message_id"] ,
+                        tmp_url["scheme"]     ,
+                        tmp_url["netloc"]     ,
+                        tmp_url["path"]       ,
+                        tmp_url["params"]     ,
+                        tmp_url["query"]      ,
+                        tmp_url["fragment"]   
+                    ]
+                    messages_list.append(tuple ( insert_data) )
+                execute_batch(self.cur, query, messages_list)
+                self.con.commit()
 
             query = """
             INSERT INTO message_replies_t (

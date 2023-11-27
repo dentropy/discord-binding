@@ -83,4 +83,6 @@ select * from roles_t limit 100;
 
 select * from mentions_t limit 100;
 
+select * from message_urls_t limit 100;
+
 ```

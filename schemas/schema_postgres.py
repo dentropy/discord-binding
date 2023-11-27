@@ -56,6 +56,19 @@ CREATE TABLE IF NOT EXISTS messages_t (
 """,
 
 """
+CREATE TABLE IF NOT EXISTS message_urls_t (
+  id             VARCHAR PRIMARY KEY,
+  message_id     VARCHAR,
+  scheme         VARCHAR,
+  netloc         VARCHAR,
+  path           VARCHAR,
+  params         VARCHAR,
+  query          VARCHAR,
+  fragment       VARCHAR
+)
+""",
+
+"""
 CREATE TABLE IF NOT EXISTS message_replies_t (
   id                       VARCHAR PRIMARY KEY,
   guild_id                 VARCHAR,
