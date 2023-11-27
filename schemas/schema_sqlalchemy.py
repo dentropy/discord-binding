@@ -225,5 +225,27 @@ class Replies(Base):
         self.reply_to_author_id = reply_to_author_id
         self.reply_to_author_guild_id = reply_to_author_guild_id
 
+class URLs(Base):
+   __tablename__ = 'message_urls_t'
+   id = Column(String, primary_key=True)
+
+   message_id            = Column(String, ForeignKey('messages_t.id'))
+   scheme                = Column(String)
+   netloc                = Column(String)
+   path                  = Column(String)
+   params                = Column(String)
+   query                 = Column(String)
+   fragment              = Column(String)
+   def __init__(self, id, message_id, scheme, netloc,
+      path, params, query, fragment):
+        self.id = id
+        self.message_id = message_id
+        self.scheme = scheme
+        self.netloc = netloc
+        self.path = path
+        self.params = params
+        self.query = query
+        self.fragment = fragment
+
 # Base.metadata.create_all(engine)
 # session = Session(engine)
