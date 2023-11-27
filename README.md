@@ -10,6 +10,8 @@ The goal of this project is to take the data exported form [Tyrrrz/DiscordChatEx
   * This doc contains instructions to setup and access a local postgres server
 * [Setup Postgraphile](./docs/setup_postgraphile.md)
   * Postgraphile generate and runs a graphql API from just looking inside a postgres database
+* [neo4j Docs](./docs/neo4j.md)
+  * Setup neo4j and contains some example queries, including how to reset the database
 
 
 ## Transforming the data from [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter)
