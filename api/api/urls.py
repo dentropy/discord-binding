@@ -16,7 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from .views.json_test import json_test
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('json_test/', json_test),
 ]
