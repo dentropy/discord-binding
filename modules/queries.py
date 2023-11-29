@@ -14,7 +14,12 @@ queries = [
     "required_args": [],
     "arg_order" : [],
     "sql_query" : """
-      select id as guild_id, guild_name from guilds_t;
+      select
+        id as guild_id,
+        guild_name,
+        guild_name as label
+      from
+        guilds_t;
     """
   },
   {
@@ -27,6 +32,7 @@ queries = [
         distinct(channels_t.id) as channel_id,
         guilds_t.guild_name,
         channel_name,
+        channel_name as label,
         guilds_t.id as guild_id
       from
         channels_t
@@ -46,7 +52,8 @@ queries = [
           authors_t.author_name,
           authors_t.author_name,
           authors_t.nickname,
-          authors_t.id as guild_id
+          authors_t.nickname as label,
+          guilds_t.id as guild_id
         from
           authors_t
         join guilds_t on authors_t.guild_id = guilds_t.id

@@ -9,7 +9,7 @@ export default function reducer(state, action) {
       case 'SET_CHANNELS':
         return { ...state, channels: action.payload };
       case 'SET_AUTHORS':
-        return { ...state, authors: tmp_metadata };
+        return { ...state, authors: action.payload };
       case 'SELECT_GUILD':
         return { ...state, select_guild: action.payload };
       case 'SELECT_CHANNEL':

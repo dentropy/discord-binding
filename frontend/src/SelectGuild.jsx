@@ -6,18 +6,52 @@ import { Context } from './Provider';
 
 export default function SelectGuild() {
   const [context, setContext] = React.useContext(Context);
+
   function set_guild(input, value) {
     setContext({
         type: 'SELECT_GUILD',
         payload: value
     })
   }
+  React.useEffect(
+    () => {
+      const form_data = new FormData();
+      form_data.append('query_name', 'list_guilds');
+      const options = {
+        method: 'POST',
+        body: form_data
+      };
+      fetch("/query", options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('POST request successful! Response data:', data);
+        setContext({
+          type: 'SET_GUILDS',
+          payload: data
+        })
+        setContext({
+          type: 'SELECT_GUILD',
+          payload: data[0]
+        })
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    },
+    []
+  )
   return (
     <Autocomplete
       disablePortal
-      id="combo-box-demo"
+      id="select_guild_autocomplete"
       onChange={set_guild}
       options={context.guilds}
+      value={context.select_guild.label}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="Guild" />}
     />

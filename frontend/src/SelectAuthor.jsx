@@ -13,13 +13,49 @@ export default function SelectAuthor() {
         payload: value
     })
   }
+  React.useEffect(
+    () => {
+      if(context.select_guild.label != "Getting Data"){
+        const form_data = new FormData();
+        form_data.append('query_name', 'guild_authors');
+        form_data.append('guild_id', context.select_guild.guild_id);
+        const options = {
+          method: 'POST',
+          body: form_data
+        };
+        fetch("/query", options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('POST request successful! Response data:', data);
+          setContext({
+            type: 'SET_AUTHORS',
+            payload: data
+          })
+          setContext({
+            type: 'SELECT_AUTHOR',
+            payload: data[0]
+          })
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        })
+      }
+    },
+    [context.select_guild]
+  )
   return (
     <>
         <Autocomplete
             disablePortal
             onChange={set_author}
-            id="combo-box-demo"
+            id="select_author_autocomplete"
             options={context.authors}
+            value={context.select_author.label}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Author" />}
         />

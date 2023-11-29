@@ -14,46 +14,26 @@ import Grid from '@mui/material/Unstable_Grid2';
 
 import MainAppBar from './MainAppBar'
 
+import { Context } from './Provider';
+
 function App() {
   // const [count, setCount] = React.useState(0)
   const [ data, setData ] = React.useState("Fetching Data")
-
-  React.useEffect(
-    () => {
-      const form_data = new FormData();
-      form_data.append('query_name', 'list_guilds');
-      const options = {
-        method: 'POST',
-        body: form_data
-      };
-      fetch("/query", options)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        console.log('POST request successful! Response data:', data);
-        setData(data)
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-    },
-    []
-  )
+  const [context, setContext] = React.useContext(Context);
 
   return (
     <>
       <MainAppBar />
       <Box sx={{ flexGrow: 1, p: 2 }} >
         <Grid container spacing={2} >
-          <Grid xs={12}>
+          <Grid xs={6}>
             <h1>Graph Goes Here</h1>
             <h1>This does not line up as I expected</h1>
             <h1>This does not line up as I expected. This does not line up as I expected. This does not line up as I expected. This does not line up as I expected. This does not line up as I expected.</h1>
-            {JSON.stringify(data)}
+          </Grid>
+          <Grid xs={6}>
+            <p>{JSON.stringify(context.guilds)}</p><br />
+            <p>{JSON.stringify(context.channels)}</p>
           </Grid>
         </Grid>
       </Box>
