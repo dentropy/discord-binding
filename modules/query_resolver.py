@@ -4,6 +4,13 @@ import timeit
 import psycopg2
 import psycopg2.extras
 
+def check_query_select(queries, query_name):
+    for query in queries:
+        if query["name"] == query_name:
+            return True
+    else:
+        return False
+
 def query_resolver(pg_cursor, queries, query_name, query_args_dict = {}):
     for query in queries:
         if query["name"] == query_name:
