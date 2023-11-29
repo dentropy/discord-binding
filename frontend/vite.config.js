@@ -11,6 +11,12 @@ export default defineConfig({
         changeOrigin: true,
         secure : false,
         rewrite: (path) => path.replace(/^\/query/, '')
+      },
+      '/list_queries': {
+        target: 'http://127.0.0.1:8000/list_queries/',
+        changeOrigin: true,
+        secure : false,
+        rewrite: (path) => path.replace(/^\/list_queries/, '')
       }
     }
   }

@@ -30,15 +30,17 @@ export default function SelectChannel() {
           return response.json();
         })
         .then(data => {
-          console.log('POST request successful! Response data:', data);
-          setContext({
-            type: 'SET_CHANNELS',
-            payload: data
-          })
-          setContext({
-            type: 'SELECT_CHANNEL',
-            payload: data[0]
-          })
+          console.log('POST request successful for Channel Data! Response data:', data);
+          if(data.length != 0){
+            setContext({
+              type: 'SET_CHANNELS',
+              payload: data
+            })
+            setContext({
+              type: 'SELECT_CHANNEL',
+              payload: data[0]
+            })
+          }
         })
         .catch(error => {
           console.error('Error:', error);

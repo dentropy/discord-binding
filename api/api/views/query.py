@@ -64,3 +64,7 @@ def query(request):
             return JsonResponse({'error': result})
         json_result = result.to_json(orient='records')
         return JsonResponse(json.loads(json_result), safe=False)
+
+@csrf_exempt
+def list_queries(request):
+    return JsonResponse(queries, safe=False)

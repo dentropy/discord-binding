@@ -4,6 +4,8 @@ export default function reducer(state, action) {
         return { ...state, count: state.count + action.payload };
       case 'DECREMENT':
         return { ...state, count: state.count - action.payload };
+      case 'SET_QUERIES':
+        return { ...state, queries: action.payload };
       case 'SET_GUILDS':
         return { ...state, guilds: action.payload };
       case 'SET_CHANNELS':
@@ -16,6 +18,8 @@ export default function reducer(state, action) {
         return { ...state, select_channel: action.payload };
       case 'SELECT_AUTHOR':
         return { ...state, select_author: action.payload };
+      case 'SELECT_QUERY':
+        return { ...state, select_query: action.payload };
       default:
         throw new Error();
     }

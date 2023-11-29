@@ -4,7 +4,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 import { Context } from './Provider';
 
-export default function SelectAuthor() {
+export default function SelectQuery() {
   const [context, setContext] = React.useContext(Context);
 
   function set_author(input, value) {
@@ -31,17 +31,15 @@ export default function SelectAuthor() {
           return response.json();
         })
         .then(data => {
-          console.log('POST request successful for Author Data! Response data:', data);
-          if(data.length != 0){
-            setContext({
-              type: 'SET_AUTHORS',
-              payload: data
-            })
-            setContext({
-              type: 'SELECT_AUTHOR',
-              payload: data[0]
-            })
-          }
+          console.log('POST request successful! Response data:', data);
+          setContext({
+            type: 'SET_QUERIES',
+            payload: data
+          })
+          setContext({
+            type: 'SELECT_QUERY',
+            payload: data[0]
+          })
         })
         .catch(error => {
           console.error('Error:', error);
@@ -59,7 +57,7 @@ export default function SelectAuthor() {
             options={context.authors}
             value={context.select_author.label}
             sx={{ width: 300 }}
-            renderInput={(params) => <TextField {...params} label="Author" />}
+            renderInput={(params) => <TextField {...params} label="Query" />}
         />
     </>
   );

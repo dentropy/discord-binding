@@ -29,7 +29,7 @@ export default function SelectGuild() {
         return response.json();
       })
       .then(data => {
-        console.log('POST request successful! Response data:', data);
+        console.log('POST request successful for Guild Data! Response data:', data);
         setContext({
           type: 'SET_GUILDS',
           payload: data

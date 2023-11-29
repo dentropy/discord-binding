@@ -6,6 +6,9 @@ export const Context = createContext();
 
 const initialState = {
   count          : 0,
+  queries         : [
+    { label : "Fetching Data", id : 0 }
+  ],
   guilds         : [
     { label : "Fetching Data", id : 0 }
   ],
@@ -15,6 +18,9 @@ const initialState = {
   authors        : [
     { label : "Fetching Data", id : 0 }
   ],
+  select_query   : {
+    label : "Getting Data"
+  },
   select_guild   : {
     label : "Getting Data"
   },
