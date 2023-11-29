@@ -203,7 +203,7 @@ class DiscordAnalytics():
             from
                 authors_t
             where
-                isBot = 'False'
+                is_bot = 'False'
                 and guild_id in %s
             group by guild_id;
             """
@@ -230,7 +230,7 @@ class DiscordAnalytics():
             from
                 authors_t
             where
-                isBot = 'True'
+                is_bot = 'True'
                 and guild_id in %s
             group by guild_id;
             """
@@ -284,7 +284,7 @@ class DiscordAnalytics():
             from
                 messages_t
             where
-                isBot = 'F'
+                is_bot = 'F'
                 and guild_id in %s
             group by guild_id;
             """
@@ -312,7 +312,7 @@ class DiscordAnalytics():
             from
                 messages_t
             where
-                isBot = 'T'
+                is_bot = 'T'
                 and guild_id in %s
             group by guild_id;
             """
@@ -345,7 +345,7 @@ class DiscordAnalytics():
             			select 
             				guild_id,
             				author_id,
-            				count(content) as msg_count
+            				count(msg_content) as msg_count
             			from messages_t
             			group by guild_id, author_id
             		) as raw_author_message_count
@@ -386,7 +386,7 @@ class DiscordAnalytics():
             			select 
             				guild_id,
             				author_id,
-            				count(content) as msg_count
+            				count(msg_content) as msg_count
             			from messages_t
             			group by guild_id, author_id
             		) as raw_author_message_count
@@ -427,7 +427,7 @@ class DiscordAnalytics():
             			select 
             				guild_id,
             				author_id,
-            				count(content) as msg_count
+            				count(msg_content) as msg_count
             			from messages_t
             			group by guild_id, author_id
             		) as raw_author_message_count
@@ -471,7 +471,7 @@ class DiscordAnalytics():
             			select 
             				guild_id,
             				author_id,
-            				count(content) as msg_count
+            				count(msg_content) as msg_count
             			from messages_t
             			group by guild_id, author_id
             		) as raw_author_message_count
@@ -527,7 +527,7 @@ class DiscordAnalytics():
                                 select 
                                     guild_id,
                                     author_id,
-                                    count(content) as msg_count,
+                                    count(msg_content) as msg_count,
                                     max(msg_timestamp) as max_msg_timestamp,
                                     min(msg_timestamp) as min_msg_timestamp
                                 from messages_t
@@ -548,7 +548,7 @@ class DiscordAnalytics():
                                     select 
                                         guild_id,
                                         author_id,
-                                        count(content) as msg_count
+                                        count(msg_content) as msg_count
                                     from messages_t
                                     group by guild_id, author_id
                                 ) as msg_something_t
@@ -595,7 +595,7 @@ class DiscordAnalytics():
         	FROM messages_t
             WHERE 
                 messages_t.guild_id = %s
-                and isBot = 'F'
+                and is_bot = 'F'
         	GROUP BY guild_id, month_timestamp
         ) as month_messages_t
         join guilds_t on month_messages_t.guild_id = guilds_t.id
@@ -632,7 +632,7 @@ class DiscordAnalytics():
         	FROM messages_t
             WHERE 
                 messages_t.guild_id = %s
-                and isBot = 'T'
+                and is_bot = 'T'
         	GROUP BY guild_id, month_timestamp
         ) as month_messages_t
         join guilds_t on month_messages_t.guild_id = guilds_t.id
@@ -675,7 +675,7 @@ class DiscordAnalytics():
             	FROM messages_t
                 WHERE 
                     guild_id = %s
-                    and isBot = 'F'
+                    and is_bot = 'F'
             	GROUP BY guild_id, month_timestamp
             ) as month_messages_t
             join guilds_t on month_messages_t.guild_id = guilds_t.id
@@ -718,7 +718,7 @@ class DiscordAnalytics():
             	FROM messages_t
                 WHERE 
                     guild_id = %s
-                    and isBot = 'T'
+                    and is_bot = 'T'
             	GROUP BY guild_id, month_timestamp
             ) as month_messages_t
             join guilds_t on month_messages_t.guild_id = guilds_t.id

@@ -34,7 +34,7 @@ guild_id = result.iloc[0]["guild_id"]
 # print("list_guilds")
 print(f"guild_id = {guild_id}")
 # pprint(result)
-assert result.shape[1] == 2
+assert result.shape[1] == 3
 
 result = query_resolver(cursor, queries, "guild_channels", {
     "guild_id" : guild_id
@@ -43,14 +43,14 @@ channel_id = result.iloc[0]["channel_id"]
 # print("guild_channels")
 print(f"channel_id = {channel_id}")
 # pprint(result)
-assert result.shape[1] == 4
+assert result.shape[1] == 5
 
 result = query_resolver(cursor, queries, "guild_authors", {
     "guild_id" : guild_id
 })
 # print("guild_authors")
 # pprint(result)
-assert result.shape[1] == 4
+assert result.shape[1] == 5
 
 result = query_resolver(cursor, queries, "channel_authors", {
     "channel_id" : channel_id
@@ -74,15 +74,8 @@ assert result.shape[1] == 10
 result = query_resolver(cursor, queries, "user_longest_avg_msg_length", {
     "guild_id" : guild_id
 })
-# print("user_longest_avg_msg_length")
-# pprint(result)
-assert result.shape[1] == 5
-
-result = query_resolver(cursor, queries, "user_longest_avg_msg_length", {
-    "guild_id" : guild_id
-})
-# print("user_longest_avg_msg_length")
-# pprint(result)
+print("user_longest_avg_msg_length")
+pprint(result)
 assert result.shape[1] == 5
 
 
