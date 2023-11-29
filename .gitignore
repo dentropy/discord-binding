@@ -1,5 +1,4 @@
 .DS_Store
-*.html
 postgres_db_1
 env/
 *csv
