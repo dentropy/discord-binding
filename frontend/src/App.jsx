@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import * as React from 'react';
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 // import './App.css'
@@ -15,7 +15,34 @@ import Grid from '@mui/material/Unstable_Grid2';
 import MainAppBar from './MainAppBar'
 
 function App() {
-  // const [count, setCount] = useState(0)
+  // const [count, setCount] = React.useState(0)
+  const [ data, setData ] = React.useState("Fetching Data")
+
+  React.useEffect(
+    () => {
+      const form_data = new FormData();
+      form_data.append('query_name', 'list_guilds');
+      const options = {
+        method: 'POST',
+        body: form_data
+      };
+      fetch("/query", options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('POST request successful! Response data:', data);
+        setData(data)
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    },
+    []
+  )
 
   return (
     <>
@@ -26,6 +53,7 @@ function App() {
             <h1>Graph Goes Here</h1>
             <h1>This does not line up as I expected</h1>
             <h1>This does not line up as I expected. This does not line up as I expected. This does not line up as I expected. This does not line up as I expected. This does not line up as I expected.</h1>
+            {JSON.stringify(data)}
           </Grid>
         </Grid>
       </Box>

@@ -15,9 +15,9 @@ export default function SelectChannel() {
   return (
     <Autocomplete
       disablePortal
-      onChange={set_channel}
       id="combo-box-demo"
-      options={context.channels.label}
+      onChange={set_channel}
+      options={context.channels}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="Channel" />}
     />
