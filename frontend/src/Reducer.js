@@ -26,6 +26,8 @@ export default function reducer(state, action) {
         return { ...state, select_data_visualization: action.payload };
       case 'SET_DATA_VISUALIZATION_DATA':
         return { ...state, data_visualization_data: action.payload };
+      case 'RENDER_NOW':
+        return { ...state, render_now: action.payload };
       default:
         throw new Error();
     }

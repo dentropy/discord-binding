@@ -38,7 +38,8 @@ const initialState = {
   },
   data_visualization_data : {
     label : "Getting Data"
-  }
+  },
+  render_now : false
 };
 
 export default function Provider(props) {

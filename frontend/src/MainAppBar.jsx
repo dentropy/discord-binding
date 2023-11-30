@@ -16,7 +16,7 @@ import SelectGuild from './SelectGuild'
 import SelectChannel from './SelectChannel';
 import SelectAuthor from './SelectAuthor';
 import SelectDataVisualization from './SelectDataVisualization';
-
+import SelectRender from './SelectRender'
 
 const drawerWidth = 375;
 
@@ -118,6 +118,7 @@ export default function MainAppBar() {
           <SelectChannel />
           <SelectAuthor />
           <SelectDataVisualization />
+          <SelectRender />
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
