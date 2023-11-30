@@ -15,6 +15,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import SelectGuild from './SelectGuild'
 import SelectChannel from './SelectChannel';
 import SelectAuthor from './SelectAuthor';
+import SelectDataVisualization from './SelectDataVisualization';
 
 
 const drawerWidth = 375;
@@ -116,6 +117,7 @@ export default function MainAppBar() {
           <SelectGuild />
           <SelectChannel />
           <SelectAuthor />
+          <SelectDataVisualization />
       </Drawer>
       <Main open={open}>
         <DrawerHeader />

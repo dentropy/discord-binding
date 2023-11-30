@@ -1,13 +1,13 @@
 query_args = [i for i in range(1, 101)]
 queries = [
-  {
-    "name" : "Template",
-    "desciption": "Template",
-    "required_args": [],
-    "arg_order" : [],
-    "sql_query" : """
-    """
-  },
+  # {
+  #   "name" : "Template",
+  #   "desciption": "Template",
+  #   "required_args": [],
+  #   "arg_order" : [],
+  #   "sql_query" : """
+  #   """
+  # },
   {
     "name" : "list_guilds",
     "desciption": "What are the discord guilds are in the database?",

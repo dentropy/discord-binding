@@ -18,6 +18,9 @@ const initialState = {
   authors        : [
     { label : "Fetching Data", id : 0 }
   ],
+  data_visualizations  : {
+    label : "Getting Data"
+  },
   select_query   : {
     label : "Getting Data"
   },
@@ -28,6 +31,12 @@ const initialState = {
     label : "Getting Data"
   },
   select_author  : {
+    label : "Getting Data"
+  },
+  select_data_visualization  : {
+    label : "Getting Data"
+  },
+  data_visualization_data : {
     label : "Getting Data"
   }
 };

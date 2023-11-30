@@ -18,10 +18,13 @@ from django.contrib import admin
 from django.urls import path
 from .views.json_test import json_test
 from .views.query import query, list_queries
+from .views.plotly_graph import plotly_graph, list_graph_data
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('json_test/', json_test),
     path('query/', query),
     path('list_queries/', list_queries),
+    path('plotly_graph/', plotly_graph),
+    path('list_graphs/', list_graph_data),
 ]

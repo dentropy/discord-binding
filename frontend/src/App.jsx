@@ -14,7 +14,9 @@ import Grid from '@mui/material/Unstable_Grid2';
 
 import MainAppBar from './MainAppBar'
 
+
 import { Context } from './Provider';
+import PlotlyChart from './PlotlyChart';
 
 function App() {
   // const [count, setCount] = React.useState(0)
@@ -27,9 +29,7 @@ function App() {
       <Box sx={{ flexGrow: 1, p: 2 }} >
         <Grid container spacing={2} >
           <Grid xs={6}>
-            <h1>Graph Goes Here</h1>
-            <h1>This does not line up as I expected</h1>
-            <h1>This does not line up as I expected. This does not line up as I expected. This does not line up as I expected. This does not line up as I expected. This does not line up as I expected.</h1>
+            <PlotlyChart />
           </Grid>
           <Grid xs={6}>
             <p>{JSON.stringify(context.guilds)}</p><br />

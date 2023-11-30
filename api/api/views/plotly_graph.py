@@ -42,29 +42,33 @@ import json
 
 from django.views.decorators.csrf import csrf_exempt
 
-@csrf_exempt
-def query(request):
-    if request.method == 'POST':
-        # Accessing POST data
-        query_name = request.POST.get('query_name')
-        # print(query_name)
-        # print(check_query_select(queries, query_name))
-        if(check_query_select(queries, query_name) == False):
-            return JsonResponse({'error': 'Invalid request method'})
-        # print(query_name)
-        query_data = {
-            "guild_id"   : request.POST.get('guild_id'),
-            "channel_id" : request.POST.get('channel_id'),
-            "author_id"  : request.POST.get('author_id'),
-            "order"      : request.POST.get('order'),
-            "offset"     : request.POST.get('offset'),
-        }
-        result = query_resolver(cursor, queries, query_name, query_data)
-        if type(result) == type(""):
-            return JsonResponse({'error': result})
-        json_result = result.to_json(orient='records')
-        return JsonResponse(json.loads(json_result), safe=False)
+from modules.graphs import build_graph, list_graphs
+
 
 @csrf_exempt
-def list_queries(request):
-    return JsonResponse(queries, safe=False)
+def plotly_graph(request):
+    if request.method == 'POST':
+        # Accessing POST data
+        graph_name = request.POST.get('graph_name')
+        # print(f"graph_name = {graph_name}")
+        graph_args = {
+            "guild_id"   : request.POST.get('guild_id')
+        }
+        # print("\n\ngraph_args")
+        # pprint(graph_args)
+        # print(request.POST.get('guild_id'))
+        fig = build_graph(
+                cursor,
+                graph_name,
+                graph_args
+            )
+        # pprint(fig)
+        if type(fig) == type(""):
+            return JsonResponse({'error': fig})
+        fig["fig"] = fig["fig"].to_json()
+        fig["layout"] = fig["layout"].to_json()
+        return JsonResponse( fig )
+
+@csrf_exempt
+def list_graph_data(request):
+    return JsonResponse(list_graphs(queries), safe=False)

@@ -17,6 +17,18 @@ export default defineConfig({
         changeOrigin: true,
         secure : false,
         rewrite: (path) => path.replace(/^\/list_queries/, '')
+      },
+      '/plotly_graph': {
+        target: 'http://127.0.0.1:8000/plotly_graph/',
+        changeOrigin: true,
+        secure : false,
+        rewrite: (path) => path.replace(/^\/plotly_graph/, '')
+      },
+      '/list_graphs': {
+        target: 'http://127.0.0.1:8000/list_graphs/',
+        changeOrigin: true,
+        secure : false,
+        rewrite: (path) => path.replace(/^\/list_graphs/, '')
       }
     }
   }
