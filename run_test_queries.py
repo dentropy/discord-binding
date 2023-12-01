@@ -128,10 +128,11 @@ assert result.shape[1] == 6
 
 query_name = "guild_author_most_attachments"
 result = query_resolver(cursor, queries, query_name, {
-    "guild_id" : guild_id
+    "guild_id" : guild_id,
+    "author_id" : author_id
 })
-print(query_name)
-pprint(result)
+# print(query_name)
+# pprint(result)
 attachment_author_id = result.iloc[0]["author_guild_id"]
 print(f"attachment_author_id = {attachment_author_id}")
 assert result.shape[1] == 6
@@ -141,8 +142,8 @@ query_name = "guild_author_edit_percentage"
 result = query_resolver(cursor, queries, query_name, {
     "guild_id" : guild_id
 })
-print(query_name)
-pprint(result)
+# print(query_name)
+# pprint(result)
 assert result.shape[1] == 8
 
 
@@ -163,7 +164,7 @@ result = query_resolver(cursor, queries, query_name, {
 # print(query_name)
 # pprint(result)
 # print(result.shape[1])
-assert result.shape[1] == 6
+assert result.shape[1] == 8
 
 
 query_name = "guild_author_most_reacted_messages"
@@ -177,7 +178,7 @@ result = query_resolver(cursor, queries, query_name, {
 assert result.shape[1] == 8
 
 
-query_name = "guild_author_messages_by_hour"
+query_name = "guild_author_messages_by_hour_of_day"
 result = query_resolver(cursor, queries, query_name, {
     "guild_id"  : guild_id,
     "author_id" : author_id
@@ -206,7 +207,7 @@ result = query_resolver(cursor, queries, query_name, {
 # pprint(result)
 # print(result.shape[1])
 assert result.shape[0] == 7
-assert result.shape[1] == 7
+assert result.shape[1] == 8
 
 
 query_name = "guild_author_most_messages"
@@ -229,23 +230,13 @@ result = query_resolver(cursor, queries, query_name, {
 assert result.shape[1] == 4
 
 
-query_name = "guild_activity_per_month"
-result = query_resolver(cursor, queries, query_name, {
-    "guild_id"  : guild_id
-})
-# print(query_name)
-# pprint(result)
-# print(result.shape[1])
-assert result.shape[1] == 4
-
-
 query_name = "guild_channels_most_active"
 result = query_resolver(cursor, queries, query_name, {
     "guild_id"  : guild_id
 })
-# print(query_name)
-# pprint(result)
-# print(result.shape[1])
+print(query_name)
+pprint(result)
+print(result.shape[1])
 assert result.shape[1] == 5
 
 

@@ -32,6 +32,21 @@ graph_names = {
     },
     "guild_author_edit_percentage" : {
         "query_name" : "guild_author_edit_percentage"
+    },
+    "count_messages_per_channel_for_user_in_guild" : {
+        "query_name" : "count_messages_per_channel_for_user_in_guild"
+    },
+    "guild_author_most_reacted_messages" : {
+        "query_name" : "guild_author_most_reacted_messages"
+    },
+    "guild_author_messages_by_hour_of_day" : {
+        "query_name" : "guild_author_messages_by_hour_of_day"
+    },
+    "guild_author_messages_day_of_week" : {
+        "query_name" : "guild_author_messages_day_of_week"
+    },
+    "guild_activity_per_month" : {
+        "query_name" : "guild_activity_per_month"
     }
 }
 
@@ -361,7 +376,7 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 height=800   # Height in pixels
             )
         }
-    if graph_name == "guild_author_most_attachments":
+    if graph_name == "guild_author_edit_percentage":
         result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
         selected_query = { "name" : "placeholder"}
         for query in queries:
@@ -409,6 +424,271 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
             "layout" : go.Layout(
                 barmode='group',
                 title='Message Editted Percentage verses Total Message Count',
+                autosize=False,
+                width=1024 * 2,  # Width in pixels
+                height=800   # Height in pixels
+            )
+        }
+    if graph_name == "guild_author_most_reacted_messages":
+        result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
+        selected_query = { "name" : "placeholder"}
+        for query in queries:
+            if graph_name == query["name"]:
+                selected_query = query
+        # print("\n\nselected_query")
+        # pprint(selected_query)
+        # print("\n\nquery_args_dict\n\n")
+        # pprint(query_args_dict)
+        # print(f"\nresult_df for graph_name\n\n")
+        # pprint(result_df)
+        # print("\nqueries\n")
+        # pprint(queries)
+        if type(result_df) == type(""):
+            return result_df
+        return {
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
+            "uuid": selected_query["uuid"],
+            "fig" : go.Figure(
+                data=[
+                    go.Bar(
+                        name='Individual Message',     
+                        x=result_df["message_id"], 
+                        yaxis='y',
+                        y = result_df["reaciton_sum"], 
+                        offsetgroup=1, 
+                        orientation='v'
+                    )
+                ],
+                layout={
+                    'yaxis':  {'title': f'Number of Reactions to message posted by {result_df.iloc[0]["nickname"]}'}
+                }
+                
+            ),
+            "layout" : go.Layout(
+                barmode='group',
+                title=f'Number of Reactions to Messages from {result_df.iloc[0]["nickname"]}',
+                autosize=False,
+                width=1024 * 2,  # Width in pixels
+                height=800   # Height in pixels
+            )
+        }    
+    if graph_name == "count_messages_per_channel_for_user_in_guild":
+        result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
+        selected_query = { "name" : "placeholder"}
+        for query in queries:
+            if graph_name == query["name"]:
+                selected_query = query
+        # print("\n\nselected_query")
+        # pprint(selected_query)
+        # print("\n\nquery_args_dict\n\n")
+        # pprint(query_args_dict)
+        # print(f"\nresult_df for graph_name\n\n")
+        # pprint(result_df)
+        # print("\nqueries\n")
+        # pprint(queries)
+        if type(result_df) == type(""):
+            return result_df
+        return {
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
+            "uuid": selected_query["uuid"],
+            "fig" : go.Figure(
+                data=[
+                    go.Bar(
+                        name='Channel Name',     
+                        x=result_df["channel_name"], 
+                        yaxis='y',
+                        y = result_df["msg_count"], 
+                        offsetgroup=1, 
+                        orientation='v'
+                    )
+                ],
+                layout={
+                    'yaxis':  {'title': f'Number of Messages from {result_df.iloc[0]["nickname"]}'}
+                }
+                
+            ),
+            "layout" : go.Layout(
+                barmode='group',
+                title=f'Number of Messages from {result_df.iloc[0]["nickname"]} Per Hour of Day',
+                autosize=False,
+                width=1024 * 2,  # Width in pixels
+                height=800   # Height in pixels
+            )
+        }
+
+    if graph_name == "guild_author_messages_by_hour_of_day":
+        result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
+        selected_query = { "name" : "placeholder"}
+        for query in queries:
+            if graph_name == query["name"]:
+                selected_query = query
+        # print("\n\nselected_query")
+        # pprint(selected_query)
+        # print("\n\nquery_args_dict\n\n")
+        # pprint(query_args_dict)
+        # print(f"\nresult_df for graph_name\n\n")
+        # pprint(result_df)
+        # print("\nqueries\n")
+        # pprint(queries)
+        if type(result_df) == type(""):
+            return result_df
+        return {
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
+            "uuid": selected_query["uuid"],
+            "fig" : go.Figure(
+                data=[
+                    go.Bar(
+                        name='Hour of Day',     
+                        x=result_df["hour_of_day"], 
+                        yaxis='y',
+                        y = result_df["num_messages_per_hour"], 
+                        offsetgroup=1, 
+                        orientation='v'
+                    )
+                ],
+                layout={
+                    'yaxis':  {'title': f'Number of Messages from {result_df.iloc[0]["nickname"]}'}
+                }
+                
+            ),
+            "layout" : go.Layout(
+                barmode='group',
+                title=f'Number of Messages from {result_df.iloc[0]["nickname"]} Per Hour of Day',
+                autosize=False,
+                width=1024 * 2,  # Width in pixels
+                height=800   # Height in pixels
+            )
+        }
+    if graph_name == "guild_author_messages_day_of_week":
+        result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
+        selected_query = { "name" : "placeholder"}
+        for query in queries:
+            if graph_name == query["name"]:
+                selected_query = query
+        # print("\n\nselected_query")
+        # pprint(selected_query)
+        # print("\n\nquery_args_dict\n\n")
+        # pprint(query_args_dict)
+        # print(f"\nresult_df for graph_name\n\n")
+        # pprint(result_df)
+        # print("\nqueries\n")
+        # pprint(queries)
+        if type(result_df) == type(""):
+            return result_df
+        return {
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
+            "uuid": selected_query["uuid"],
+            "fig" : go.Figure(
+                data=[
+                    go.Bar(
+                        name='Day of Week',     
+                        x=result_df["day_of_week"], 
+                        yaxis='y',
+                        y = result_df["num_messages_on_day"], 
+                        offsetgroup=1, 
+                        orientation='v'
+                    )
+                ],
+                layout={
+                    'yaxis':  {'title': f'Number of Messages from {result_df.iloc[0]["nickname"]}'}
+                }
+                
+            ),
+            "layout" : go.Layout(
+                barmode='group',
+                title=f'Number of Messages from {result_df.iloc[0]["nickname"]} Per Day of Week',
+                autosize=False,
+                width=1024 * 2,  # Width in pixels
+                height=800   # Height in pixels
+            )
+        }
+    if graph_name == "guild_activity_per_month":
+        result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
+        selected_query = { "name" : "placeholder"}
+        for query in queries:
+            if graph_name == query["name"]:
+                selected_query = query
+        # print("\n\nselected_query")
+        # pprint(selected_query)
+        # print("\n\nquery_args_dict\n\n")
+        # pprint(query_args_dict)
+        # print(f"\nresult_df for graph_name\n\n")
+        # pprint(result_df)
+        # print("\nqueries\n")
+        # pprint(queries)
+        if type(result_df) == type(""):
+            return result_df
+        return {
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
+            "uuid": selected_query["uuid"],
+            "fig" : go.Figure(
+                data=[
+                    go.Bar(
+                        name='Month and Year',     
+                        x=result_df["month_timestamp"], 
+                        yaxis='y',
+                        y = result_df["msg_count"], 
+                        offsetgroup=1, 
+                        orientation='v'
+                    )
+                ],
+                layout={
+                    'yaxis':  {'title': f'Number of Messages'}
+                }
+                
+            ),
+            "layout" : go.Layout(
+                barmode='group',
+                title=f'Number of Messages per month in {result_df.iloc[0]["guild_name"]}',
+                autosize=False,
+                width=1024 * 2,  # Width in pixels
+                height=800   # Height in pixels
+            )
+        }
+    if graph_name == "guild_channels_most_active":
+        result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
+        selected_query = { "name" : "placeholder"}
+        for query in queries:
+            if graph_name == query["name"]:
+                selected_query = query
+        # print("\n\nselected_query")
+        # pprint(selected_query)
+        # print("\n\nquery_args_dict\n\n")
+        # pprint(query_args_dict)
+        # print(f"\nresult_df for graph_name\n\n")
+        # pprint(result_df)
+        # print("\nqueries\n")
+        # pprint(queries)
+        if type(result_df) == type(""):
+            return result_df
+        return {
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
+            "uuid": selected_query["uuid"],
+            "fig" : go.Figure(
+                data=[
+                    go.Bar(
+                        name='Channel Name',     
+                        x=result_df["channel_name"], 
+                        yaxis='y',
+                        y = result_df["msg_count"], 
+                        offsetgroup=1, 
+                        orientation='v'
+                    )
+                ],
+                layout={
+                    'yaxis':  {'title': f'Number of Messages'}
+                }
+                
+            ),
+            "layout" : go.Layout(
+                barmode='group',
+                title=f'Number of Messages per Channel in {result_df.iloc[0]["guild_name"]}',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
                 height=800   # Height in pixels

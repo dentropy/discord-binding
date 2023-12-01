@@ -424,27 +424,31 @@ queries = [
     "required_args": ["guild_id", "author_id"],
     "arg_order" : ["guild_id", "author_id", "author_id"],
     "sql_query" : """
-      select
-        authors_t.author_name,
-        authors_t.nickname,
-        msg_count,
-        guilds_t.guild_name,
-        authors_t.id as authors_guild_id,
-        guilds_t.id
-      from
-      (
         select
-          count(*) as msg_count,
-          channel_id
+          author_channel_msg_count_t.channel_id,
+          channels_t.channel_name,
+          authors_t.author_name,
+          authors_t.nickname,
+          msg_count,
+          guilds_t.guild_name,
+          authors_t.id as authors_guild_id,
+          guilds_t.id
         from
-          messages_t
-        where
-      	  guild_id = '{}'
-          and author_guild_id = '{}'
-        group by channel_id
-      ) as author_channel_msg_count_t
-  	join authors_t on '{}' = authors_t.id
-    join guilds_t  on guilds_t.id = authors_t.guild_id;
+        (
+          select
+            count(*) as msg_count,
+            channel_id
+          from
+            messages_t
+          where
+            guild_id = '{}'
+            and author_guild_id = '{}'
+          group by channel_id
+        ) as author_channel_msg_count_t
+      join channels_t on author_channel_msg_count_t.channel_id = channels_t.id
+      join authors_t on '{}' = authors_t.id
+      join guilds_t  on guilds_t.id = authors_t.guild_id
+      order by msg_count desc;
     """
   },
   {
@@ -508,7 +512,7 @@ queries = [
     """
   },
   {
-    "name" : "guild_author_messages_by_hour",
+    "name" : "guild_author_messages_by_hour_of_day",
     "desciption": "What time of day does the particular discord author post their messages, group by hour?",
     "uuid": "d0faa6c6-be48-4170-941a-a30d833f6d1c",
     "required_args": ["guild_id", "author_id"],
@@ -543,7 +547,7 @@ queries = [
       ) as agg_days_posted_t
       join authors_t on authors_t.id = agg_days_posted_t.author_guild_id
       join guilds_t  on guilds_t.id  = authors_t.guild_id
-      order by num_messages_per_hour desc;
+      order by hour_of_day asc;
     """
   },
   {
@@ -613,6 +617,7 @@ queries = [
         authors_t.author_name,
         authors_t.nickname,
         agg_days_posted_t.day_of_week,
+        agg_days_posted_t.day_of_week_number,
         num_messages_on_day,
         guilds_t.id,
         agg_days_posted_t.author_guild_id
@@ -621,23 +626,25 @@ queries = [
         select
           author_guild_id,
           day_message_t.day_of_week,
+          day_message_t.day_of_week_number,
           count(day_message_t.day_of_week) as num_messages_on_day
         from
         (
           select
             author_guild_id,
-            TO_CHAR(msg_timestamp, 'Day') as day_of_week
+            TO_CHAR(msg_timestamp, 'Day') as day_of_week,
+            EXTRACT(DOW FROM msg_timestamp) AS day_of_week_number
           from
             messages_t
           where
               guild_id = '{}'
               and author_guild_id = '{}'
         ) as day_message_t
-        group by author_guild_id, day_message_t.day_of_week
+        group by author_guild_id, day_message_t.day_of_week, day_message_t.day_of_week_number
       ) as agg_days_posted_t
       join authors_t on authors_t.id = agg_days_posted_t.author_guild_id
       join guilds_t  on guilds_t.id  = authors_t.guild_id
-      order by num_messages_on_day desc;
+      order by agg_days_posted_t.day_of_week_number asc;
     """
   },
   {
