@@ -7,9 +7,10 @@ import { Context } from './Provider';
 export default function SelectQuery() {
   const [context, setContext] = React.useContext(Context);
 
-  function set_author(input, value) {
+  function set_query(input, value) {
+    console.log(value)
     setContext({
-        type: 'SELECT_AUTHOR',
+        type: 'SELECT_QUERY',
         payload: value
     })
   }
@@ -52,22 +53,13 @@ export default function SelectQuery() {
     <>
         <Autocomplete
             disablePortal
-            onChange={set_author}
-            id="select_author_autocomplete"
-            options={context.authors}
-            value={context.select_author.label}
+            onChange={set_query}
+            id="select_query_autocomplete"
+            options={context.queries}
+            value={context.queries[0]}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Query" />}
         />
     </>
   );
 }
-
-const top100Films = [
-    { label: 'The Shawshank Redemption', year: 1994 },
-    { label: 'The Godfather', year: 1972 },
-    { label: 'The Godfather: Part II', year: 1974 },
-    { label: 'The Dark Knight', year: 2008 },
-    { label: '12 Angry Men', year: 1957 },
-    { label: "Schindler's List", year: 1993 }
-]

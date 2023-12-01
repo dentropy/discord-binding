@@ -12,15 +12,19 @@ const initialState = {
   guilds         : [
     { label : "Fetching Data", id : 0 }
   ],
-  channels       : [
-    { label : "Fetching Data", id : 0 }
-  ],
-  authors        : [
-    { label : "Fetching Data", id : 0 }
-  ],
-  data_visualizations  : {
-    label : "Getting Data"
+  channels       : {
+    selected_value : { label : "Fetching Data", id : 0 },
+    value : "Fetching Data",
+    options : [{ label : "Fetching Data", id : 0 }]
   },
+  authors       : {
+    selected_value : { label : "Fetching Data", id : 0 },
+    value : "Fetching Data",
+    options : [{ label : "Fetching Data", id : 0 }]
+  },
+  data_visualizations  : [
+    { label : "Fetching Data", id : 0 }
+  ],
   select_query   : {
     label : "Getting Data"
   },
@@ -34,7 +38,11 @@ const initialState = {
     label : "Getting Data"
   },
   select_data_visualization  : {
-    label : "Getting Data"
+    label : "Getting Data",
+    description : "Loading...",
+    query_data : {
+      description : "Loading...."
+    }
   },
   data_visualization_data : {
     label : "Getting Data"

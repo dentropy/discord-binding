@@ -647,39 +647,39 @@ queries = [
       order by agg_days_posted_t.day_of_week_number asc;
     """
   },
-  {
-    "name" : "guild_author_most_messages",
-    "desciption": "What authors posted the most in a specific discord guild?",
-    "uuid": "7922cc2d-f1cc-435d-832d-5fa4d555b121",
-    "required_args": ["guild_id"],
-    "arg_order" : ["guild_id"],
-    "sql_query" : """
-      select 
-        guilds_t.guild_name,
-        authors_t.author_name,
-        author_msg_count.msg_count,
-        author_msg_count.guild_id,
-        authors_t.author_id as author_id,
-        author_msg_count.author_guild_id
-      from 
-      (
-        select 
-          guild_id,
-          author_guild_id,
-          count(content) as msg_count
-        from
-          messages_t
-        where 
-          guild_id = '{}'
-        group by
-          guild_id,
-          author_guild_id
-      ) as author_msg_count
-      join guilds_t on author_msg_count.guild_id = guilds_t.id
-      join authors_t on author_msg_count.author_guild_id = authors_t.id
-      order by msg_count desc;
-    """
-  },
+  # {
+  #   "name" : "guild_author_most_messages",
+  #   "desciption": "What authors posted the most in a specific discord guild?",
+  #   "uuid": "7922cc2d-f1cc-435d-832d-5fa4d555b121",
+  #   "required_args": ["guild_id"],
+  #   "arg_order" : ["guild_id"],
+  #   "sql_query" : """
+  #     select 
+  #       guilds_t.guild_name,
+  #       authors_t.author_name,
+  #       author_msg_count.msg_count,
+  #       author_msg_count.guild_id,
+  #       authors_t.author_id as author_id,
+  #       author_msg_count.author_guild_id
+  #     from 
+  #     (
+  #       select 
+  #         guild_id,
+  #         author_guild_id,
+  #         count(content) as msg_count
+  #       from
+  #         messages_t
+  #       where 
+  #         guild_id = '{}'
+  #       group by
+  #         guild_id,
+  #         author_guild_id
+  #     ) as author_msg_count
+  #     join guilds_t on author_msg_count.guild_id = guilds_t.id
+  #     join authors_t on author_msg_count.author_guild_id = authors_t.id
+  #     order by msg_count desc;
+  #   """
+  # },
   {
     "name" : "guild_activity_per_month",
     "desciption": "How much activity for a specific discord guild per month?",

@@ -6,7 +6,6 @@ import { Context } from './Provider';
 
 export default function SelectGuild() {
   const [context, setContext] = React.useContext(Context);
-
   function set_guild(input, value) {
     setContext({
         type: 'SELECT_GUILD',
@@ -45,13 +44,14 @@ export default function SelectGuild() {
     },
     []
   )
+
   return (
     <Autocomplete
       disablePortal
       id="select_guild_autocomplete"
       onChange={set_guild}
       options={context.guilds}
-      value={context.select_guild.label}
+      value={context.guilds[0]}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="Guild" />}
     />

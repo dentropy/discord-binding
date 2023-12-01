@@ -6,9 +6,11 @@ import { Context } from './Provider';
 
 export default function SelectDataVisualization() {
   const [context, setContext] = React.useContext(Context);
-  function set_channel(input, value) {
+  function set_data_visualization(input, value) {
+    console.log("set_data_visualization")
+    console.log(value)
     setContext({
-        type: 'SELECT_CHANNEL',
+        type: 'SELECT_DATA_VISUALIZATION',
         payload: value
     })
   }
@@ -31,6 +33,8 @@ export default function SelectDataVisualization() {
         .then(data => {
           console.log('POST request successful for Data Visualization Data! Response data:', data);
           if(data.length != 0){
+            console.log("list_graphs")
+            console.log(data)
             setContext({
               type: 'SET_DATA_VISUALIZATIONS',
               payload: data
@@ -52,9 +56,9 @@ export default function SelectDataVisualization() {
     <Autocomplete
       disablePortal
       id="select_data_disualization_autocomplete"
-      onChange={set_channel}
+      onChange={set_data_visualization}
       options={context.data_visualizations}
-      value={context.select_data_visualization.label}
+      value={context.data_visualizations[0]}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="Data Visualization" />}
     />

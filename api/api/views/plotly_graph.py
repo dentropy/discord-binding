@@ -42,7 +42,7 @@ import json
 
 from django.views.decorators.csrf import csrf_exempt
 
-from modules.graphs import build_graph, list_graphs
+from modules.graphs import build_graph, list_graphs, graph_names
 
 
 @csrf_exempt

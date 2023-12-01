@@ -33,13 +33,11 @@ export default function SelectAuthor() {
         .then(data => {
           console.log('POST request successful for Author Data! Response data:', data);
           if(data.length != 0){
+            console.log("Fetched new Author Data")
+            console.log(data)
             setContext({
-              type: 'SET_AUTHORS',
+              type: 'SET_AND_SELECT_AUTHORS',
               payload: data
-            })
-            setContext({
-              type: 'SELECT_AUTHOR',
-              payload: data[0]
             })
           }
         })
@@ -56,8 +54,8 @@ export default function SelectAuthor() {
             disablePortal
             onChange={set_author}
             id="select_author_autocomplete"
-            options={context.authors}
-            value={context.select_author.label}
+            options={context.authors.options}
+            value={context.authors.value}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Author" />}
         />

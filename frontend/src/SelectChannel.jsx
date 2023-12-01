@@ -6,6 +6,10 @@ import { Context } from './Provider';
 
 export default function SelectChannel() {
   const [context, setContext] = React.useContext(Context);
+  const [autoCompleteOptions, setAutoComplateOptions] = React.useState([
+    { label : "Fetching Data", id : 0 }
+  ])
+  const [autoCompleteValue, setAutoComplateValue] = React.useState()
   function set_channel(input, value) {
     setContext({
         type: 'SELECT_CHANNEL',
@@ -32,14 +36,16 @@ export default function SelectChannel() {
         .then(data => {
           console.log('POST request successful for Channel Data! Response data:', data);
           if(data.length != 0){
+            console.log("Fetched new Channel Data")
+            console.log(data)
             setContext({
-              type: 'SET_CHANNELS',
+              type: 'SET_AND_SELECT_CHANNELS',
               payload: data
             })
-            setContext({
-              type: 'SELECT_CHANNEL',
-              payload: data[0]
-            })
+            // setContext({
+            //   type: 'SELECT_CHANNEL',
+            //   payload: data[0]
+            // })
           }
         })
         .catch(error => {
@@ -54,8 +60,8 @@ export default function SelectChannel() {
       disablePortal
       id="select_channel_autocomplete"
       onChange={set_channel}
-      options={context.channels}
-      value={context.select_channel.label}
+      options={context.channels.options}
+      value={context.channels.value}
       sx={{ width: 300 }}
       renderInput={(params) => <TextField {...params} label="Channel" />}
     />

@@ -18,6 +18,13 @@ import MainAppBar from './MainAppBar'
 import { Context } from './Provider';
 import PlotlyChart from './PlotlyChart';
 
+
+import SelectGuild from './SelectGuild'
+import SelectChannel from './SelectChannel';
+import SelectAuthor from './SelectAuthor';
+import SelectDataVisualization from './SelectDataVisualization';
+import SelectRender from './SelectRender'
+import SelectDiscordData from './SelectDiscordData';
 function App() {
   // const [count, setCount] = React.useState(0)
   const [ data, setData ] = React.useState("Fetching Data")
@@ -28,12 +35,11 @@ function App() {
       <MainAppBar />
       <Box sx={{ flexGrow: 1, p: 2 }} >
         <Grid container spacing={2} >
-          <Grid xs={6}>
+          {/* <Grid xs={3}>
+            <SelectDiscordData />
+          </Grid> */}
+          <Grid xs={12}>
             <PlotlyChart />
-          </Grid>
-          <Grid xs={6}>
-            <p>{JSON.stringify(context.guilds)}</p><br />
-            <p>{JSON.stringify(context.channels)}</p>
           </Grid>
         </Grid>
       </Box>

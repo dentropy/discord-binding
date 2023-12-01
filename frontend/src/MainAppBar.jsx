@@ -17,6 +17,7 @@ import SelectChannel from './SelectChannel';
 import SelectAuthor from './SelectAuthor';
 import SelectDataVisualization from './SelectDataVisualization';
 import SelectRender from './SelectRender'
+import SelectDiscordData from './SelectDiscordData';
 
 const drawerWidth = 375;
 
@@ -92,7 +93,7 @@ export default function MainAppBar() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Persistent drawer
+            Query Select Drawer
           </Typography>
         </Toolbar>
       </AppBar>
@@ -114,11 +115,12 @@ export default function MainAppBar() {
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
-          <SelectGuild />
+          <SelectDiscordData />
+          {/* <SelectGuild />
           <SelectChannel />
           <SelectAuthor />
           <SelectDataVisualization />
-          <SelectRender />
+          <SelectRender /> */}
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
