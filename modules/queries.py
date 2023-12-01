@@ -182,7 +182,7 @@ queries = [
       """
   },
   {
-    "name" : "guild_author_consistent",
+    "name" : "guild_author_most_days_with_messages",
     "desciption": "Who is the most consistent poster within a Discord Guild?",
     "uuid": "dba668aa-bb99-46d5-9942-9f41bed27766",
     "required_args": ["guild_id"],
