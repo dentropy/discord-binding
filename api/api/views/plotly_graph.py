@@ -52,7 +52,9 @@ def plotly_graph(request):
         graph_name = request.POST.get('graph_name')
         # print(f"graph_name = {graph_name}")
         graph_args = {
-            "guild_id"   : request.POST.get('guild_id')
+            "guild_id"   : request.POST.get('guild_id'),
+            "channel_id" : request.POST.get('channel_id'),
+            "author_id"  : request.POST.get('author_id')
         }
         # print("\n\ngraph_args")
         # pprint(graph_args)

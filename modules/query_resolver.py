@@ -18,8 +18,8 @@ def query_resolver(pg_cursor, queries, query_name, query_args_dict = {}):
                 # pprint(query_args_dict.keys())
                 if arg not in list(query_args_dict.keys()):
                     return f"""
-                        Error: Missing Query Args
-                        Required Args: {str(query["required_args"])}
+                        Error: Missing Query Args\n
+                        Required Args: {str(query["required_args"])}\n
                         Provided Args: {str(list(query_args_dict.keys()))}
                     """
             query_args = []

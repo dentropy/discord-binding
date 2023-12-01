@@ -79,6 +79,10 @@ export default function PlotlyChart(){
         })
         .catch(error => {
           console.error('Error:', error);
+          setContext({
+            type: 'RENDER_NOW',
+            payload: false
+          })
         })
       }
     },

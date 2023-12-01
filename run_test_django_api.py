@@ -61,8 +61,8 @@ print("\n\nTesting /list_graphs API Endpoint")
 response = requests.get(api_url + "/list_graphs/")
 result = response.json()
 # pprint(result)
-# pprint(len(result.keys()))
-assert len(result) == 1
+# pprint(len(result))
+assert len(result) == 13
 print("/list_queries endpoint works")
 
 

@@ -242,7 +242,7 @@ export default function SelectDiscordData() {
             onChange={set_guild}
             options={guildData.options}
             value={guildData.selected_value}
-            isOptionEqualToValue={(option, value) => option.label === value.label}
+            isOptionEqualToValue={(option, value) => option.guild_id === value.guild_id}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Guild" />}
         />
@@ -252,14 +252,14 @@ export default function SelectDiscordData() {
             onChange={set_channel}
             options={channelData.options}
             value={channelData.selected_value}
-            isOptionEqualToValue={(option, value) => option.label === value.label}
+            isOptionEqualToValue={(option, value) => option.channel_id === value.channel_id}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Channel" />}
         />
         <Autocomplete
             disablePortal
             id="autocompelte_select_author"
-            isOptionEqualToValue={(option, value) => option.query_name === value.query_name}
+            isOptionEqualToValue={(option, value) => option.author_guild_id === value.author_guild_id}
             onChange={set_author}
             options={authorData.options}
             value={authorData.selected_value}
@@ -271,8 +271,8 @@ export default function SelectDiscordData() {
             id="autocomplete_select_data_visualization"
             onChange={set_data_visualization}
             options={dataVisualization.options}
-            value={dataVisualization.value}
-            isOptionEqualToValue={(option, value) => option.label === value.label}
+            value={dataVisualization.selected_value}
+            isOptionEqualToValue={(option, value) => option.query_name == value.query_name}
             sx={{ width: 300 }}
             renderInput={(params) => <TextField {...params} label="Data Visualization" />}
         />
