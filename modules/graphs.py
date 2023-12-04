@@ -66,7 +66,7 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
     if graph_name not in graph_names.keys():
         return f"Error: {graph_name} is not in graph_names \n {graph_names}"
     if graph_name == "user_longest_avg_msg_length":
-        result_df = query_resolver(pg_cursor, queries, "user_longest_avg_msg_length", query_args_dict)
+        result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
         # print("\n\nquery_args_dict\n\n")
         # pprint(query_args_dict)
         # print("\nresult_df for user_longest_avg_msg_length\n\n")

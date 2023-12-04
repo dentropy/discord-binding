@@ -234,9 +234,9 @@ query_name = "guild_channels_most_active"
 result = query_resolver(cursor, queries, query_name, {
     "guild_id"  : guild_id
 })
-print(query_name)
-pprint(result)
-print(result.shape[1])
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
 assert result.shape[1] == 5
 
 
@@ -249,5 +249,133 @@ result = query_resolver(cursor, queries, query_name, {
 # print(result.shape[1])
 assert result.shape[0] == 1
 assert result.shape[1] == 7
+
+
+
+query_name = "guild_bots_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[0] == 1
+assert result.shape[1] == 1
+
+
+query_name = "guild_author_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[0] == 1
+assert result.shape[1] == 1
+
+
+query_name = "guild_channels_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[0] == 1
+assert result.shape[1] == 1
+
+
+query_name = "guild_oldest_message"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[0] == 1
+assert result.shape[1] == 9
+
+
+query_name = "guild_message_per_channel"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 7
+
+
+query_name = "guild_attachment_file_type_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 4
+
+
+
+query_name = "guild_attachment_reactions"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 8
+
+
+query_name = "guild_messages_month"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 4
+
+
+query_name = "guild_channel_author_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 4
+
+query_name = "guild_author_mention_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 6
+
+
+query_name = "guild_domain_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+print(query_name)
+pprint(result)
+print(result.shape[1])
+assert result.shape[1] == 2
+
+
+query_name = "guild_author_url_react"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 9
+
+
+
 
 print("TEST SUCCESS")

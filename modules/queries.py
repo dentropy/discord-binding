@@ -769,5 +769,341 @@ queries = [
       group by id, guild_name;
     """
   },
+  {
+    "name"    : "guild_bots_count",
+     "uuid"   :  "d1c748eb-cb64-4a67-9e19-20cceb9fc1db",
+    "desciption": "How to count the number of bots on a specific discord guild?",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select 
+        	count(*)
+        from
+        	authors_t 
+        join guilds_t on guilds_t.id = authors_t.guild_id
+        where 
+        	is_bot = 'T'
+        	and guild_id = '{}';
+    """
+  },
+  {
+    "name"    : "guild_author_count",
+     "uuid"   :  "63d6106e-79d3-47ec-b06d-d613ab3ff71d",
+    "desciption": "How to count the number of authors within a specific discord guild?",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select 
+        	count(*)
+        from
+        	authors_t 
+        join guilds_t on guilds_t.id = authors_t.guild_id
+        where 
+        	is_bot = 'F'
+        	and guild_id = '{}';
+    """
+  },
+  {
+    "name" : "guild_channels_count",
+    "desciption": "What is the number of channels within a specific discord guild?",
+    "uuid": "4ed752fe-249c-49ac-aaad-43d365c385dd",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	count( distinct(channels_t.id) ) as channel_count
+        from
+        	channels_t
+        where
+        	guild_id = '{}';
+    """
+  },
+  {
+    "name" : "guild_oldest_message",
+    "desciption": "What is the age of the oldest message in each channel of a specific discord guild?",
+    "uuid": "29361fd4-6f1d-46b5-8154-c0b0ee39381d",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	guilds_t.guild_name,
+        	channels_t.channel_name,
+        	authors_t.author_name,
+        	authors_t.nickname,
+        	earliest_message_t.msg_content,
+        	earliest_message_t.msg_timestamp,
+        	guilds_t.id,
+        	channels_t.id,
+        	authors_t.id,
+        	authors_t.author_id,
+        	authors_t.is_bot
+        from
+        (
+        select
+        	*
+        from
+        	messages_t
+        where
+        	guild_id = '{}'
+        order by msg_timestamp asc
+        limit 1
+        ) as earliest_message_t
+        join authors_t on earliest_message_t.author_guild_id = authors_t.id
+        join channels_t on earliest_message_t.channel_id = channels_t.id
+        join guilds_t on earliest_message_t.guild_id = guilds_t.id
+        limit 1;
+    """
+  },
+  {
+    "name" : "guild_message_per_channel",
+    "desciption": "How many messages per channel in a specific discord guild?",
+    "uuid": "320d56d6-d028-425b-a1de-10d80b6d8669",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	guild_name,
+        	channel_name,
+        	msg_count,
+        	channel_type,
+        	guild_id,
+        	channel_id,
+        	topic
+        from 
+        (
+        	select
+        		count(*) msg_count,
+        		channel_id	
+        	from messages_t
+        	where guild_id = '{}'
+        	group by channel_id
+        ) as channel_msg_count_t
+        join channels_t on channel_msg_count_t.channel_id = channels_t.id
+        join guilds_t on channels_t.guild_id = guilds_t.id
+        order by msg_count desc;
+    """
+  },
+  {
+    "name" : "guild_attachment_file_type_count",
+    "desciption": "How many attachments of a specific file type are each channel of a specific discord guild?",
+    "uuid": "3d0bc481-e27a-4076-9452-302ec5dd7ce5",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	guilds_t.guild_name,
+        	attachment_extension_count_t.file_extension,
+        	attachment_extension_count_t.extension_count,
+        	guild_id 
+        from
+        (
+        	select
+        		guild_id,
+        		file_extension,
+        		count(file_extension) as extension_count
+        	from
+        		attachments_t
+            where guild_id = '{}'
+        	group by guild_id, file_extension
+        ) as attachment_extension_count_t
+        join guilds_t on attachment_extension_count_t.guild_id = guilds_t.id
+        order by extension_count desc;
+    """
+  },
+  {
+    "name" : "guild_attachment_reactions",
+    "desciption": "What discord attachment message has the most reactions?",
+    "uuid": "0ddac7dd-a016-4971-b163-b4f890232e50",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	guilds_t.guild_name,
+        	channels_t.channel_name,
+        	authors_t.author_name,
+        	authors_t.nickname,
+        	messages_t.msg_content,
+        	messages_t.msg_timestamp,
+        	guilds_t.id,
+        	channels_t.id,
+        	authors_t.id,
+        	authors_t.author_id
+        from
+        (
+        	select
+        		attachment_messages_t.id as message_id,
+        		sum(reaction_count) as reaciton_count
+        	from 
+        	(
+        	select
+        		*
+        	from
+        		messages_t
+        	where
+        		attachments = 'True'
+        		and guild_id = '{}'
+        	) as attachment_messages_t
+        	join reactions_t on reactions_t.message_id = attachment_messages_t.id
+        	group by attachment_messages_t.id
+        ) as attachment_reaction_sum_t
+        join messages_t on attachment_reaction_sum_t.message_id = messages_t.id
+        join authors_t  on messages_t.author_guild_id = authors_t.id
+        join channels_t on messages_t.channel_id = channels_t.id
+        join guilds_t   on messages_t.guild_id = guilds_t.id
+        order by reaciton_count desc;
+    """
+  },
+  {
+    "name" : "guild_messages_month",
+    "desciption": "What is the activity per month of each discord guild measured in messages per month?",
+    "uuid": "edb39918-b02f-4ee7-b2b2-d902c8370412",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select 
+        	distinct guilds_t.id, guilds_t.guild_name, month_timestamp, msg_count 
+        from (
+        	select
+        		distinct DATE_TRUNC('month', msg_timestamp)
+        			         AS  month_timestamp,
+        	    COUNT(guild_id) AS msg_count,
+        	    guild_id 
+        	FROM messages_t
+            Where guild_id = '{}'
+        	GROUP BY guild_id, month_timestamp
+        ) as month_messages_t
+        join guilds_t on month_messages_t.guild_id = guilds_t.id
+        order by guilds_t.id, month_timestamp;
+    """
+  },
+  {
+    "name" : "guild_channel_author_count",
+    "desciption": "How many authors posted in each specific channel of a specific discord guild?",
+    "uuid": "a1e2f1f3-a636-4f25-949f-e9bec02f9830",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	guild_name,
+        	channel_name,
+        	author_count,
+        	channel_id
+        from
+        (
+        	select
+        		distinct(channel_id) as channel_id,
+        		count(author_guild_id) as author_count
+        	from
+        		messages_t
+        	where
+        		guild_id = '{}'
+        		and messages_t.is_bot = 'F'
+        	group by channel_id, author_guild_id
+        ) as author_in_channel_count_t
+        join channels_t on author_in_channel_count_t.channel_id = channels_t.id
+        join guilds_t on channels_t.guild_id = guilds_t.id
+        order by author_count desc;
+    """
+  },
+  {
+    "name" : "guild_author_mention_count",
+    "desciption": "What discord author was mentioned the most?",
+    "uuid": "02996ff2-f55e-4eae-a4b6-15d042b92896",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	authors_t.author_name,
+        	authors_t.nickname,
+        	mention_count_t.mention_count,
+        	guilds_t.guild_name,
+        	mention_count_t.author_guild_id,
+        	guilds_t.id as guild_id
+        from
+        (
+        	select
+        		count(*) as mention_count,
+        		author_guild_id
+        	from
+        		mentions_t
+            where guild_id = '{}'
+        	group by author_guild_id
+        ) as mention_count_t
+        join authors_t on mention_count_t.author_guild_id = authors_t.id
+        join guilds_t  on authors_t.guild_id = guilds_t.id
+        order by mention_count_t.mention_count desc;
+    """
+  },
+  {
+    "name" : "guild_domain_count",
+    "desciption": "How many times was each domain name mentioned in a specific discord guild?",
+    "uuid": "7164edc9-2cb5-4505-b30f-bb1664a6fe2f",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	netloc,
+        	count(netloc) as count_domain
+        from
+        (
+        	select
+        		*
+        	from
+        		message_urls_t
+        	join messages_t on message_urls_t.message_id = messages_t.id
+        ) url_messages_t
+        where url_messages_t.guild_id = '{}'
+        group by netloc
+        order by count_domain desc;
+    """
+  },
+  {
+    "name" : "guild_author_url_react",
+    "desciption": "How to list the most reacted to URL's from a specific discord guild?",
+    "uuid": "2afa5525-8727-4032-8742-56a176e63c82",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	guilds_t.guild_name,
+        	channels_t.channel_name,
+        	author_name,
+        	nickname,
+        	reaction_count,
+        	messages_t.msg_content,
+        	messages_t.msg_timestamp,
+        	guilds_t.id,
+        	channels_t.id,
+        	authors_t.id,
+        	authors_t.author_id
+        from
+        (
+        	select
+        		netloc,
+        		message_urls_t.message_id,
+        		sum(reactions_t.reaction_count) as reaction_count
+        	from
+        		message_urls_t
+        	join messages_t on message_urls_t.message_id = messages_t.id
+        	join reactions_t on message_urls_t.message_id = reactions_t.message_id
+        	where messages_t.guild_id = '{}'
+        	group by netloc, message_urls_t.message_id, reactions_t.reaction_count
+        ) url_messages_t
+        join messages_t on url_messages_t.message_id = messages_t.id
+        join authors_t on messages_t.author_guild_id = authors_t.id
+        join guilds_t on authors_t.guild_id = guilds_t.id
+        join channels_t on messages_t.channel_id = channels_t.id
+        order by reaction_count desc;
+    """
+  },
+  # {
+  #   "name" : "Template",
+  #   "desciption": "Template",
+  #   "uuid": "Tempate",
+  #   "required_args": [],
+  #   "arg_order" : [],
+  #   "sql_query" : """
+  #   """
+  # },
   
 ]
