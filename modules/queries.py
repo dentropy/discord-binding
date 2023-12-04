@@ -1,4 +1,3 @@
-query_args = [i for i in range(1, 101)]
 queries = [
   # {
   #   "name" : "Template",
@@ -1096,6 +1095,72 @@ queries = [
         order by reaction_count desc;
     """
   },
+  {
+    "name" : "guild_author_message_min_100",
+    "desciption": "How many users have posted more than 100 messages in a particular discord guild?",
+    "uuid": "edc06a13-7305-4b5f-8eb6-9e8eb1b4df23",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	guild_name,
+        	author_name,
+        	nickname,
+        	msg_count,
+        	guild_id,
+        	authors_t.author_id,
+        	authors_t.id
+        from
+        (
+        	select
+        		author_guild_id,
+        		count(*) as msg_count
+        	from
+        		messages_t
+        	where
+        		guild_id = '{}'
+        		and messages_t.is_bot = 'F'
+        	group by author_guild_id
+        ) as author_message_count_t
+        join authors_t on author_message_count_t.author_guild_id = authors_t.id
+        join guilds_t on authors_t.guild_id = guilds_t.id
+        where msg_count > 100
+        order by msg_count desc;
+    """
+  },
+
+  {
+    "name" : "guild_channel_message_length",
+    "desciption": "What discord channel has the longest average message length of a particular guild?",
+    "uuid": "86ac9f2f-087d-4791-a0e0-2f01688fe0c7",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+        	guild_name,
+        	channel_name,
+        	msg_length,
+        	msg_count,
+        	channel_id
+        from
+        (
+        	select
+        		channel_id,
+        		avg(msg_content_length) as msg_length,
+        		count(msg_content_length) as msg_count
+        	from
+        		messages_t
+        	where
+        		guild_id = '{}'
+        		and messages_t.is_bot = 'F'
+        	group by channel_id
+        ) as author_in_channel_count_t
+        join channels_t on author_in_channel_count_t.channel_id = channels_t.id
+        join guilds_t on channels_t.guild_id = guilds_t.id
+        order by msg_length desc;
+    """
+  },
+  
   # {
   #   "name" : "Template",
   #   "desciption": "Template",

@@ -360,9 +360,9 @@ query_name = "guild_domain_count"
 result = query_resolver(cursor, queries, query_name, {
     "guild_id"  : guild_id
 })
-print(query_name)
-pprint(result)
-print(result.shape[1])
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
 assert result.shape[1] == 2
 
 
@@ -375,6 +375,25 @@ result = query_resolver(cursor, queries, query_name, {
 # print(result.shape[1])
 assert result.shape[1] == 9
 
+
+query_name = "guild_author_message_min_100"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 7
+
+
+query_name = "guild_channel_message_length"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 5
 
 
 
