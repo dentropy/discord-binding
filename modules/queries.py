@@ -923,6 +923,9 @@ queries = [
         	authors_t.nickname,
         	messages_t.msg_content,
         	messages_t.msg_timestamp,
+        	attachments_t.attachment_url,
+        	attachments_t.file_extension,
+        	attachments_t.file_size_bytes,
         	guilds_t.id,
         	channels_t.id,
         	authors_t.id,
@@ -940,7 +943,7 @@ queries = [
         		messages_t
         	where
         		attachments = 'True'
-        		and guild_id = '{}'
+        		-- and guild_id = '{}'
         	) as attachment_messages_t
         	join reactions_t on reactions_t.message_id = attachment_messages_t.id
         	group by attachment_messages_t.id
@@ -949,6 +952,7 @@ queries = [
         join authors_t  on messages_t.author_guild_id = authors_t.id
         join channels_t on messages_t.channel_id = channels_t.id
         join guilds_t   on messages_t.guild_id = guilds_t.id
+        join attachments_t on messages_t.id = attachments_t.message_id
         order by reaciton_count desc;
     """
   },
@@ -985,22 +989,23 @@ queries = [
         select
         	guild_name,
         	channel_name,
-        	author_count,
+        	count(distinct(author_guild_id)) as author_count,
         	channel_id
         from
         (
         	select
         		distinct(channel_id) as channel_id,
-        		count(author_guild_id) as author_count
+        		author_guild_id
         	from
         		messages_t
         	where
-        		guild_id = '{}'
-        		and messages_t.is_bot = 'F'
+        		messages_t.is_bot = 'F'
+        		and guild_id = '{}'
         	group by channel_id, author_guild_id
         ) as author_in_channel_count_t
         join channels_t on author_in_channel_count_t.channel_id = channels_t.id
         join guilds_t on channels_t.guild_id = guilds_t.id
+        group by guild_name, channel_name, channel_id
         order by author_count desc;
     """
   },
@@ -1128,7 +1133,6 @@ queries = [
         order by msg_count desc;
     """
   },
-
   {
     "name" : "guild_channel_message_length",
     "desciption": "What discord channel has the longest average message length of a particular guild?",
@@ -1160,7 +1164,27 @@ queries = [
         order by msg_length desc;
     """
   },
-  
+  {
+    "name" : "guild_activity_per_day_of_week",
+    "desciption": "How much activity for a specific discord guild per day of week?",
+    "uuid": "7cd7bef3-c7ca-4d80-b02b-ba6552b6087c",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select distinct guilds_t.id , guilds_t.guild_name, month_timestamp, msg_count from (
+        	select
+        		distinct DATE_TRUNC('day', msg_timestamp)
+        			         AS  month_timestamp,
+        	    COUNT(guild_id) AS msg_count,
+        	    guild_id 
+        	FROM messages_t
+        	WHERE guild_id = '{}'
+        	GROUP BY guild_id, month_timestamp
+        ) as month_messages_t
+        join guilds_t on month_messages_t.guild_id = guilds_t.id
+        order by guilds_t.id, month_timestamp;
+    """
+  },
   # {
   #   "name" : "Template",
   #   "desciption": "Template",
