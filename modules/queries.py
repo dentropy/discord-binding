@@ -1241,6 +1241,239 @@ queries = [
       limit 100;
     """
   },
+  {
+    "name" : "guild_channel_messages_per_month",
+    "desciption": "How to get the message count of each channel per month for a specific discord guild?",
+    "uuid": "32d87a4b-c8ba-44c2-9fc2-f04d7e141425",
+    "required_args": ["guild_id", "channel_id"],
+    "arg_order" : ["guild_id", "channel_id"],
+    "sql_query" : """
+      select 
+        distinct guilds_t.id, guilds_t.guild_name, month_timestamp, msg_count 
+      from (
+        select
+          distinct DATE_TRUNC('month', msg_timestamp)
+                    AS  month_timestamp,
+            COUNT(guild_id) AS msg_count,
+            guild_id 
+        FROM messages_t
+          where
+            guild_id = '{}'
+            and channel_id = '{}'
+        GROUP BY guild_id, month_timestamp
+      ) as month_messages_t
+      join guilds_t on month_messages_t.guild_id = guilds_t.id
+      order by guilds_t.id, month_timestamp;
+    """
+  },
+  {
+    "name" : "guild_channel_author_message_count",
+    "desciption": "How to visualize the message count of each author in a specific channel?",
+    "uuid": "faf2668b-49df-469f-a630-fca35d1c7c9d",
+    "required_args": ["guild_id", "channel_id"],
+    "arg_order" : ["guild_id", "channel_id"],
+    "sql_query" : """
+      select
+        authors_t.author_name,
+        authors_t.nickname,
+        msg_count_per_author_t.msg_count,
+        msg_count_per_author_t.author_guild_id,
+        guilds_t.guild_name,
+        guilds_t.id as guild_id
+          from
+          (
+            select
+              count(*) as msg_count,
+              author_guild_id
+            from
+              messages_t
+            where 
+              guild_id = '{}'
+              and channel_id = '{}'
+            group by author_guild_id
+            order by msg_count desc
+          ) as msg_count_per_author_t
+          join authors_t on msg_count_per_author_t.author_guild_id = authors_t.id
+          join guilds_t  on authors_t.guild_id = guilds_t.id
+          order by msg_count_per_author_t.msg_count desc;
+    """
+  },
+  {
+    "name" : "guild_channel_most_messages",
+    "desciption": "What discord channels have the most messages?",
+    "uuid": "8db17737-329a-485d-9f99-98dce3ec1462",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id", "guild_id"],
+    "sql_query" : """
+        select 
+          guilds_t.guild_name,
+          channel_name,
+          msg_count, 
+          channels_t.guild_id,
+          channels_grouped_t.channel_id
+        from
+        ( 
+          select 
+            count(*) as msg_count,
+            channel_id,
+            guild_id
+          from
+            messages_t
+          where guild_id = '{}'
+          group by channel_id, guild_id
+        ) as channels_grouped_t
+        join channels_t on channels_grouped_t.channel_id = channels_t.id
+        join guilds_t on channels_grouped_t.guild_id = guilds_t.id
+        order by msg_count desc;
+    """
+  },
+  {
+    "name" : "guild_attachment_channel_file_type_count",
+    "desciption": "How many attachments of each file type are in each discord channel of a specific discord guild?",
+    "uuid": "eeeb2990-0ac3-4d26-a11f-4ba86713a06b",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+          guilds_t.guild_name,
+          channels_t.channel_name,
+          attachment_extension_channel_count_t.file_extension,
+          attachment_extension_channel_count_t.extension_count,
+          guilds_t.id as guild_id,
+          channels_t.id as channel_id
+        from
+        (
+          select
+            channel_id,
+            file_extension,
+            count(file_extension) as extension_count
+          from
+            attachments_t
+          join messages_t on attachments_t.message_id = messages_t.id
+          where messages_t.guild_id = '{}'
+          group by channel_id, file_extension
+        ) as attachment_extension_channel_count_t
+        join channels_t on attachment_extension_channel_count_t.channel_id = channels_t.id
+        join guilds_t on channels_t.guild_id = guilds_t.id
+        order by channel_name, extension_count desc;
+    """
+  },
+  {
+    "name" : "guild_new_author_per_month",
+    "desciption": "What is the rate of new users joining the specific discord guild per month?",
+    "uuid": "53d082f2-cdd8-443f-ab0e-527915f88f45",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+        select
+          guilds_t.guild_name,
+          count(guilds_t.guild_name) as author_count,
+          TO_TIMESTAMP(min_month_timestamp, 'YYYY-MM') as month_timestamp,
+          earliest_author_message.guild_id
+        from
+        (
+          select
+            distinct 
+              guild_id,
+              author_guild_id,
+              TO_CHAR(    min(msg_timestamp), 'YYYY-MM') as min_month_timestamp
+          from
+            messages_t
+          where guild_id = '{}'
+          group by guild_id, author_guild_id
+        ) as earliest_author_message
+        join guilds_t on earliest_author_message.guild_id = guilds_t.id
+        group by earliest_author_message.guild_id, guilds_t.id, min_month_timestamp
+        order by month_timestamp asc;
+    """
+  },
+  {
+    "name" : "guild_author_messages_per_month",
+    "desciption": "What is the number of messages from a specific author from a particular discord guild aggregated by month?",
+    "uuid": "9046827c-32a0-4720-92f2-ab6b7b31bd64",
+    "required_args": ["guild_id", "author_id"],
+    "arg_order" : ["guild_id", "author_id"],
+    "sql_query" : """
+        select
+          guilds_t.guild_name,
+          count(guilds_t.guild_name) as author_count,
+          TO_TIMESTAMP(min_month_timestamp, 'YYYY-MM') as month_timestamp,
+          earliest_author_message.guild_id
+        from
+        (
+          select
+            distinct 
+              guild_id,
+              author_guild_id,
+              TO_CHAR(    min(msg_timestamp), 'YYYY-MM') as min_month_timestamp
+          from
+            messages_t
+          where guild_id = '{}' and author_guild_id = '{}'
+          group by guild_id, author_guild_id
+        ) as earliest_author_message
+        join guilds_t on earliest_author_message.guild_id = guilds_t.id
+        group by earliest_author_message.guild_id, guilds_t.id, min_month_timestamp
+        order by month_timestamp asc;
+    """
+  },
+  {
+    "name" : "guild_author_messages_per_week",
+    "desciption": "What is the number of messages from a specific author from a particular discord guild aggregated by week?",
+    "uuid": "333a03ed-caee-4355-841a-4af914799849",
+    "required_args": ["guild_id", "author_id"],
+    "arg_order" : ["guild_id", "author_id"],
+    "sql_query" : """
+        select
+          guilds_t.guild_name,
+          count(guilds_t.guild_name),
+          TO_TIMESTAMP(min_month_timestamp, 'YYYY-WW') as month_timestamp,
+          earliest_author_message.guild_id
+        from
+        (
+          select
+            distinct 
+              guild_id,
+              author_guild_id,
+              TO_CHAR(    min(msg_timestamp), 'YYYY-WW') as min_month_timestamp
+          from
+            messages_t
+          where guild_id = '{}' and author_guild_id = '{}'
+          group by guild_id, author_guild_id
+        ) as earliest_author_message
+        join guilds_t on earliest_author_message.guild_id = guilds_t.id
+        group by earliest_author_message.guild_id, guilds_t.id, min_month_timestamp
+        order by month_timestamp asc;
+    """
+  },
+  {
+    "name" : "guild_author_messages_per_day",
+    "desciption": "What is the number of messages from a specific author from a particular discord guild aggregated by day?",
+    "uuid": "d15f7093-b584-4f17-9ad0-b6e2d0f9d004",
+    "required_args": ["guild_id", "author_id"],
+    "arg_order" : ["guild_id", "author_id"],
+    "sql_query" : """
+        select
+          guilds_t.guild_name,
+          count(guilds_t.guild_name),
+          TO_TIMESTAMP(min_month_timestamp, 'YYYY-MM-DD') as month_timestamp,
+          earliest_author_message.guild_id
+        from
+        (
+          select
+            distinct 
+              guild_id,
+              author_guild_id,
+              TO_CHAR(    min(msg_timestamp), 'YYYY-MM-DD') as min_month_timestamp
+          from
+            messages_t
+          where guild_id = '{}' and author_guild_id = '{}'
+          group by guild_id, author_guild_id
+        ) as earliest_author_message
+        join guilds_t on earliest_author_message.guild_id = guilds_t.id
+        group by earliest_author_message.guild_id, guilds_t.id, min_month_timestamp
+        order by month_timestamp asc;
+    """
+  },
   # {
   #   "name" : "Template",
   #   "desciption": "Template",
