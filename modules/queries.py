@@ -57,7 +57,8 @@ queries = [
           authors_t
         join guilds_t on authors_t.guild_id = guilds_t.id
         where
-        guild_id in (  '{}'  );
+        guild_id in (  '{}'  )
+        limit 100;
       """
   },
   {
@@ -76,7 +77,8 @@ queries = [
           messages_t
         join authors_t on messages_t.author_guild_id = authors_t.id
         where
-        channel_id in (  '{}' );
+        channel_id in (  '{}' )
+        limit 100;
       """
   },
   {
@@ -115,7 +117,8 @@ queries = [
         offset {}
       ) as just_messages_t
       join authors_t on authors_t.id = just_messages_t.author_guild_id
-      order by msg_timestamp {};
+      order by msg_timestamp {}
+      limit 100;
       """
   },
   {
@@ -146,7 +149,8 @@ queries = [
       ) as avg_content_length_t
       join authors_t
       on authors_t.id = avg_content_length_t.author_guild_id
-      order by avg_content_length_t.content_length desc;
+      order by avg_content_length_t.content_length desc
+      limit 100;
       """
   },
   {
@@ -177,7 +181,8 @@ queries = [
       ) as msg_count_per_author_t
       join authors_t on msg_count_per_author_t.author_guild_id = authors_t.id
       join guilds_t  on authors_t.guild_id = guilds_t.id
-      order by msg_count_per_author_t.msg_count desc;
+      order by msg_count_per_author_t.msg_count desc
+      limit 100;
       """
   },
   {
@@ -214,7 +219,8 @@ queries = [
       ) as count_msg_day_t
       join authors_t on count_msg_day_t.author_guild_id = authors_t.id
       join guilds_t on authors_t.guild_id = guilds_t.id 
-      order by day_count desc;
+      order by day_count desc
+      limit 100;
       """
   },
   {
@@ -244,7 +250,8 @@ queries = [
       ) as reaction_count_t
       join authors_t on reaction_count_t.author_guild_id = authors_t.id
       join guilds_t  on authors_t.guild_id = guilds_t.id
-      order by reaction_count desc;
+      order by reaction_count desc
+      limit 100;
       """
   },
   {
@@ -274,7 +281,8 @@ queries = [
       ) as reaction_count_t
       join authors_t on reaction_count_t.author_guild_id = authors_t.id
       join guilds_t  on authors_t.guild_id = guilds_t.id
-      order by reaction_count desc;
+      order by reaction_count desc
+      limit 100;
     """
   },
   {
@@ -288,6 +296,7 @@ queries = [
         authors_t.author_name,
         authors_t.nickname,
         msg_date_agg_t.day_msg_count,
+        msg_date_agg_t.msg_date,
         msg_date_agg_t.author_guild_id,
         guilds_t.guild_name,
         guilds_t.id as guild_id
@@ -310,7 +319,8 @@ queries = [
       ) as msg_date_agg_t
       join authors_t on msg_date_agg_t.author_guild_id = authors_t.id
       join guilds_t on authors_t.guild_id = guilds_t.id
-      order by day_msg_count desc;
+      order by day_msg_count desc
+      limit 100;
     """
   },
   {
@@ -338,7 +348,8 @@ queries = [
       ) as attachment_msg_count_t
       join authors_t on attachment_msg_count_t.author_guild_id = authors_t.id
       join guilds_t  on authors_t.guild_id = guilds_t.id
-      order by attachment_msg_count_t.attachment_msg_count desc;
+      order by attachment_msg_count_t.attachment_msg_count desc
+      limit 100;
     """
   },
   {
@@ -381,7 +392,8 @@ queries = [
       join authors_t on msg_timestamp_edited_count_t.author_guild_id = authors_t.id
       join guilds_t  on authors_t.guild_id = guilds_t.id
       where msg_count > 1
-      order by msg_edited_percentage desc;
+      order by msg_edited_percentage desc
+      limit 100;
     """
   },
   {
@@ -413,7 +425,8 @@ queries = [
       ) as avg_content_length_t
       join authors_t
       on authors_t.id = avg_content_length_t.author_guild_id
-      order by avg_content_length_t.content_count desc;
+      order by avg_content_length_t.content_count desc
+      limit 100;
     """
   },
   {
@@ -447,7 +460,8 @@ queries = [
       join channels_t on author_channel_msg_count_t.channel_id = channels_t.id
       join authors_t on '{}' = authors_t.id
       join guilds_t  on guilds_t.id = authors_t.guild_id
-      order by msg_count desc;
+      order by msg_count desc
+      limit 100;
     """
   },
   {
@@ -507,7 +521,8 @@ queries = [
       join channels_t on messages_t.channel_id = channels_t.id
       join authors_t on messages_t.author_guild_id = authors_t.id
       join guilds_t on messages_t.guild_id = guilds_t.id
-      order by reaciton_sum desc;
+      order by reaciton_sum desc
+      limit 100;
     """
   },
   {
@@ -546,7 +561,8 @@ queries = [
       ) as agg_days_posted_t
       join authors_t on authors_t.id = agg_days_posted_t.author_guild_id
       join guilds_t  on guilds_t.id  = authors_t.guild_id
-      order by hour_of_day asc;
+      order by hour_of_day asc
+      limit 100;
     """
   },
   {
@@ -601,7 +617,8 @@ queries = [
       join channels_t on messages_t.channel_id = channels_t.id
       join authors_t on messages_t.author_guild_id = authors_t.id
       join guilds_t on messages_t.guild_id = guilds_t.id
-      order by reaciton_sum desc;
+      order by reaciton_sum desc
+      limit 100;
     """
   },
   {
@@ -643,7 +660,8 @@ queries = [
       ) as agg_days_posted_t
       join authors_t on authors_t.id = agg_days_posted_t.author_guild_id
       join guilds_t  on guilds_t.id  = authors_t.guild_id
-      order by agg_days_posted_t.day_of_week_number asc;
+      order by agg_days_posted_t.day_of_week_number asc
+      limit 100;
     """
   },
   # {
@@ -697,7 +715,8 @@ queries = [
         GROUP BY guild_id, month_timestamp
       ) as month_messages_t
       join guilds_t on month_messages_t.guild_id = guilds_t.id
-      order by guilds_t.id, month_timestamp;
+      order by guilds_t.id, month_timestamp
+      limit 100;
     """
   },
   {
@@ -726,7 +745,8 @@ queries = [
       ) as messages_channel_agg_t
       join channels_t on messages_channel_agg_t.channel_id = channels_t.id
       join guilds_t on channels_t.guild_id = guilds_t.id
-      order by message_count desc;
+      order by message_count desc
+      limit 100;
     """
   },
   {
@@ -765,7 +785,8 @@ queries = [
         join guilds_t on month_messages_t.guild_id = guilds_t.id
         order by day_timestamp desc
       ) as daily_msg_stats_t
-      group by id, guild_name;
+      group by id, guild_name
+      limit 100;
     """
   },
   {
@@ -799,7 +820,8 @@ queries = [
         join guilds_t on guilds_t.id = authors_t.guild_id
         where 
         	is_bot = 'F'
-        	and guild_id = '{}';
+        	and guild_id = '{}'
+         limit 100;
     """
   },
   {
@@ -814,7 +836,8 @@ queries = [
         from
         	channels_t
         where
-        	guild_id = '{}';
+        	guild_id = '{}'
+         limit 100;
     """
   },
   {
@@ -879,7 +902,8 @@ queries = [
         ) as channel_msg_count_t
         join channels_t on channel_msg_count_t.channel_id = channels_t.id
         join guilds_t on channels_t.guild_id = guilds_t.id
-        order by msg_count desc;
+        order by msg_count desc
+        limit 100;
     """
   },
   {
@@ -1035,7 +1059,8 @@ queries = [
         ) as mention_count_t
         join authors_t on mention_count_t.author_guild_id = authors_t.id
         join guilds_t  on authors_t.guild_id = guilds_t.id
-        order by mention_count_t.mention_count desc;
+        order by mention_count_t.mention_count desc
+        limit 100;
     """
   },
   {
@@ -1058,7 +1083,8 @@ queries = [
         ) url_messages_t
         where url_messages_t.guild_id = '{}'
         group by netloc
-        order by count_domain desc;
+        order by count_domain desc
+        limit 100;
     """
   },
   {
@@ -1097,7 +1123,8 @@ queries = [
         join authors_t on messages_t.author_guild_id = authors_t.id
         join guilds_t on authors_t.guild_id = guilds_t.id
         join channels_t on messages_t.channel_id = channels_t.id
-        order by reaction_count desc;
+        order by reaction_count desc
+        limit 100;
     """
   },
   {
@@ -1130,7 +1157,8 @@ queries = [
         join authors_t on author_message_count_t.author_guild_id = authors_t.id
         join guilds_t on authors_t.guild_id = guilds_t.id
         where msg_count > 100
-        order by msg_count desc;
+        order by msg_count desc
+        limit 100;
     """
   },
   {
@@ -1161,7 +1189,8 @@ queries = [
         ) as author_in_channel_count_t
         join channels_t on author_in_channel_count_t.channel_id = channels_t.id
         join guilds_t on channels_t.guild_id = guilds_t.id
-        order by msg_length desc;
+        order by msg_length desc
+        limit 100;
     """
   },
   {
@@ -1171,18 +1200,45 @@ queries = [
     "required_args": ["guild_id"],
     "arg_order" : ["guild_id"],
     "sql_query" : """
-        select distinct guilds_t.id , guilds_t.guild_name, month_timestamp, msg_count from (
+        select 
+        	distinct guilds_t.id , guilds_t.guild_name, day_of_week, day_of_week_string, msg_count 
+    	from (
         	select
-        		distinct DATE_TRUNC('day', msg_timestamp)
-        			         AS  month_timestamp,
+        		distinct  EXTRACT(DOW FROM msg_timestamp) AS  day_of_week,
+        		TO_CHAR(msg_timestamp, 'Day') as day_of_week_string,
         	    COUNT(guild_id) AS msg_count,
         	    guild_id 
         	FROM messages_t
         	WHERE guild_id = '{}'
-        	GROUP BY guild_id, month_timestamp
+        	GROUP BY guild_id, day_of_week, day_of_week_string
         ) as month_messages_t
         join guilds_t on month_messages_t.guild_id = guilds_t.id
-        order by guilds_t.id, month_timestamp;
+        order by guilds_t.id, day_of_week
+        limit 7
+    """
+  },
+  {
+    "name" : "guild_activity_per_month_search_text",
+    "desciption": "How many messages per month with matching test in specific discord guild?",
+    "uuid": "efcd6f7d-b36e-4032-b89b-0fe9fd5a0da9",
+    "required_args": ["guild_id", "search_string"],
+    "arg_order" : ["guild_id", "search_string"],
+    "sql_query" : """
+      select distinct guilds_t.id , guilds_t.guild_name, month_timestamp, msg_count from (
+        select
+          distinct DATE_TRUNC('month', msg_timestamp)
+                    AS  month_timestamp,
+            COUNT(guild_id) AS msg_count,
+            guild_id 
+        FROM messages_t
+        WHERE
+            guild_id = '{}'
+            and msg_content ILIKE '%{}%'
+        GROUP BY guild_id, month_timestamp
+      ) as month_messages_t
+      join guilds_t on month_messages_t.guild_id = guilds_t.id
+      order by guilds_t.id, month_timestamp
+      limit 100;
     """
   },
   # {

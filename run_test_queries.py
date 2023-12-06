@@ -191,7 +191,7 @@ assert result.shape[1] == 7
 query_name = "guild_author_most_reaction_to_attachment"
 result = query_resolver(cursor, queries, query_name, {
     "guild_id"  : guild_id,
-    "author_id" : attachment_author_id
+    "author_id" : author_id # attachment_author_id
 })
 # print(query_name)
 # pprint(result)
@@ -201,7 +201,7 @@ assert result.shape[1] == 8
 query_name = "guild_author_messages_day_of_week"
 result = query_resolver(cursor, queries, query_name, {
     "guild_id"  : guild_id,
-    "author_id" : attachment_author_id
+    "author_id" : author_id # attachment_author_id
 })
 # print(query_name)
 # pprint(result)
@@ -324,7 +324,7 @@ result = query_resolver(cursor, queries, query_name, {
 # print(query_name)
 # pprint(result)
 # print(result.shape[1])
-assert result.shape[1] == 8
+assert result.shape[1] == 11
 
 
 query_name = "guild_messages_month"

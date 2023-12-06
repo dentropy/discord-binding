@@ -84,6 +84,9 @@ graph_names = {
     },
     "guild_author_most_question_messages" : {
         "query_name" : "guild_author_most_question_messages"
+    },
+    "guild_activity_per_month_search_text" : {
+        "query_name": "guild_activity_per_month_search_text"
     }
 }
 
@@ -989,8 +992,8 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
             "fig" : go.Figure(
                 data=[
                     go.Bar(
-                        name='Month - Year',     
-                        x=result_df["month_timestamp"], 
+                        name='Day of Week',     
+                        x=result_df["day_of_week_string"], 
                         yaxis='y',
                         y = result_df["msg_count"], 
                         offsetgroup=1, 
@@ -1114,7 +1117,7 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
         # pprint(result_df)
         # print("\nqueries\n")
         # pprint(queries)
-        pprint(result_df)
+        # pprint(result_df)
         if type(result_df) == type(""):
             return result_df
         return {
@@ -1163,8 +1166,8 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
         if type(result_df) == type(""):
             return result_df
         return {
-            "name" : "user_longest_avg_msg_length",
-            "desciption": "What discord user has the longest average message length in a particular guild?",
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
             "uuid": selected_query["uuid"],
             "fig" : go.Figure(
                 data=[
@@ -1194,6 +1197,51 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
             "layout" : go.Layout(
                 barmode='group',
                 title='Messages length and count for Question Messages',
+                autosize=False,
+                width=1024 * 2,  # Width in pixels
+                height=800   # Height in pixels
+            )
+        }
+    if graph_name == "guild_activity_per_month_search_text":
+        result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
+        selected_query = { "name" : "placeholder"}
+        for query in queries:
+            if graph_name == query["name"]:
+                selected_query = query
+        # print("\n\nselected_query")
+        # pprint(selected_query)
+        # print("\n\nquery_args_dict\n\n")
+        # pprint(query_args_dict)
+        # print(f"\nresult_df for graph_name\n\n")
+        # pprint(result_df)
+        # print("\nqueries\n")
+        # pprint(queries)
+        # pprint(result_df)
+        if type(result_df) == type(""):
+            return result_df
+        return {
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
+            "uuid": selected_query["uuid"],
+            "fig" : go.Figure(
+                data=[
+                    go.Bar(
+                        name='Month - Year',     
+                        x=result_df["month_timestamp"], 
+                        yaxis='y',
+                        y = result_df["msg_count"], 
+                        offsetgroup=1, 
+                        orientation='v'
+                    )
+                ],
+                layout={
+                    'yaxis':  {'title': f'Number of Messages Matching {query_args_dict["search_string"]}'}
+                }
+                
+            ),
+            "layout" : go.Layout(
+                barmode='group',
+                title=f'Number of Messages Per Month Matching {query_args_dict["search_string"]}',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
                 height=800   # Height in pixels
