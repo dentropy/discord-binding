@@ -76,6 +76,7 @@ result = query_resolver(cursor, queries, query_name, {
 })
 # print(query_name)
 # pprint(result)
+# print(result.shape[1])
 assert result.shape[1] == 5
 
 

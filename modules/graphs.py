@@ -105,6 +105,10 @@ def list_graphs(queries):
 def build_graph(pg_cursor, graph_name, query_args_dict):
     if graph_name not in graph_names.keys():
         return f"Error: {graph_name} is not in graph_names \n {graph_names}"
+    selected_query = { "name" : "placeholder"}
+    for query in queries:
+        if graph_name == query["name"]:
+            selected_query = query
     if graph_name == "user_longest_avg_msg_length":
         result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
         # print("\n\nquery_args_dict\n\n")
@@ -116,9 +120,8 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
         if type(result_df) == type(""):
             return result_df
         return {
-            "name" : "user_longest_avg_msg_length",
-            "desciption": "What discord user has the longest average message length in a particular guild?",
-            "uuid": "2f4fd09e-24a3-4359-81b2-049742a03610",
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
             "fig" : go.Figure(
                 data=[
                     go.Bar(
@@ -149,7 +152,9 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 title='Longest Average Message Length',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
-                height=800   # Height in pixels
+                height=800,   # Height in pixels
+                yaxis=  {'title': 'Average Content Length'},
+                yaxis2= {'title': 'Content Count', 'overlaying': 'y', 'side': 'right'}
             )
         }
     if graph_name == "guild_author_most_messages":
@@ -466,7 +471,9 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 title='Message Editted Percentage verses Total Message Count',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
-                height=800   # Height in pixels
+                height=800,   # Height in pixels
+                yaxis=  {'title': 'Message Editted Percentage'},
+                yaxis2= {'title': 'Total Message Count', 'overlaying': 'y', 'side': 'right'}
             )
         }
     if graph_name == "guild_author_most_reacted_messages":
@@ -874,7 +881,9 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 title=f'Average Message Length per Channel and Message Count Per Channel in {result_df.iloc[0]["guild_name"]}',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
-                height=800   # Height in pixels
+                height=800,  # Height in pixels
+                yaxis=  {'title': 'Average Message Length'},
+                yaxis2= {'title': 'Total Message Count', 'overlaying': 'y', 'side': 'right'}
             )
         }
     if graph_name == "guild_attachment_file_type_count":
@@ -1199,7 +1208,9 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 title='Messages length and count for Question Messages',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
-                height=800   # Height in pixels
+                height=800,   # Height in pixels
+                yaxis=  {'title': 'Average Content Length'},
+                yaxis2= {'title': 'Content Count', 'overlaying': 'y', 'side': 'right'}
             )
         }
     if graph_name == "guild_activity_per_month_search_text":

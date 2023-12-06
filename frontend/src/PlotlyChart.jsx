@@ -64,10 +64,18 @@ export default function PlotlyChart(){
           return response.json();
         })
         .then(data => {
+          
           console.log('POST request successful for Data Visualization Data! PlotlyChart:', data);
           console.log(JSON.parse(data.fig))
-          setGraphData(JSON.parse(data.fig).data)
+          let graph_data = JSON.parse(data.fig).data
+          setGraphData(graph_data)
           let tmp_layout = JSON.parse(data.layout)
+          // console.log("data.fig.layout")
+          // console.log(graph_data) 
+          // Object.keys(JSON.parse(graph_data.layout)).forEach(((element) => {
+          //   console.log("data.fig.layout")
+          //   console.log(element) 
+          // }))
           tmp_layout.width = window.innerWidth / 12 * 12 - 20
           tmp_layout.height = window.innerHeight - 250
           setGraphLayout(tmp_layout)
