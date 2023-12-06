@@ -29,7 +29,7 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: `-${drawerWidth}px`,
+    marginLeft: `-${drawerWidth * 2}px`,
     ...(open && {
       transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.easeOut,
@@ -70,7 +70,8 @@ export default function PersistentDrawerLeft() {
   const theme = useTheme();
   const [context, setContext] = React.useContext(Context);
   const [open, setOpen] = React.useState(false);
-  const [graphWidth, setGraphWidth] = React.useState(window.innerWidth / 12 * 12 - 20);
+  const [openRight, setOpenRight] = React.useState(false);
+  const [graphWidth, setGraphWidth] = React.useState(0)//window.innerWidth / 12 * 12 - 20);
   function update_render() {
     // console.log("UDPATE RENDER_NOW")
     setContext({
@@ -80,21 +81,33 @@ export default function PersistentDrawerLeft() {
   }
   const handleDrawerOpen = () => {
     setGraphWidth(graphWidth - drawerWidth)
-    console.log(graphWidth)
+    // console.log(graphWidth)
     setOpen(true);
   };
 
   const handleDrawerClose = () => {
     setGraphWidth(graphWidth + drawerWidth)
-    console.log(graphWidth)
+    // console.log(graphWidth)
     setOpen(false);
+  };
+
+  const handleDrawerOpenRight = () => {
+    setGraphWidth(graphWidth + drawerWidth)
+    // console.log(graphWidth)
+    setOpenRight(true);
+  };
+
+  const handleDrawerCloseRight = () => {
+    setGraphWidth(graphWidth - drawerWidth)
+    // console.log(graphWidth)
+    setOpenRight(false);
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar>
+        <Toolbar style={{left : 0}}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -106,11 +119,22 @@ export default function PersistentDrawerLeft() {
           </IconButton>
           <Typography variant="h6" noWrap component="div">
             Discord Binding
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </Typography>
           <br />
-          <div style={{textAlign: 'center', alignItems: 'center', display: 'flex', justifyContent: 'center', position: 'relative' }}>
-            <Button variant="contained" style={{transform: 'translate(50%, 0%)'}} onClick={update_render}>Render Data Visualization</Button>
-          </div>
+            {
+              //style={{transform: 'translate(50%, 0%)'}}
+            }
+          <Button variant="contained"  onClick={update_render}>Render Data Visualization</Button>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpenRight}
+            edge="start"
+            sx={{ mr: 2, ...(openRight && { display: 'none' }) }}
+          >
+            <MenuIcon style={{position: "absolute", right : - window.innerWidth  + 600 - graphWidth}}/>
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -135,9 +159,33 @@ export default function PersistentDrawerLeft() {
 
         <Divider />
       </Drawer>
+
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
+        }}
+        variant="persistent"
+        anchor="right"
+        open={openRight}
+      >
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerCloseRight}>
+            {theme.direction === 'rtr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
+        </DrawerHeader>
+        <p>OTHER DATA</p>
+        <Divider />
+      </Drawer>
+
+
       <Main open={open}>
         <DrawerHeader />
-        <PlotlyChart graphWidth={graphWidth}/>
+        <PlotlyChart graphWidth={(window.innerWidth / 12 * 12 - 20) + graphWidth  }/>
       </Main>
     </Box>
   );
