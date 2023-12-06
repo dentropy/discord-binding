@@ -78,8 +78,8 @@ export default function PlotlyChart(props){
           //   console.log("data.fig.layout")
           //   console.log(element) 
           // }))
-          tmp_layout.width = props.graphWidth //window.innerWidth / 12 * 12 - 20
-          tmp_layout.height = window.innerHeight - 250
+          tmp_layout.width = props.graphWidth - 65//window.innerWidth / 12 * 12 - 20
+          tmp_layout.height = window.innerHeight - 295
           setGraphLayout(tmp_layout)
           setQueryDescription(context.select_data_visualization)
           setContext({

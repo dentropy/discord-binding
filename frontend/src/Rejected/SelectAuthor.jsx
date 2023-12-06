@@ -2,17 +2,14 @@ import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
-import { Context } from './Provider';
+import { Context } from '../Provider';
 
-export default function SelectChannel() {
+export default function SelectAuthor() {
   const [context, setContext] = React.useContext(Context);
-  const [autoCompleteOptions, setAutoComplateOptions] = React.useState([
-    { label : "Fetching Data", id : 0 }
-  ])
-  const [autoCompleteValue, setAutoComplateValue] = React.useState()
-  function set_channel(input, value) {
+
+  function set_author(input, value) {
     setContext({
-        type: 'SELECT_CHANNEL',
+        type: 'SELECT_AUTHOR',
         payload: value
     })
   }
@@ -20,7 +17,7 @@ export default function SelectChannel() {
     () => {
       if(context.select_guild.label != "Getting Data"){
         const form_data = new FormData();
-        form_data.append('query_name', 'guild_channels');
+        form_data.append('query_name', 'guild_authors');
         form_data.append('guild_id', context.select_guild.guild_id);
         const options = {
           method: 'POST',
@@ -34,18 +31,14 @@ export default function SelectChannel() {
           return response.json();
         })
         .then(data => {
-          console.log('POST request successful for Channel Data! Response data:', data);
+          console.log('POST request successful for Author Data! Response data:', data);
           if(data.length != 0){
-            console.log("Fetched new Channel Data")
+            console.log("Fetched new Author Data")
             console.log(data)
             setContext({
-              type: 'SET_AND_SELECT_CHANNELS',
+              type: 'SET_AND_SELECT_AUTHORS',
               payload: data
             })
-            // setContext({
-            //   type: 'SELECT_CHANNEL',
-            //   payload: data[0]
-            // })
           }
         })
         .catch(error => {
@@ -56,15 +49,17 @@ export default function SelectChannel() {
     [context.select_guild]
   )
   return (
-    <Autocomplete
-      disablePortal
-      id="select_channel_autocomplete"
-      onChange={set_channel}
-      options={context.channels.options}
-      value={context.channels.value}
-      sx={{ width: 300 }}
-      renderInput={(params) => <TextField {...params} label="Channel" />}
-    />
+    <>
+        <Autocomplete
+            disablePortal
+            onChange={set_author}
+            id="select_author_autocomplete"
+            options={context.authors.options}
+            value={context.authors.value}
+            sx={{ width: 300 }}
+            renderInput={(params) => <TextField {...params} label="Author" />}
+        />
+    </>
   );
 }
 

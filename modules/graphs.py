@@ -10,82 +10,107 @@ from modules.queries import queries
 
 graph_names = {
     "user_longest_avg_msg_length" : {
+        "tags" : ["Message Length", "Author"],
         "query_name" : "user_longest_avg_msg_length"
     },
     "guild_author_most_messages" : {
+        "tags" : ["Most Messages", "Author"],
         "query_name" : "guild_author_most_messages"
     },
     "guild_author_most_days_with_messages" : {
+        "tags" : ["Time Query", "Author"],
         "query_name" : "guild_author_most_days_with_messages"
     },
     "guild_author_most_reactions" : {
+        "tags" : ["Author", "Reactions"],
         "query_name" : "guild_author_most_reactions"
     },
     "guild_author_distinct_reaction_count" : {
+        "tags" : ["Message Length", "Author", "Reactions"],
         "query_name" : "guild_author_distinct_reaction_count"
     },
     "guild_author_most_messages_single_day" : {
+        "tags" : ["Message Length", "Author"],
         "query_name" : "guild_author_most_messages_single_day"
     },
     "guild_author_most_attachments" : {
-        "query_name" : "guild_author_most_attachments"
+        "tags" : ["Attachments"],
+        "query_name" : "guild_author_most_attachments",
     },
     "guild_author_edit_percentage" : {
+        "tags" : ["Author"],
         "query_name" : "guild_author_edit_percentage"
     },
     "count_messages_per_channel_for_user_in_guild" : {
+        "tags" : ["Channels"],
         "query_name" : "count_messages_per_channel_for_user_in_guild"
     },
     "guild_author_most_reacted_messages" : {
+        "tags" : ["Reactions"],
         "query_name" : "guild_author_most_reacted_messages"
     },
     "guild_author_messages_by_hour_of_day" : {
+        "tags" : ["Time Query", "Select Author"],
         "query_name" : "guild_author_messages_by_hour_of_day"
     },
     "guild_author_messages_day_of_week" : {
+        "tags" : ["Time Query", "Select Author"],
         "query_name" : "guild_author_messages_day_of_week"
     },
     "guild_activity_per_month" : {
+        "tags" : ["Time Query"],
         "query_name" : "guild_activity_per_month"
     },
     "guild_message_per_channel" : {
+        "tags" : ["Channels"],
         "query_name" : "guild_message_per_channel"
     },
     
     "guild_author_message_min_100" : {
+        "tags" : ["Author"],
         "query_name" : "guild_author_message_min_100"
     },
     "guild_channel_message_length" : {
+        "tags" : ["Message Length", "Channels"],
         "query_name" : "guild_channel_message_length"
     },
     "guild_attachment_file_type_count" : {
+        "tags" : ["Attachments"],
         "query_name" : "guild_attachment_file_type_count"
     },
     "guild_channel_message_length" : {
+        "tags" : ["Message Length", "Channels"],
         "query_name" : "guild_channel_message_length"
     },
     "guild_messages_month" : {
+        "tags" : ["Time Query"],
         "query_name" : "guild_messages_month"
     },
     "guild_activity_per_day_of_week" : {
+        "tags" : ["Time Query"],
         "query_name" : "guild_activity_per_day_of_week"
     },
     # "guild_activity_per_day_of_week" : {
     #     "query_name" : "guild_activity_per_day_of_week"
     # },
     "guild_domain_count" : {
+        "tags" : ["Domain URLs"],
         "query_name" : "guild_domain_count"
     },
     "guild_channel_author_count" : {
+        "tags" : ["Channels"],
         "query_name" : "guild_channel_author_count"
     },
     "guild_author_mention_count" : {
+        "tags" : ["Mentions"],
         "query_name" : "guild_author_mention_count"
     },
     "guild_author_most_question_messages" : {
+        "tags" : ["Questions"],
         "query_name" : "guild_author_most_question_messages"
     },
     "guild_activity_per_month_search_text" : {
+        "tags" : ["Time Query"],
         "query_name": "guild_activity_per_month_search_text"
     }
 }

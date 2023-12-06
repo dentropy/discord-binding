@@ -2,7 +2,7 @@ import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
-import { Context } from './Provider';
+import { Context } from '../Provider';
 
 export default function SelectGuild() {
   const [context, setContext] = React.useContext(Context);

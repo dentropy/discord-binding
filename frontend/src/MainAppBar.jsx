@@ -12,12 +12,13 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import Button from '@mui/material/Button';
+import Grid from '@mui/material/Unstable_Grid2';
 
 import SelectDiscordData from './SelectDiscordData'
 import PlotlyChart from './PlotlyChart';
 
 import { Context } from './Provider';
-
+import SelectDataVisualization from './SelectDataVisualization'
 
 const drawerWidth = 375;
 
@@ -178,14 +179,23 @@ export default function PersistentDrawerLeft() {
             {theme.direction === 'rtr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
-        <p>OTHER DATA</p>
+        <SelectDataVisualization />
         <Divider />
       </Drawer>
 
 
       <Main open={open}>
         <DrawerHeader />
-        <PlotlyChart graphWidth={(window.innerWidth / 12 * 12 - 20) + graphWidth  }/>
+        <Box sx={{ flexGrow: 1, p: 2 }} >
+        <Grid container spacing={2} >
+          {/* <Grid xs={3}>
+            <SelectDataVisualization />
+          </Grid> */}
+          <Grid xs={12}>
+            <PlotlyChart graphWidth={(window.innerWidth / 12 * 12 - 20) + graphWidth  }/>
+          </Grid>
+        </Grid>
+      </Box>
       </Main>
     </Box>
   );

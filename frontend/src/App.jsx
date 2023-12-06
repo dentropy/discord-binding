@@ -16,15 +16,15 @@ import MainAppBar from './MainAppBar'
 
 
 import { Context } from './Provider';
-import PlotlyChart from './PlotlyChart';
+// import PlotlyChart from './PlotlyChart';
 
 
-import SelectGuild from './SelectGuild'
-import SelectChannel from './SelectChannel';
-import SelectAuthor from './SelectAuthor';
-import SelectDataVisualization from './SelectDataVisualization';
-import SelectRender from './SelectRender'
-import SelectDiscordData from './SelectDiscordData';
+// import SelectGuild from './SelectGuild'
+// import SelectChannel from './SelectChannel';
+// import SelectAuthor from './SelectAuthor';
+// import SelectDataVisualization from './SelectDataVisualization';
+// import SelectRender from './SelectRender'
+// import SelectDiscordData from './SelectDiscordData';
 function App() {
   // const [count, setCount] = React.useState(0)
   const [ data, setData ] = React.useState("Fetching Data")
