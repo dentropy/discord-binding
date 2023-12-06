@@ -76,6 +76,7 @@ result = query_resolver(cursor, queries, query_name, {
 })
 # print(query_name)
 # pprint(result)
+# print(result.shape[1])
 assert result.shape[1] == 5
 
 
@@ -123,7 +124,7 @@ result = query_resolver(cursor, queries, query_name, {
 # pprint(result)
 author_id = result.iloc[0]["author_guild_id"]
 print(f"author_id = {author_id}")
-assert result.shape[1] == 6
+assert result.shape[1] == 7
 
 
 query_name = "guild_author_most_attachments"
@@ -396,5 +397,99 @@ result = query_resolver(cursor, queries, query_name, {
 assert result.shape[1] == 5
 
 
+query_name = "guild_channel_most_messages"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"  : guild_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+channel_id = result.iloc[0]["channel_id"]
+assert result.shape[1] == 5
+
+
+query_name = "guild_channel_messages_per_month"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"   : guild_id,
+    "author_id"  : author_id,
+    "channel_id" : channel_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 4
+
+
+query_name = "guild_channel_author_message_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"   : guild_id,
+    "author_id"  : author_id,
+    "channel_id" : channel_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 6
+
+
+query_name = "guild_attachment_channel_file_type_count"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"   : guild_id,
+    "author_id"  : author_id,
+    "channel_id" : channel_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 6
+
+
+query_name = "guild_new_author_per_month"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"   : guild_id,
+    "author_id"  : author_id,
+    "channel_id" : channel_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 4
+
+
+query_name = "guild_author_messages_per_month"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"   : guild_id,
+    "author_id"  : author_id,
+    "channel_id" : channel_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 4
+
+
+query_name = "guild_author_messages_per_week"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"   : guild_id,
+    "author_id"  : author_id,
+    "channel_id" : channel_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 4
+
+
+
+query_name = "guild_author_messages_per_day"
+result = query_resolver(cursor, queries, query_name, {
+    "guild_id"   : guild_id,
+    "author_id"  : author_id,
+    "channel_id" : channel_id
+})
+# print(query_name)
+# pprint(result)
+# print(result.shape[1])
+assert result.shape[1] == 4
 
 print("TEST SUCCESS")

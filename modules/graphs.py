@@ -10,82 +10,107 @@ from modules.queries import queries
 
 graph_names = {
     "user_longest_avg_msg_length" : {
+        "tags" : ["Message Length", "Author"],
         "query_name" : "user_longest_avg_msg_length"
     },
     "guild_author_most_messages" : {
+        "tags" : ["Most Messages", "Author"],
         "query_name" : "guild_author_most_messages"
     },
     "guild_author_most_days_with_messages" : {
+        "tags" : ["Time Query", "Author"],
         "query_name" : "guild_author_most_days_with_messages"
     },
     "guild_author_most_reactions" : {
+        "tags" : ["Author", "Reactions"],
         "query_name" : "guild_author_most_reactions"
     },
     "guild_author_distinct_reaction_count" : {
+        "tags" : ["Message Length", "Author", "Reactions"],
         "query_name" : "guild_author_distinct_reaction_count"
     },
     "guild_author_most_messages_single_day" : {
+        "tags" : ["Message Length", "Author"],
         "query_name" : "guild_author_most_messages_single_day"
     },
     "guild_author_most_attachments" : {
-        "query_name" : "guild_author_most_attachments"
+        "tags" : ["Attachments"],
+        "query_name" : "guild_author_most_attachments",
     },
     "guild_author_edit_percentage" : {
+        "tags" : ["Author"],
         "query_name" : "guild_author_edit_percentage"
     },
     "count_messages_per_channel_for_user_in_guild" : {
+        "tags" : ["Channels"],
         "query_name" : "count_messages_per_channel_for_user_in_guild"
     },
     "guild_author_most_reacted_messages" : {
+        "tags" : ["Reactions"],
         "query_name" : "guild_author_most_reacted_messages"
     },
     "guild_author_messages_by_hour_of_day" : {
+        "tags" : ["Time Query", "Select Author"],
         "query_name" : "guild_author_messages_by_hour_of_day"
     },
     "guild_author_messages_day_of_week" : {
+        "tags" : ["Time Query", "Select Author"],
         "query_name" : "guild_author_messages_day_of_week"
     },
     "guild_activity_per_month" : {
+        "tags" : ["Time Query"],
         "query_name" : "guild_activity_per_month"
     },
     "guild_message_per_channel" : {
+        "tags" : ["Channels"],
         "query_name" : "guild_message_per_channel"
     },
     
     "guild_author_message_min_100" : {
+        "tags" : ["Author"],
         "query_name" : "guild_author_message_min_100"
     },
     "guild_channel_message_length" : {
+        "tags" : ["Message Length", "Channels"],
         "query_name" : "guild_channel_message_length"
     },
     "guild_attachment_file_type_count" : {
+        "tags" : ["Attachments"],
         "query_name" : "guild_attachment_file_type_count"
     },
     "guild_channel_message_length" : {
+        "tags" : ["Message Length", "Channels"],
         "query_name" : "guild_channel_message_length"
     },
     "guild_messages_month" : {
+        "tags" : ["Time Query"],
         "query_name" : "guild_messages_month"
     },
     "guild_activity_per_day_of_week" : {
+        "tags" : ["Time Query"],
         "query_name" : "guild_activity_per_day_of_week"
     },
     # "guild_activity_per_day_of_week" : {
     #     "query_name" : "guild_activity_per_day_of_week"
     # },
     "guild_domain_count" : {
+        "tags" : ["Domain URLs"],
         "query_name" : "guild_domain_count"
     },
     "guild_channel_author_count" : {
+        "tags" : ["Channels"],
         "query_name" : "guild_channel_author_count"
     },
     "guild_author_mention_count" : {
+        "tags" : ["Mentions"],
         "query_name" : "guild_author_mention_count"
     },
     "guild_author_most_question_messages" : {
+        "tags" : ["Questions"],
         "query_name" : "guild_author_most_question_messages"
     },
     "guild_activity_per_month_search_text" : {
+        "tags" : ["Time Query"],
         "query_name": "guild_activity_per_month_search_text"
     }
 }
@@ -105,6 +130,10 @@ def list_graphs(queries):
 def build_graph(pg_cursor, graph_name, query_args_dict):
     if graph_name not in graph_names.keys():
         return f"Error: {graph_name} is not in graph_names \n {graph_names}"
+    selected_query = { "name" : "placeholder"}
+    for query in queries:
+        if graph_name == query["name"]:
+            selected_query = query
     if graph_name == "user_longest_avg_msg_length":
         result_df = query_resolver(pg_cursor, queries, graph_name, query_args_dict)
         # print("\n\nquery_args_dict\n\n")
@@ -116,9 +145,8 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
         if type(result_df) == type(""):
             return result_df
         return {
-            "name" : "user_longest_avg_msg_length",
-            "desciption": "What discord user has the longest average message length in a particular guild?",
-            "uuid": "2f4fd09e-24a3-4359-81b2-049742a03610",
+            "name" : graph_name,
+            "desciption": selected_query["desciption"],
             "fig" : go.Figure(
                 data=[
                     go.Bar(
@@ -149,7 +177,9 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 title='Longest Average Message Length',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
-                height=800   # Height in pixels
+                height=800,   # Height in pixels
+                yaxis=  {'title': 'Average Content Length'},
+                yaxis2= {'title': 'Content Count', 'overlaying': 'y', 'side': 'right'}
             )
         }
     if graph_name == "guild_author_most_messages":
@@ -466,7 +496,9 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 title='Message Editted Percentage verses Total Message Count',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
-                height=800   # Height in pixels
+                height=800,   # Height in pixels
+                yaxis=  {'title': 'Message Editted Percentage'},
+                yaxis2= {'title': 'Total Message Count', 'overlaying': 'y', 'side': 'right'}
             )
         }
     if graph_name == "guild_author_most_reacted_messages":
@@ -874,7 +906,9 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 title=f'Average Message Length per Channel and Message Count Per Channel in {result_df.iloc[0]["guild_name"]}',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
-                height=800   # Height in pixels
+                height=800,  # Height in pixels
+                yaxis=  {'title': 'Average Message Length'},
+                yaxis2= {'title': 'Total Message Count', 'overlaying': 'y', 'side': 'right'}
             )
         }
     if graph_name == "guild_attachment_file_type_count":
@@ -1199,7 +1233,9 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
                 title='Messages length and count for Question Messages',
                 autosize=False,
                 width=1024 * 2,  # Width in pixels
-                height=800   # Height in pixels
+                height=800,   # Height in pixels
+                yaxis=  {'title': 'Average Content Length'},
+                yaxis2= {'title': 'Content Count', 'overlaying': 'y', 'side': 'right'}
             )
         }
     if graph_name == "guild_activity_per_month_search_text":

@@ -4,8 +4,10 @@ import Plot from 'react-plotly.js';
 import { Context } from './Provider';
 
 
-export default function PlotlyChart(){
+export default function PlotlyChart(props){
   const [context, setContext] = React.useContext(Context);
+  console.log("PlotlyChart props")
+  console.log(props)
   const [queryDescription, setQueryDescription] = React.useState({
     label : "Getting Data",
     query_data : {
@@ -64,12 +66,20 @@ export default function PlotlyChart(){
           return response.json();
         })
         .then(data => {
+          
           console.log('POST request successful for Data Visualization Data! PlotlyChart:', data);
           console.log(JSON.parse(data.fig))
-          setGraphData(JSON.parse(data.fig).data)
+          let graph_data = JSON.parse(data.fig).data
+          setGraphData(graph_data)
           let tmp_layout = JSON.parse(data.layout)
-          tmp_layout.width = window.innerWidth / 12 * 12 - 20
-          tmp_layout.height = window.innerHeight - 250
+          // console.log("data.fig.layout")
+          // console.log(graph_data) 
+          // Object.keys(JSON.parse(graph_data.layout)).forEach(((element) => {
+          //   console.log("data.fig.layout")
+          //   console.log(element) 
+          // }))
+          tmp_layout.width = props.graphWidth - 65//window.innerWidth / 12 * 12 - 20
+          tmp_layout.height = window.innerHeight - 295
           setGraphLayout(tmp_layout)
           setQueryDescription(context.select_data_visualization)
           setContext({

@@ -6,18 +6,19 @@ import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Unstable_Grid2';
 
+import SelectDiscordData from './SelectDiscordData'
+import PlotlyChart from './PlotlyChart';
 
-import SelectGuild from './SelectGuild'
-import SelectChannel from './SelectChannel';
-import SelectAuthor from './SelectAuthor';
-import SelectDataVisualization from './SelectDataVisualization';
-import SelectRender from './SelectRender'
-import SelectDiscordData from './SelectDiscordData';
+import { Context } from './Provider';
+import SelectDataVisualization from './SelectDataVisualization'
 
 const drawerWidth = 375;
 
@@ -29,13 +30,13 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: `-${drawerWidth}px`,
+    marginLeft: `-${drawerWidth * 2}px`,
     ...(open && {
       transition: theme.transitions.create('margin', {
         easing: theme.transitions.easing.easeOut,
         duration: theme.transitions.duration.enteringScreen,
       }),
-      marginLeft: 0,
+      marginLeft: `-${drawerWidth}px`
     }),
   }),
 );
@@ -66,23 +67,48 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-export default function MainAppBar() {
+export default function PersistentDrawerLeft() {
   const theme = useTheme();
+  const [context, setContext] = React.useContext(Context);
   const [open, setOpen] = React.useState(false);
-
+  const [openRight, setOpenRight] = React.useState(false);
+  const [graphWidth, setGraphWidth] = React.useState(0)//window.innerWidth / 12 * 12 - 20);
+  function update_render() {
+    // console.log("UDPATE RENDER_NOW")
+    setContext({
+        type: 'RENDER_NOW',
+        payload: true
+    })
+  }
   const handleDrawerOpen = () => {
+    setGraphWidth(graphWidth - drawerWidth)
+    // console.log(graphWidth)
     setOpen(true);
   };
 
   const handleDrawerClose = () => {
+    setGraphWidth(graphWidth + drawerWidth)
+    // console.log(graphWidth)
     setOpen(false);
+  };
+
+  const handleDrawerOpenRight = () => {
+    setGraphWidth(graphWidth + drawerWidth)
+    // console.log(graphWidth)
+    setOpenRight(true);
+  };
+
+  const handleDrawerCloseRight = () => {
+    setGraphWidth(graphWidth - drawerWidth)
+    // console.log(graphWidth)
+    setOpenRight(false);
   };
 
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
-        <Toolbar>
+        <Toolbar style={{left : 0}}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -93,8 +119,23 @@ export default function MainAppBar() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Query Select Drawer
+            Discord Binding
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           </Typography>
+          <br />
+            {
+              //style={{transform: 'translate(50%, 0%)'}}
+            }
+          <Button variant="contained"  onClick={update_render}>Render Data Visualization</Button>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpenRight}
+            edge="start"
+            sx={{ mr: 2, ...(openRight && { display: 'none' }) }}
+          >
+            <MenuIcon style={{position: "absolute", right : - window.innerWidth  + 600 - graphWidth}}/>
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -115,15 +156,46 @@ export default function MainAppBar() {
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
-          <SelectDiscordData />
-          {/* <SelectGuild />
-          <SelectChannel />
-          <SelectAuthor />
-          <SelectDataVisualization />
-          <SelectRender /> */}
+        < SelectDiscordData />
+
+        <Divider />
       </Drawer>
+
+      <Drawer
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+          },
+        }}
+        variant="persistent"
+        anchor="right"
+        open={openRight}
+      >
+        <DrawerHeader>
+          <IconButton onClick={handleDrawerCloseRight}>
+            {theme.direction === 'rtr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </IconButton>
+        </DrawerHeader>
+        <SelectDataVisualization />
+        <Divider />
+      </Drawer>
+
+
       <Main open={open}>
         <DrawerHeader />
+        <Box sx={{ flexGrow: 1, p: 2 }} >
+        <Grid container spacing={2} >
+          {/* <Grid xs={3}>
+            <SelectDataVisualization />
+          </Grid> */}
+          <Grid xs={12}>
+            <PlotlyChart graphWidth={(window.innerWidth / 12 * 12 - 20) + graphWidth  }/>
+          </Grid>
+        </Grid>
+      </Box>
       </Main>
     </Box>
   );
