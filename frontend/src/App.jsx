@@ -29,7 +29,6 @@ function App() {
   // const [count, setCount] = React.useState(0)
   const [ data, setData ] = React.useState("Fetching Data")
   const [context, setContext] = React.useContext(Context);
-
   return (
     <>
       <MainAppBar />
@@ -39,7 +38,7 @@ function App() {
             <SelectDiscordData />
           </Grid> */}
           <Grid xs={12}>
-            <PlotlyChart />
+            {/* <PlotlyChart /> */}
           </Grid>
         </Grid>
       </Box>

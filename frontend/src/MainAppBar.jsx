@@ -6,18 +6,18 @@ import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import Button from '@mui/material/Button';
 
+import SelectDiscordData from './SelectDiscordData'
+import PlotlyChart from './PlotlyChart';
 
-import SelectGuild from './SelectGuild'
-import SelectChannel from './SelectChannel';
-import SelectAuthor from './SelectAuthor';
-import SelectDataVisualization from './SelectDataVisualization';
-import SelectRender from './SelectRender'
-import SelectDiscordData from './SelectDiscordData';
+import { Context } from './Provider';
+
 
 const drawerWidth = 375;
 
@@ -66,15 +66,27 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   justifyContent: 'flex-end',
 }));
 
-export default function MainAppBar() {
+export default function PersistentDrawerLeft() {
   const theme = useTheme();
+  const [context, setContext] = React.useContext(Context);
   const [open, setOpen] = React.useState(false);
-
+  const [graphWidth, setGraphWidth] = React.useState(window.innerWidth / 12 * 12 - 20);
+  function update_render() {
+    // console.log("UDPATE RENDER_NOW")
+    setContext({
+        type: 'RENDER_NOW',
+        payload: true
+    })
+  }
   const handleDrawerOpen = () => {
+    setGraphWidth(graphWidth - drawerWidth)
+    console.log(graphWidth)
     setOpen(true);
   };
 
   const handleDrawerClose = () => {
+    setGraphWidth(graphWidth + drawerWidth)
+    console.log(graphWidth)
     setOpen(false);
   };
 
@@ -93,8 +105,12 @@ export default function MainAppBar() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            Query Select Drawer
+            Discord Binding
           </Typography>
+          <br />
+          <div style={{textAlign: 'center', alignItems: 'center', display: 'flex', justifyContent: 'center', position: 'relative' }}>
+            <Button variant="contained" style={{transform: 'translate(50%, 0%)'}} onClick={update_render}>Render Data Visualization</Button>
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -115,15 +131,13 @@ export default function MainAppBar() {
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </DrawerHeader>
-          <SelectDiscordData />
-          {/* <SelectGuild />
-          <SelectChannel />
-          <SelectAuthor />
-          <SelectDataVisualization />
-          <SelectRender /> */}
+        < SelectDiscordData />
+
+        <Divider />
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
+        <PlotlyChart graphWidth={graphWidth}/>
       </Main>
     </Box>
   );
