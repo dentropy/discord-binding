@@ -72,6 +72,37 @@ class ETLFunctions():
       sys.exit()
 
 
+  def dump_list_s3_objects(self):
+    logging.info("Getting list of S3 JSON objects")
+    logging.debug("Checking for existing list of JSON object paths")
+    try:
+      self.s3_client = boto3.client('s3', 
+        aws_access_key_id=os.environ.get("aws_access_key_id"), 
+        aws_secret_access_key=os.environ.get("aws_secret_access_key"),
+        endpoint_url=os.environ.get("endpoint_url")
+      )
+      json_object_paths = []
+      paginator = self.s3_client.get_paginator('list_objects')
+      operation_parameters = {'Bucket': os.environ.get("bucket_name") }
+      page_iterator = paginator.paginate(**operation_parameters)
+      for page in page_iterator:
+          for obj in page["Contents"]:
+              json_object_paths.append(obj["Key"])
+              # if obj["Key"][-5:] == ".json" and "json_Files/" not in obj["Key"]:
+              #   json_object_paths.append(obj["Key"])
+              print(obj["Key"])
+      logging.debug(f"Length of JSON files = {len(json_object_paths)}")
+    except Exception as e:
+      logging.error("An error occurred:")
+      logging.exception(e)
+      logging.critical("Unable to get list of JSON objects, Exiting")
+      sys.exit()
+    if os.environ.get("save_new_object_path_list") == "True":
+      with open(os.environ.get("object_path_list"), "w") as json_file:
+        json.dump(json_object_paths, json_file, indent=4)
+    logging.info("Successfully got list of S3 JSON objects")
+    return json_object_paths
+
   def get_list_s3_json_objects(self):
     logging.info("Getting list of S3 JSON objects")
     logging.debug("Checking for existing list of JSON object paths")
