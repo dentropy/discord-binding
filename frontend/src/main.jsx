@@ -11,7 +11,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 
-
+import Provider from './Provider';
 const router = createBrowserRouter([
   {
     path: "/",
@@ -23,7 +23,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/messages",
-    element: <Messages />,
+    element: <Provider><Messages /></Provider>,
   },
 ]);
 
