@@ -1,3 +1,9 @@
+
+
+function getValuesForKey(list, key) {
+  return list.map(item => item[key]);
+}
+
 export default function reducer(state, action) {
     switch (action.type) {
       case 'SELECT_GUILD':
@@ -40,6 +46,23 @@ export default function reducer(state, action) {
         return { ...state, data_visualization_data: action.payload };
       case 'RENDER_NOW':
         return { ...state, render_now: action.payload };
+      case 'RENDER_NOW':
+        return { ...state, render_now: action.payload };
+      case 'ADD_MESSAGE_ID':
+        console.log(action.payload)
+        if(!state.selected_messages.includes(action.payload.id)){
+          state.selected_messages.push(action.payload) 
+          return { ...state, selected_messages: state.selected_messages }
+        }
+        return { ...state };
+      case 'REMOVE_MESSAGE_ID':
+        for(var i = 0; i < state.selected_messages.length; i++){
+          if( state.selected_messages[i].id == action.payload.id)
+          {
+            state.selected_messages.splice(i, 1)
+          }
+        }
+        return { ...state,  selected_messages : state.selected_messages};
       default:
         throw new Error();
     }

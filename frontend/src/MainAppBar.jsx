@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
-import Box from '@mui/material/Box';
+// import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar from '@mui/material/AppBar';
@@ -105,7 +105,7 @@ export default function PersistentDrawerLeft() {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <div style={{ display: 'flex' }}>
       <CssBaseline />
       <AppBar position="fixed" open={open}>
         <Toolbar style={{left : 0}}>
@@ -186,7 +186,7 @@ export default function PersistentDrawerLeft() {
 
       <Main open={open}>
         <DrawerHeader />
-        <Box sx={{ flexGrow: 1, p: 2 }} >
+        <div sx={{ flexGrow: 1, p: 2 }} >
         <Grid container spacing={2} >
           {/* <Grid xs={3}>
             <SelectDataVisualization />
@@ -195,8 +195,8 @@ export default function PersistentDrawerLeft() {
             <PlotlyChart graphWidth={(window.innerWidth / 12 * 12 - 20) + graphWidth  }/>
           </Grid>
         </Grid>
-      </Box>
+      </div>
       </Main>
-    </Box>
+    </div>
   );
 }

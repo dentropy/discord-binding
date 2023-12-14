@@ -47,7 +47,8 @@ const initialState = {
   data_visualization_data : {
     label : "Getting Data"
   },
-  render_now : false
+  render_now : false,
+  selected_messages : []
 };
 
 export default function Provider(props) {

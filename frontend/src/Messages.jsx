@@ -7,12 +7,10 @@ function Messages() {
 
     return (
       <>
-        <h1>Messages</h1>
         <DisplayMessages />
-        {/* <SelectDiscordData /> */}
       </>
     )
   }
   
-  export default Messages
+export default Messages
   
