@@ -29,6 +29,18 @@ export default defineConfig({
         changeOrigin: true,
         secure : false,
         rewrite: (path) => path.replace(/^\/list_graphs/, '')
+      },
+      '/add_label': {
+        target: 'http://127.0.0.1:8000/add_label/',
+        changeOrigin: true,
+        secure : false,
+        rewrite: (path) => path.replace(/^\/add_label/, '')
+      },
+      '/list_labels': {
+        target: 'http://127.0.0.1:8000/list_labels/',
+        changeOrigin: true,
+        secure : false,
+        rewrite: (path) => path.replace(/^\/list_labels/, '')
       }
     }
   }

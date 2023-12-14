@@ -9,6 +9,12 @@ import { Button } from '@mui/material';
 function Messages() {
     const [context, setContext] = React.useContext(Context);
     const [messageData, setMessageData] = React.useState([]);
+    const [newLabelName, setNewLabelName] = React.useState('');
+    const [selectLabels, setSelectLabels] = React.useState([
+      { label: 'The Shawshank Redemption', year: 1994 },
+      { label: 'The Godfather', year: 1972 },
+      { label: 'The Godfather: Part II', year: 1974 }
+    ])
     const [messages, setMessages] = React.useState(<>
                 <Message
                     message_id="1234"
@@ -113,20 +119,87 @@ function Messages() {
         },
         [context.render_now]
       )
+
+
+      const refresh_lables = () => {
+        const form_data = new FormData();
+        form_data.append('query_name', "list_labels");
+        const options = {
+          method: 'POST',
+          body: form_data
+        };
+        fetch("/query/", options)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Labels Below")
+          console.log(data)
+          console.log(data[0])
+          setSelectLabels(data)
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        })
+      }
+      React.useEffect(
+        () => {
+          refresh_lables()
+        },
+        []
+      )
+
+
+      
+    const handleNewLabelName = (e) => {
+      setNewLabelName(e.target.value);
+    };
+    const handleAddLabel = () => {
+      newLabelName
+      const form_data = new FormData();
+      form_data.append('label_name', newLabelName);
+      form_data.append('label_description', "TODO");
+      const options = {
+        method: 'POST',
+        body: form_data
+      };
+      for (var value of form_data.values()) {
+            console.log(value);
+      }
+      fetch("/add_label/", options)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data)
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      })
+    };
     return (
       <>
         <Grid container spacing={2}>
             <Grid item xs={4}>
                 <h1>Messages</h1>
                 <SelectDiscordData />
+                <br /><br /><br /><br /><br />
+                <TextField onChange={handleNewLabelName} id="outlined-basic" label="Label Name" value={newLabelName} variant="outlined" />
                 <br />
-                <TextField id="outlined-basic" label="Outlined" variant="outlined" />
-                <Button>Add Tag</Button>
+                <Button   variant="outlined" onClick={handleAddLabel}>Add Tag</Button>
+                <h1>{newLabelName}</h1>
+                <br /><br /><br /><br /><br />
                 <Autocomplete
                     disablePortal
                     id="combo-box-demo"
-                    options={top100Films}
-                    sx={{ width: 300 }}
+                    options={selectLabels}
+                    sx={{ width: 300 }} 
                     renderInput={(params) => <TextField {...params} label="Movie" />}
                 />
                 <Button  variant="outlined">Add Tags to Messages</Button>< br/>

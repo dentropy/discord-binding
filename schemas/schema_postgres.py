@@ -147,6 +147,56 @@ CREATE TABLE IF NOT EXISTS mentions_t (
   author_guild_id   VARCHAR,
   channel_id        VARCHAR
 )
+""",
+
+"""
+CREATE TABLE IF NOT EXISTS labels_t (
+  id                SERIAL PRIMARY KEY,  --VARCHAR PRIMARY KEY,
+  label_name        VARCHAR,
+  label_description TEXT,
+  label_color       VARCHAR
+);
+""",
+
+"""
+CREATE TABLE IF NOT EXISTS labeled_data_t (
+  id                SERIAL PRIMARY KEY,  --VARCHAR PRIMARY KEY,
+  guild_id          VARCHAR,
+  channel_id        VARCHAR,
+  author_guild_id   VARCHAR,
+  author_id         VARCHAR,
+  message_id        VARCHAR,
+  label_name        VARCHAR,
+  label_type        VARCHAR,
+  label_rating      INTEGER,
+  label_description TEXT
+);
+""",
+
+"""
+CREATE TABLE IF NOT EXISTS discord_label_collections_t (
+  id                       VARCHAR PRIMARY KEY,
+  discord_label_id         VARCHAR,
+  collection_name          VARCHAR,
+  collection_description   TEXT
+);
+""",
+
+"""
+CREATE EXTENSION if not exists vector;
+""",
+
+"""
+CREATE TABLE IF NOT EXISTS messages_vectors_bert_t (
+  id                SERIAL PRIMARY KEY,--VARCHAR PRIMARY KEY,
+  guild_id          VARCHAR,
+  channel_id        VARCHAR,
+  author_guild_id   VARCHAR,
+  author_id         VARCHAR,
+  message_id        VARCHAR,
+  embedding_model   VARCHAR,
+  embedding         vector
+);
 """
 ]
 

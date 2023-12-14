@@ -1474,6 +1474,16 @@ queries = [
         order by month_timestamp asc;
     """
   },
+  {
+    "name" : "list_labels",
+    "desciption": "Get a list of all Labels you can use",
+    "uuid": "NONE",
+    "required_args": [],
+    "arg_order" : [],
+    "sql_query" : """
+      select id, label_name as label, label_name as key, label_description, label_color from labels_t;
+    """
+  },
   # {
   #   "name" : "Template",
   #   "desciption": "Template",

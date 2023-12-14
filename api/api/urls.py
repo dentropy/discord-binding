@@ -19,6 +19,7 @@ from django.urls import path
 from .views.json_test import json_test
 from .views.query import query, list_queries
 from .views.plotly_graph import plotly_graph, list_graph_data
+from .views.labels import list_labels, add_label
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +28,6 @@ urlpatterns = [
     path('list_queries/', list_queries),
     path('plotly_graph/', plotly_graph),
     path('list_graphs/', list_graph_data),
+    path('add_label/', add_label),
+    path('list_labels/', list_labels),
 ]
