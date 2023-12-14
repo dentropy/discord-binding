@@ -56,11 +56,12 @@ function Message({ text, sender, timestamp, message_id, tags, avatarUrl }) {
           {tags.length > 0 &&
             <Typography style={{display : "inline-block"}} variant="body2" color="textSecondary">
               Tags: {tags.map((item) => (
-                <li key={item.id}>{item.name}</li>
+                <li key={item.msg_id}>{item.name}</li>
               ))}
             </Typography>
           }
           </div>
+          
         </Grid>
       </Grid>
     </Paper>
