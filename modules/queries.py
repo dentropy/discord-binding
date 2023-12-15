@@ -182,7 +182,7 @@ queries = [
       join authors_t on msg_count_per_author_t.author_guild_id = authors_t.id
       join guilds_t  on authors_t.guild_id = guilds_t.id
       order by msg_count_per_author_t.msg_count desc
-      limit 100;
+      limit 20;
       """
   },
   {
@@ -320,7 +320,7 @@ queries = [
       join authors_t on msg_date_agg_t.author_guild_id = authors_t.id
       join guilds_t on authors_t.guild_id = guilds_t.id
       order by day_msg_count desc
-      limit 100;
+      limit 20;
     """
   },
   {
@@ -664,39 +664,39 @@ queries = [
       limit 100;
     """
   },
-  # {
-  #   "name" : "guild_author_most_messages",
-  #   "desciption": "What authors posted the most in a specific discord guild?",
-  #   "uuid": "7922cc2d-f1cc-435d-832d-5fa4d555b121",
-  #   "required_args": ["guild_id"],
-  #   "arg_order" : ["guild_id"],
-  #   "sql_query" : """
-  #     select 
-  #       guilds_t.guild_name,
-  #       authors_t.author_name,
-  #       author_msg_count.msg_count,
-  #       author_msg_count.guild_id,
-  #       authors_t.author_id as author_id,
-  #       author_msg_count.author_guild_id
-  #     from 
-  #     (
-  #       select 
-  #         guild_id,
-  #         author_guild_id,
-  #         count(content) as msg_count
-  #       from
-  #         messages_t
-  #       where 
-  #         guild_id = '{}'
-  #       group by
-  #         guild_id,
-  #         author_guild_id
-  #     ) as author_msg_count
-  #     join guilds_t on author_msg_count.guild_id = guilds_t.id
-  #     join authors_t on author_msg_count.author_guild_id = authors_t.id
-  #     order by msg_count desc;
-  #   """
-  # },
+  {
+    "name" : "guild_author_most_messages",
+    "desciption": "What authors posted the most in a specific discord guild?",
+    "uuid": "7922cc2d-f1cc-435d-832d-5fa4d555b121",
+    "required_args": ["guild_id"],
+    "arg_order" : ["guild_id"],
+    "sql_query" : """
+      select 
+        guilds_t.guild_name,
+        authors_t.author_name,
+        author_msg_count.msg_count,
+        author_msg_count.guild_id,
+        authors_t.author_id as author_id,z
+        author_msg_count.author_guild_id
+      from 
+      (
+        select 
+          guild_id,
+          author_guild_id,
+          count(content) as msg_count
+        from
+          messages_t
+        where 
+          guild_id = '{}'
+        group by
+          guild_id,
+          author_guild_id
+      ) as author_msg_count
+      join guilds_t on author_msg_count.guild_id = guilds_t.id
+      join authors_t on author_msg_count.author_guild_id = authors_t.id
+      order by msg_count desc;
+    """
+  },
   {
     "name" : "guild_activity_per_month",
     "desciption": "How much activity for a specific discord guild per month?",
@@ -1217,30 +1217,30 @@ queries = [
         limit 7
     """
   },
-  {
-    "name" : "guild_activity_per_month_search_text",
-    "desciption": "How many messages per month with matching test in specific discord guild?",
-    "uuid": "efcd6f7d-b36e-4032-b89b-0fe9fd5a0da9",
-    "required_args": ["guild_id", "search_string"],
-    "arg_order" : ["guild_id", "search_string"],
-    "sql_query" : """
-      select distinct guilds_t.id , guilds_t.guild_name, month_timestamp, msg_count from (
-        select
-          distinct DATE_TRUNC('month', msg_timestamp)
-                    AS  month_timestamp,
-            COUNT(guild_id) AS msg_count,
-            guild_id 
-        FROM messages_t
-        WHERE
-            guild_id = '{}'
-            and msg_content ILIKE '%{}%'
-        GROUP BY guild_id, month_timestamp
-      ) as month_messages_t
-      join guilds_t on month_messages_t.guild_id = guilds_t.id
-      order by guilds_t.id, month_timestamp
-      limit 100;
-    """
-  },
+  # {
+  #   "name" : "guild_activity_per_month_search_text",
+  #   "desciption": "How many messages per month with matching test in specific discord guild?",
+  #   "uuid": "efcd6f7d-b36e-4032-b89b-0fe9fd5a0da9",
+  #   "required_args": ["guild_id", "search_string"],
+  #   "arg_order" : ["guild_id", "search_string"],
+  #   "sql_query" : """
+  #     select distinct guilds_t.id , guilds_t.guild_name, month_timestamp, msg_count from (
+  #       select
+  #         distinct DATE_TRUNC('month', msg_timestamp)
+  #                   AS  month_timestamp,
+  #           COUNT(guild_id) AS msg_count,
+  #           guild_id 
+  #       FROM messages_t
+  #       WHERE
+  #           guild_id = '{}'
+  #           and msg_content ILIKE '%{}%'
+  #       GROUP BY guild_id, month_timestamp
+  #     ) as month_messages_t
+  #     join guilds_t on month_messages_t.guild_id = guilds_t.id
+  #     order by guilds_t.id, month_timestamp
+  #     limit 100;
+  #   """
+  # },
   {
     "name" : "guild_channel_messages_per_month",
     "desciption": "How to get the message count of each channel per month for a specific discord guild?",

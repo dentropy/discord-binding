@@ -108,11 +108,11 @@ graph_names = {
     "guild_author_most_question_messages" : {
         "tags" : ["Questions"],
         "query_name" : "guild_author_most_question_messages"
-    },
-    "guild_activity_per_month_search_text" : {
-        "tags" : ["Time Query"],
-        "query_name": "guild_activity_per_month_search_text"
-    }
+    } #,
+    # "guild_activity_per_month_search_text" : {
+    #     "tags" : ["Time Query"],
+    #     "query_name": "guild_activity_per_month_search_text"
+    # }
 }
 
 def list_graphs(queries):
@@ -193,6 +193,7 @@ def build_graph(pg_cursor, graph_name, query_args_dict):
         # print("\n\nquery_args_dict\n\n")
         # pprint(query_args_dict)
         # print(f"\nresult_df for graph_name\n\n")
+        # display(result_df)
         # pprint(result_df)
         # print("\nqueries\n")
         # pprint(queries)
