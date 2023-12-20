@@ -1217,30 +1217,62 @@ queries = [
         limit 7
     """
   },
-  # {
-  #   "name" : "guild_activity_per_month_search_text",
-  #   "desciption": "How many messages per month with matching test in specific discord guild?",
-  #   "uuid": "efcd6f7d-b36e-4032-b89b-0fe9fd5a0da9",
-  #   "required_args": ["guild_id", "search_string"],
-  #   "arg_order" : ["guild_id", "search_string"],
-  #   "sql_query" : """
-  #     select distinct guilds_t.id , guilds_t.guild_name, month_timestamp, msg_count from (
-  #       select
-  #         distinct DATE_TRUNC('month', msg_timestamp)
-  #                   AS  month_timestamp,
-  #           COUNT(guild_id) AS msg_count,
-  #           guild_id 
-  #       FROM messages_t
-  #       WHERE
-  #           guild_id = '{}'
-  #           and msg_content ILIKE '%{}%'
-  #       GROUP BY guild_id, month_timestamp
-  #     ) as month_messages_t
-  #     join guilds_t on month_messages_t.guild_id = guilds_t.id
-  #     order by guilds_t.id, month_timestamp
-  #     limit 100;
-  #   """
-  # },
+  {
+    "name" : "number_of_messages_matching_search_string",
+    "desciption": "How many messages per month with matching test in specific discord guild?",
+    "uuid": "efcd6f7d-b36e-4032-b89b-0fe9fd5a0da9",
+    "required_args": ["guild_id", "search_string"],
+    "arg_order" : ["search_string", "guild_id", "search_string"],
+    "sql_query" : """
+      select 
+          distinct guilds_t.id , 
+          guilds_t.guild_name, 
+          msg_count,
+          '{}' as search_string
+      from (
+        select
+            COUNT(guild_id) AS msg_count,
+            guild_id 
+        FROM messages_t
+        WHERE
+            guild_id = '{}'
+            and msg_content ILIKE '%{}%'
+        GROUP BY guild_id
+      ) as month_messages_t
+      join guilds_t on month_messages_t.guild_id = guilds_t.id
+      order by guilds_t.id
+      limit 100;
+    """
+  },
+  {
+    "name" : "guild_activity_per_month_search_text",
+    "desciption": "How many messages per month with matching test in specific discord guild?",
+    "uuid": "efcd6f7d-b36e-4032-b89b-0fe9fd5a0da9",
+    "required_args": ["guild_id", "search_string"],
+    "arg_order" : ["search_string", "guild_id", "search_string"],
+    "sql_query" : """
+      select 
+          distinct guilds_t.id , 
+          guilds_t.guild_name, 
+          month_timestamp, 
+          msg_count,
+          '{}' as search_string
+      from (
+        select
+            distinct DATE_TRUNC('month', msg_timestamp) AS  month_timestamp,
+            COUNT(guild_id) AS msg_count,
+            guild_id 
+        FROM messages_t
+        WHERE
+            guild_id = '{}'
+            and msg_content ILIKE '%{}%'
+        GROUP BY guild_id, month_timestamp
+      ) as month_messages_t
+      join guilds_t on month_messages_t.guild_id = guilds_t.id
+      order by guilds_t.id, month_timestamp
+      limit 100;
+    """
+  },
   {
     "name" : "guild_channel_messages_per_month",
     "desciption": "How to get the message count of each channel per month for a specific discord guild?",
