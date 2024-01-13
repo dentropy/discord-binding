@@ -33,7 +33,7 @@ sys.path.append(two_folders_up)
 # pprint(sys.path)
 
 
-from tests.postgresql_query_test import test_queries
+# from tests.postgresql_query_test import test_queries
 from modules.query_resolver import query_resolver
 from modules.query_resolver import check_query_select
 from modules.queries import queries
