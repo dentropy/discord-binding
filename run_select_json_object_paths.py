@@ -7,13 +7,20 @@ import sys
 from pathlib import Path
 import json
 
+if(len(sys.argv) == 3):
+  print("First  Arg = output of run_S3_generate_index.py")
+  print("Second Arg = List of paths you want to index")
+  print("Third  Arg = Ouptut json file path")
+  sys.exit()
 
 input_path=sys.argv[1]
 output_path=sys.argv[2]
+output_path=sys.argv[3]
 
 raw_paths = json.load(open(input_path))
 
-guild_ids = ["748031363935895552", "612953348487905282", "902663358346571826", "484546513507188745", "810803176243724291", "858103637023391746"]
+guild_ids = json.load(open(input_path))
+# guild_ids = ["748031363935895552", "612953348487905282", "902663358346571826", "484546513507188745", "810803176243724291", "858103637023391746"]
 
 json_object_paths = []
 for s3_path in raw_paths:

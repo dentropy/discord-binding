@@ -1,6 +1,8 @@
 .vite
 .DS_Store
 postgres_db_1
+Export*
+guild_names.json
 env/
 *csv
 .env
