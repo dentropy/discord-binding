@@ -57,7 +57,7 @@ class ExportDiscord():
 
 
     def test_connection(self):
-        if(self.db_select == "posgres"):
+        if(self.db_select == "postgres"):
             try:
                 # Execute a simple SQL query (e.g., select the current date)
                 self.cur.execute("SELECT version();")
