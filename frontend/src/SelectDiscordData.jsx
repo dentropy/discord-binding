@@ -182,7 +182,10 @@ export default function SelectDiscordData() {
 
   function set_guild(input, value){
     guildData.selected_value = value
+    console.log("set_guild guildData.selected_value")
+    console.log(guildData.selected_value)
     setGuildData(guildData)
+    fetch_channels(value.guild_id)
     setContext({
         type: 'SELECT_GUILD',
         payload: value
@@ -284,7 +287,7 @@ export default function SelectDiscordData() {
         {/* {JSON.stringify(dataVisualization)}
         <br></br>  */}
     </>
-  );d
+  );
 }
 
 const top100Films = [
