@@ -3,7 +3,7 @@ version: '3.1'
 services:
 
   db:
-    image: ankane/pgvector # postgres
+    image: supabase/postgres:17.4.1.043
     container_name: postgres2
     restart: always
     environment:
